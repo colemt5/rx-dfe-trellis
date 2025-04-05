@@ -18,7 +18,7 @@ import org.scalatest.freespec.AnyFreeSpec
   * sbt 'testOnly pdfd.PDFDSpec'
   * }}}
   */
-class PDFDSpec extends AnyFreeSpec with ChiselScalatestTester {
+class LaPDFDSpec extends AnyFreeSpec with ChiselScalatestTester {
 
   // todo add test cases here
 }
