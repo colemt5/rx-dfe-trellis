@@ -3,14 +3,17 @@ package pdfd
 import chisel3._
 import chisel3.util.log2Ceil
 
-/** Top module for the PDFD (Parallel Decision Feedback Decoder) project.
+/** ACSU module that compute the path metrics for each active path
   *
-  * todo add a description of the project.
+  * @param bitWidth the bit width of the input and output signals
   */
-class ACSU() // todo add parameters 
+class ACSU(bitWidth: Int)
     extends Module {
   val io = IO(new Bundle {
-    // todo add port declarations
+    val brMetric4D = Input(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
+    val pathMetrics = Input(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
+    val pathSelect = Output(Vec(2, UInt(2.W)))
+    val pathMetric = Output(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
   })
   
   // todo add module implementation

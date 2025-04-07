@@ -3,14 +3,18 @@ package pdfd
 import chisel3._
 import chisel3.util.log2Ceil
 
-/** Top module for the PDFD (Parallel Decision Feedback Decoder) project.
+/** 1D LaBMU module that computes the branch metrics for the 1D Lookahead
+  * Branch Metric Unit (LaBMU) for each of the 4 channel symbols.
   *
-  * todo add a description of the project.
+  * @param bitWidth the bit width of the input and output signals
   */
-class OneDimLaBMU() // todo add parameters 
+class OneDimLaBMU(bitWidth: Int) // todo add parameters 
     extends Module {
   val io = IO(new Bundle {
-    // todo add port declarations
+    val preFilteredSymbol = Input(SInt(bitWidth.W)) // todo need to verify if int or fixed point
+    val chanCoeff1 = Input(SInt(bitWidth.W)) // todo need to verify if int or fixed point
+    val symMetricsA = output(Vec(5, SInt(bitWidth.W))) // todo need to verify if int or fixed point
+    val symMetricsB = output(Vec(5, SInt(bitWidth.W))) // todo need to verify if int or fixed point
   })
   
   // todo add module implementation

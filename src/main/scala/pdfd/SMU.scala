@@ -3,14 +3,16 @@ package pdfd
 import chisel3._
 import chisel3.util.log2Ceil
 
-/** Top module for the PDFD (Parallel Decision Feedback Decoder) project.
+/** SMU module keeps track of the path metrics to reconstruct the most
+ * likely bit sequence.
   *
-  * todo add a description of the project.
   */
 class SMU() // todo add parameters 
     extends Module {
   val io = IO(new Bundle {
-    // todo add port declarations
+    val pathSelect = Input(Vec(2, UInt(2.W)))
+    val symSelects4d = Input(Vec(4, Vec(4, UInt(3.W))))
+    val symSelects = Input(Vec(4, UInt(3.W)))
   })
   
   // todo add module implementation
