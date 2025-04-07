@@ -10,10 +10,10 @@ import chisel3.util.log2Ceil
 class ACSU(bitWidth: Int)
     extends Module {
   val io = IO(new Bundle {
-    val brMetric4D = Input(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
+    val brMetrics4D = Input(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
     val pathMetrics = Input(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
     val pathSelect = Output(Vec(2, UInt(2.W)))
-    val pathMetric = Output(Vec(4, SInt(bitWidth.W))) // todo need to verify if int or fixed point
+    val pathMetric = Output(SInt(bitWidth.W))) // todo need to verify if int or fixed point
   })
   
   // todo add module implementation

@@ -12,7 +12,8 @@ class SMU() // todo add parameters
   val io = IO(new Bundle {
     val pathSelect = Input(Vec(2, UInt(2.W)))
     val symSelects4d = Input(Vec(4, Vec(4, UInt(3.W))))
-    val symSelects = Input(Vec(4, UInt(3.W)))
+    val byteOut = Output (Uint(8.W))
+    val symSelects = Output(Vec(4, UInt(3.W)))
   })
   
   // todo add module implementation
