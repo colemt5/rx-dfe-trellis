@@ -1,26 +1,27 @@
 package pdfd
 
 import chisel3._
-import chisel3.util.log2Ceil
+import chisel3.util._
 import pdfd.Utils._
 
 /** DFP module that computes the pre-filtered symbol for each channel
   *
   * @param bitWidth the bit width of the input and output signals
   */
-class DFP(bitWidth: Int) // todo add parameters 
+class DFP(bitWidth: Int, numTaps: Int = 14) // todo add parameters 
     extends Module {
   val io = IO(new Bundle {
     val inSymbol = Input(SInt(bitWidth.W)) // todo need to verify if int or fixed point
-    val chanCoeffs = Input(Vec(14, SInt(bitWidth.W))) // todo need to verify if int or fixed point
-    val preFilteredSymbol = output(SInt(bitWidth.W)) // todo need to verify if int or fixed point
+    val chanCoeffs = Input(Vec(numTaps, SInt(bitWidth.W))) // todo need to verify if int or fixed point
+    val preFilteredSymbol = Output(SInt(bitWidth.W)) // todo need to verify if int or fixed point
   })
-  
+
+  /* 
   // Slice input symbol
   val a = RegInit(0.S(bitWidth.W))
 
-  // Register chain of 12 stages
-  val y = RegInit(VecInit(Seq.fill(13)(0.S(bitWidth.W))))
+  // Register chain 
+  val y = RegInit(VecInit(Seq.fill(numTaps-1)(0.S(bitWidth.W))))
 
   // Compute each stage
   y(0) := -io.chanCoeffs(13) * a // f14
@@ -34,5 +35,6 @@ class DFP(bitWidth: Int) // todo add parameters
 
   // Set output symbol
   io.preFilteredSymbol := y(12)
+  */
 
 }

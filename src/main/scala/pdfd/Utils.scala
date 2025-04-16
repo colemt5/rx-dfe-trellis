@@ -1,6 +1,7 @@
 package pdfd
 
 import chisel3._
+import chisel3.util._
 
 object Utils {
   /** 
@@ -10,20 +11,9 @@ object Utils {
    * @return output SInt output symbol // todo need to verify if int or fixed point
    */
   def pam5Slice(input: SInt): SInt = {
-    val out = Wire(SInt(input.getWidth.W))
-    // todo need to understand what levels to slice at
-    when (input <= (-1.5).S) {
-      out := (-2).S
-    } .elsewhen (input <= (-0.5).S) {
-      out := (-1).S
-    } .elsewhen (input <= 0.5.S) {
-      out := 0.S
-    } .elsewhen (input <= 1.S) {
-      out := 1.S
-    } .otherwise {
-      out := 2.S
-    }
+    val out = input 
     out
+    // todo need to understand what levels to slice at
   }
   
   /**
@@ -36,12 +26,12 @@ object Utils {
   def logApproxSquare(input: UInt): UInt = {
     val width = input.getWidth
     val out = Wire(UInt((2 * width).W))
-    when (input === 0.U) {
-      out := 0.U
-    } .otherwise {
-      val approxExp = (Log2(input) << 1).asUInt  // multiply log2 by 2
-      out := (1.U << approxExp).asUInt
-    }
+    // when (input === 0.U) {
+    //   out := 0.U
+    // } .otherwise {
+    //   val approxExp = (log2Ceil(input) << 1).asUInt  // multiply log2 by 2
+    //   out := (1.U << approxExp).asUInt
+    // }
     out
   }
 
@@ -65,14 +55,14 @@ object Utils {
    * @param values Vector of UInt values
    * @return Index (as UInt) of the minimum value
    */
-  def minIndex(values: Seq[UInt]): UInt = {
-    require(values.nonEmpty, "Input sequence must not be empty")
+  def minIndex(values: Seq[SInt]): UInt = {
+    // require(values.nonEmpty, "Input sequence must not be empty")
 
-    val pairs = values.zipWithIndex.map { case (v, i) => (v, i.U(log2Ceil(values.length).W)) }
-    val (minVal, minIdx) = pairs.reduce { case ((v1, i1), (v2, i2)) =>
-      (Mux(v1 < v2, v1, v2), Mux(v1 < v2, i1, i2))
-    }
-
+    // val pairs = values.zipWithIndex.map { case (v, i) => (v, i.U(log2Ceil(values.length).W)) }
+    // val (minVal, minIdx) = pairs.reduce { case ((v1, i1), (v2, i2)) =>
+    //   (Mux(v1 < v2, v1, v2), Mux(v1 < v2, i1, i2))
+    // }
+    val minIdx = 0.U
     minIdx
   }
 }
