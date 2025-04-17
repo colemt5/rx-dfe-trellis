@@ -35,10 +35,11 @@ class LaPDFD(symBitWidth: Int = 18, chanBitWidth: Int, numTaps: Int = 14)
   val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(symBitWidth)))
 
   // one unit per state 
-  val muxu  = Seq.fill(8)(Module(new MUXU(symBitWidth)))
-  val bmu   = Seq.fill(8)(Module(new FourDimBMU(symBitWidth)))
-  val acsu  = Seq.fill(8)(Module(new ACSU(symBitWidth)))
-  val smu   = Seq.fill(8)(Module(new SMU()))
+  val muxu    = Seq.fill(8)(Module(new MUXU(symBitWidth)))
+  val bmuEven = Seq.fill(8)(Module(new FourDimBMU(symBitWidth, true)))
+  val bmuOdd  = Seq.fill(8)(Module(new FourDimBMU(symBitWidth, false)))
+  val acsu    = Seq.fill(8)(Module(new ACSU(symBitWidth)))
+  val smu     = Seq.fill(8)(Module(new SMU()))
   
   for (i <- 0 until 4) {
     // DFP <- IO
@@ -57,21 +58,30 @@ class LaPDFD(symBitWidth: Int = 18, chanBitWidth: Int, numTaps: Int = 14)
     muxu(i).io.symMetricsB := VecInit(Seq(laBmu(3).io.symMetricsB, laBmu(2).io.symMetricsB, laBmu(1).io.symMetricsB, laBmu(0).io.symMetricsB))
 
     // 4D-BMU <- MUXU (SMU survivor symbols)
-    bmu(i).io.symSelects := smu(i).io.symSelects
-    bmu(i).io.brMetricsA := muxu(i).io.brMetricsA
-    bmu(i).io.brMetricsB := muxu(i).io.brMetricsB
-
-   // ACSU <- 4D-BMU
     if (i % 2 == 0) {
+      bmuEven(i / 2).io.brMetricsA := muxu(i).io.brMetricsA
+      bmuEven(i / 2).io.brMetricsB := muxu(i).io.brMetricsB
+    } else {
+      bmuOdd(i / 2).io.brMetricsA := muxu(i).io.brMetricsA
+      bmuOdd(i / 2).io.brMetricsB := muxu(i).io.brMetricsB
+    }
+
+    // ACSU <- 4D-BMU
+    if (i % 2 == 0) {
+      acsu(i).io.brMetrics4D := bmuEven(i / 2).io.brMetrics4D
       acsu(i).io.pathMetrics := VecInit(Seq(acsu(6).io.pathMetric, acsu(4).io.pathMetric, acsu(2).io.pathMetric, acsu(0).io.pathMetric))
     } else {
+      acsu(i).io.brMetrics4D := bmuOdd(i / 2).io.brMetrics4D
       acsu(i).io.pathMetrics := VecInit(Seq(acsu(7).io.pathMetric, acsu(5).io.pathMetric, acsu(3).io.pathMetric, acsu(1).io.pathMetric))
     }
-    acsu(i).io.brMetrics4D := bmu(i).io.brMetrics4D
 
     // SMU <- ACSU (4D-BMU survivor symbols)
     smu(i).io.pathSelect := acsu(i).io.pathSelect
-    smu(i).io.symSelects4D := bmu(i).io.symSelects4D // todo need to check this need to change to symbol lists
+    if (i % 2 == 0) {
+      smu(i).io.stateSymSelects := VecInit(Seq(smu(i).io.symSelects(6), smu(i).io.symSelects(4), smu(i).io.symSelects(2), smu(i).io.symSelects(0)))
+    } else {
+      smu(i).io.stateSymSelects := VecInit(Seq(smu(i).io.symSelects(7), smu(i).io.symSelects(5), smu(i).io.symSelects(3), smu(i).io.symSelects(1)))
+    }
 
   }
   // SMU -> output
