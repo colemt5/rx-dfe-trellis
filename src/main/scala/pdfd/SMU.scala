@@ -11,13 +11,11 @@ import pdfd.Utils._
 class SMU() // todo add parameters 
     extends Module {
   val io = IO(new Bundle {
-    val pathSelect = Input(Vec(2, UInt(2.W)))
+    val pathSelect = Input(UInt(2.W))
     val stateSymSelects = Input(Vec(4, Vec(4, UInt(3.W))))
     val byteOut = Output(UInt(8.W))
     val symSelects = Output(Vec(4, UInt(3.W)))
   })
   
-  // todo add module implementation
-
-
+  
 }

@@ -13,7 +13,7 @@ class ACSU(symBitWidth: Int)
   val io = IO(new Bundle {
     val brMetrics4D = Input(Vec(4, SInt(symBitWidth.W))) // todo need to verify if int or fixed point
     val pathMetrics = Input(Vec(4, SInt(symBitWidth.W))) // todo need to verify if int or fixed point
-    val pathSelect = Output(Vec(2, UInt(2.W)))
+    val pathSelect = Output(UInt(2.W))
     val pathMetric = Output(SInt(symBitWidth.W)) // todo need to verify if int or fixed point
   })
   
