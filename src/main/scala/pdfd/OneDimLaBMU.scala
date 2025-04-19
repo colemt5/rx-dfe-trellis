@@ -9,9 +9,8 @@ import pdfd.Utils._
   *
   * @param symBitWidth the bit width of the input and output signals
   */
-class OneDimLaBMU(tapWidth: Int = 8, upSizeWidth: Int = 13, pam5: Seq[SInt], pam5Thresholds: Seq[SInt]) // todo add parameters 
+class OneDimLaBMU(tapWidth: Int = 8, sampleWidth: Int, upSizeWidth: Int, pam5: Seq[Int]) // todo add parameters 
     extends Module {
-  val sliceThresh = 51
   val io = IO(new Bundle {
     val rxFilter = Input(SInt(upSizeWidth.W))
     val tapOne  = Input(SInt(tapWidth.W))
@@ -20,20 +19,23 @@ class OneDimLaBMU(tapWidth: Int = 8, upSizeWidth: Int = 13, pam5: Seq[SInt], pam
     val symsA = Output(Vec(5, SInt(3.W)))
     val symsB = Output(Vec(5, SInt(3.W)))
   })
-
-  val pam5ThreshA = Seq(pam5Thresholds(1), pam5Thresholds(3))
-  val pam5ThreshB = Seq(pam5Thresholds(0), pam5Thresholds(2), pam5Thresholds(4))
-  val pam5A = VecInit(Seq(pam5(1), pam5(3)))
-  val pam5B = VecInit(Seq(pam5(0), pam5(2), pam5(4)))
   
-  val estSym = Wire(Vec(4, SInt(upSizeWidth.W)))
+  val pam5Vals = pam5.map(_.S(sampleWidth.W))
+  // the midpoint of {-1, 1} is 0
+  val pam5ThreshA = Seq(pam5Vals(2))
+  // the midpoints of {-2, 0, 2} is {-1, 1}
+  val pam5ThreshB = Seq(pam5Vals(1), pam5Vals(3))
+
+  val pam5A = Seq(pam5Vals(1), pam5Vals(3))
+  val pam5B = Seq(pam5Vals(0), pam5Vals(2), pam5Vals(4))
+  
+  val estSym = Wire(Vec(5, SInt(upSizeWidth.W)))
   // diff to closest A/B Pam5 symbol
-  val diffA = Vec(5, SInt(upSizeWidth.W))
-  val diffB = Vec(5, SInt(upSizeWidth.W))
+  val diffA = Wire(Vec(5, SInt(upSizeWidth.W)))
+  val diffB = Wire(Vec(5, SInt(upSizeWidth.W)))
 
-
-  for (i <- 0 until 4) {
-    estSym(i) := io.rxFilter - pam5(i) * io.tapOne
+  for (i <- 0 until 5) {
+    estSym(i) := io.rxFilter - pam5Vals(i) * io.tapOne
     diffA(i) := estSym(i) - levelSlicer(estSym(i), pam5A, pam5ThreshA)
     diffB(i) := estSym(i) - levelSlicer(estSym(i), pam5B, pam5ThreshB)
     io.symMetricsA(i) := diffA(i)*diffA(i)

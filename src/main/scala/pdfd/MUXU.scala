@@ -13,21 +13,29 @@ import pdfd.Utils._
 class MUXU(symBitWidth: Int)
     extends Module {
   val io = IO(new Bundle {
-    val symSelects = Input(Vec(4, UInt(3.W)))
+    val symSelects = Input(Vec(4, SInt(3.W)))
+    val symsA = Input(Vec(4, Vec(5, SInt(3.W))))
+    val symsB = Input(Vec(4, Vec(5, SInt(3.W))))
     val symMetricsA = Input(Vec(4, Vec(5, SInt(symBitWidth.W))))
     val symMetricsB = Input(Vec(4, Vec(5, SInt(symBitWidth.W))))
     val brMetricsA = Output(Vec(4, SInt(symBitWidth.W)))
     val brMetricsB = Output(Vec(4, SInt(symBitWidth.W)))
+    val brSymsA = Output(Vec(4, SInt(3.W)))
+    val brSymsB = Output(Vec(4, SInt(3.W)))
 })
 
 val mux = Seq.fill(4)(Module(new SymMux(symBitWidth)))
 
 for (i <- 0 until 4) {
+  mux(i).io.symsA := io.symsA(i)
+  mux(i).io.symsB := io.symsB(i)
   mux(i).io.symSelect := io.symSelects(i)
   mux(i).io.symMetricA := io.symMetricsA(i)
   mux(i).io.symMetricB := io.symMetricsB(i)
   io.brMetricsA(i) := mux(i).io.brMetricA
   io.brMetricsB(i) := mux(i).io.brMetricB
+  io.brSymsA(i) := mux(i).io.brSymA
+  io.brSymsB(i) := mux(i).io.brSymB
 }
 }
 
@@ -39,42 +47,42 @@ for (i <- 0 until 4) {
 
 class SymMux(symBitWidth: Int) extends Module {
   val io = IO(new Bundle {
-    val symSelect = Input(UInt(3.W))
+    val symSelect = Input(SInt(3.W))
     val symMetricA = Input(Vec(5, SInt(symBitWidth.W)))
     val symMetricB = Input(Vec(5, SInt(symBitWidth.W)))
-    val symsA = Input(Vec(5, UInt(3.W)))
-    val symsB = Input(Vec(5, UInt(3.W)))
+    val symsA = Input(Vec(5, SInt(3.W)))
+    val symsB = Input(Vec(5, SInt(3.W)))
     val brMetricA = Output(SInt(symBitWidth.W))
     val brMetricB = Output(SInt(symBitWidth.W))
-    val brSymA = Output(UInt(3.W))
-    val brSymB = Output(UInt(3.W))
+    val brSymA = Output(SInt(3.W))
+    val brSymB = Output(SInt(3.W))
   })
 
-  when (io.symSelect === 0.U) {
+  when (io.symSelect === -2.S) {
     io.brMetricA := io.symMetricA(0)
     io.brMetricB := io.symMetricB(0)
     io.brSymA := io.symsA(0)
     io.brSymB := io.symsB(0)
   }
-  .elsewhen (io.symSelect === 1.U) {
+  .elsewhen (io.symSelect === -1.S) {
     io.brMetricA := io.symMetricA(1)
     io.brMetricB := io.symMetricB(1)
     io.brSymA := io.symsA(1)
     io.brSymB := io.symsB(1)
   }
-  .elsewhen (io.symSelect === 2.U) {
+  .elsewhen (io.symSelect === 0.S) {
     io.brMetricA := io.symMetricA(2)
     io.brMetricB := io.symMetricB(2)
     io.brSymA := io.symsA(2)
     io.brSymB := io.symsB(2)
   }
-  .elsewhen (io.symSelect === 3.U) {
+  .elsewhen (io.symSelect === 1.S) {
     io.brMetricA := io.symMetricA(3)
     io.brMetricB := io.symMetricB(3)
     io.brSymA := io.symsA(3)
     io.brSymB := io.symsB(3)
   }
-  .elsewhen (io.symSelect === 4.U) {
+  .elsewhen (io.symSelect === 2.S) {
     io.brMetricA := io.symMetricA(4)
     io.brMetricB := io.symMetricB(4)
     io.brSymA := io.symsA(4)
@@ -83,7 +91,7 @@ class SymMux(symBitWidth: Int) extends Module {
   .otherwise {
     io.brMetricA := 0.S
     io.brMetricB := 0.S
-    io.brSymA := 0.U
-    io.brSymB := 0.U
+    io.brSymA := 0.S
+    io.brSymB := 0.S
   }
 }

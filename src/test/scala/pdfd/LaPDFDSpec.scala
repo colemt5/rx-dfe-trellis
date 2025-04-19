@@ -21,14 +21,19 @@ import org.scalatest.freespec.AnyFreeSpec
   */
 class LaPDFDSpec extends AnyFreeSpec with ChiselScalatestTester {
 
-    "Standard SRAM behavioral model should pass BIST" in {
+    "Check if Seq makes it through" in {
     test(
       new LaPDFD()
     ).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
-      dut.io.rxSamples(0).poke(0.S(8.W))
-      dut.io.rxSamples(1).poke(0.S(8.W))
-      dut.io.rxSamples(2).poke(0.S(8.W))
-      dut.io.rxSamples(3).poke(0.S(8.W))
+      for (i <- 0 until 17) {
+        dut.io.rxSamples(0).poke(120.S(8.W))
+        dut.io.rxSamples(1).poke(0.S(8.W))
+        dut.io.rxSamples(2).poke(50.S(8.W))
+        dut.io.rxSamples(3).poke(-70.S(8.W))
+        dut.clock.step()
+      }
+      val outVal = dut.io.rxData.peek().litValue
+      println(s"Output is: $outVal")
     }
   }
 }

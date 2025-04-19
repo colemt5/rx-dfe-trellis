@@ -14,15 +14,15 @@ class FourDimBMU(bmWidth: Int, isEvenState: Boolean)
   val io = IO(new Bundle { // [0] is Channel 1, [1] is Channel 2, [2] is Channel 3, [3] is Channel 4
     val brMetricsA = Input(Vec(4, SInt(bmWidth.W))) // todo need to verify if int or fixed point
     val brMetricsB = Input(Vec(4, SInt(bmWidth.W))) // todo need to verify if int or fixed point
-    val brSymsA = Input(Vec(4, UInt(3.W)))
-    val brSymsB = Input(Vec(4, UInt(3.W)))
+    val brSymsA = Input(Vec(4, SInt(3.W)))
+    val brSymsB = Input(Vec(4, SInt(3.W)))
     val brMetrics4D = Output(Vec(4, SInt(bmWidth.W))) // todo need to verify if int or fixed point
-    val brSyms4D = Output(Vec(4, Vec(4, UInt(3.W))))
+    val brSyms4D = Output(Vec(4, Vec(4, SInt(3.W))))
   })
-  val sumBrMetricA = Vec(4, SInt(bmWidth.W))
-  val sumBrMetricB = Vec(4, SInt(bmWidth.W))
-  val brSymsA = Vec(4, Vec(4, UInt(3.W)))
-  val brSymsB = Vec(4, Vec(4, UInt(3.W)))
+  val sumBrMetricA = Wire(Vec(4, SInt(bmWidth.W)))
+  val sumBrMetricB = Wire(Vec(4, SInt(bmWidth.W)))
+  val brSymsA = Wire(Vec(4, Vec(4, SInt(3.W))))
+  val brSymsB = Wire(Vec(4, Vec(4, SInt(3.W))))
 
   if (isEvenState) {
     sumBrMetricA(0) := io.brMetricsA(0) + io.brMetricsA(1) + io.brMetricsA(2) + io.brMetricsA(3) // AAAA S0

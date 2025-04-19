@@ -30,16 +30,16 @@ class LaPDFD()
   })
   // local parameters
   val upSizeWidth = 13 // dictated by DFP
-  val pam5 = Seq(-103.S(8.W), -52.S(8.W), 0.S(8.W), 51.S(8.W), 102.S(8.W))
-  val pam5Thresholds = Seq(-77.S(8.W), -26.S(8.W), 25.S(8.W), 76.S(8.W))
+  val pam5 = Seq(-103, -52, 0, 51, 101)
+  val pam5Thresholds = Seq(-77, -26, 25, 76)
   // one unit per channel
   val dfp   = Seq.fill(4)(Module(new DFP(numTaps, tapWidth, sampleWidth, upSizeWidth, pam5, pam5Thresholds)))
-  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, upSizeWidth, pam5, pam5Thresholds)))
+  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, sampleWidth, upSizeWidth, pam5)))
 
   // one unit per state 
   val muxu    = Seq.fill(8)(Module(new MUXU(upSizeWidth)))
-  val bmuEven = Seq.fill(8)(Module(new FourDimBMU(upSizeWidth, true)))
-  val bmuOdd  = Seq.fill(8)(Module(new FourDimBMU(upSizeWidth, false)))
+  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(upSizeWidth, true)))
+  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(upSizeWidth, false)))
   val acsu    = Seq.fill(8)(Module(new ACSU(upSizeWidth)))
   val smu     = Seq.fill(8)(Module(new SMU()))
   
@@ -55,17 +55,25 @@ class LaPDFD()
 
   for (i <- 0 until 8) {
     // MUXU <- LaBMU (SMU survivor symbols)
+    for (j <- 0 until 4) {
+      muxu(i).io.symsA(j) := laBmu(j).io.symsA
+      muxu(i).io.symsB(j) := laBmu(j).io.symsB
+      muxu(i).io.symMetricsA(j) := laBmu(j).io.symMetricsA
+      muxu(i).io.symMetricsB(j) := laBmu(j).io.symMetricsB
+    }
     muxu(i).io.symSelects := smu(i).io.symSelects
-    muxu(i).io.symMetricsA := VecInit(Seq(laBmu(0).io.symMetricsA, laBmu(1).io.symMetricsA, laBmu(2).io.symMetricsA, laBmu(3).io.symMetricsA))
-    muxu(i).io.symMetricsB := VecInit(Seq(laBmu(0).io.symMetricsB, laBmu(1).io.symMetricsB, laBmu(2).io.symMetricsB, laBmu(3).io.symMetricsB))
 
     // 4D-BMU <- MUXU (SMU survivor symbols)
     if (i % 2 == 0) {
       bmuEven(i / 2).io.brMetricsA := muxu(i).io.brMetricsA
       bmuEven(i / 2).io.brMetricsB := muxu(i).io.brMetricsB
+      bmuEven(i / 2).io.brSymsA := muxu(i).io.brSymsA
+      bmuEven(i / 2).io.brSymsB := muxu(i).io.brSymsB
     } else {
       bmuOdd(i / 2).io.brMetricsA := muxu(i).io.brMetricsA
       bmuOdd(i / 2).io.brMetricsB := muxu(i).io.brMetricsB
+      bmuOdd(i / 2).io.brSymsA := muxu(i).io.brSymsA
+      bmuOdd(i / 2).io.brSymsB := muxu(i).io.brSymsB
     }
 
     // ACSU <- 4D-BMU
@@ -80,24 +88,65 @@ class LaPDFD()
     if (i % 2 == 0) {
       smu(i).io.stateSymSelects := bmuEven(i / 2).io.brSyms4D
     } else {
-      smu(i).io.stateSymSelects := VecInit(Seq(smu(i).io.symSelects(7), smu(i).io.symSelects(5), smu(i).io.symSelects(3), smu(i).io.symSelects(1)))
+      smu(i).io.stateSymSelects := bmuOdd(i / 2).io.brSyms4D
     }
 
   }
   // not sure how to do ACSU <- ACSU in the loop
-    acsu(0).io.pathMetrics := VecInit(Seq(acsu(0).io.pathMetric, acsu(2).io.pathMetric, acsu(4).io.pathMetric, acsu(6).io.pathMetric))
-    acsu(1).io.pathMetrics := VecInit(Seq(acsu(2).io.pathMetric, acsu(0).io.pathMetric, acsu(6).io.pathMetric, acsu(4).io.pathMetric))
-    acsu(2).io.pathMetrics := VecInit(Seq(acsu(4).io.pathMetric, acsu(6).io.pathMetric, acsu(0).io.pathMetric, acsu(2).io.pathMetric))
-    acsu(3).io.pathMetrics := VecInit(Seq(acsu(6).io.pathMetric, acsu(4).io.pathMetric, acsu(2).io.pathMetric, acsu(0).io.pathMetric))
-    acsu(4).io.pathMetrics := VecInit(Seq(acsu(1).io.pathMetric, acsu(3).io.pathMetric, acsu(5).io.pathMetric, acsu(7).io.pathMetric))
-    acsu(5).io.pathMetrics := VecInit(Seq(acsu(3).io.pathMetric, acsu(1).io.pathMetric, acsu(7).io.pathMetric, acsu(5).io.pathMetric))
-    acsu(6).io.pathMetrics := VecInit(Seq(acsu(5).io.pathMetric, acsu(7).io.pathMetric, acsu(1).io.pathMetric, acsu(3).io.pathMetric))
-    acsu(7).io.pathMetrics := VecInit(Seq(acsu(7).io.pathMetric, acsu(5).io.pathMetric, acsu(3).io.pathMetric, acsu(1).io.pathMetric))
+  acsu(0).io.pathMetrics := VecInit(Seq(acsu(0).io.pathMetric, acsu(2).io.pathMetric, acsu(4).io.pathMetric, acsu(6).io.pathMetric))
+  acsu(1).io.pathMetrics := VecInit(Seq(acsu(2).io.pathMetric, acsu(0).io.pathMetric, acsu(6).io.pathMetric, acsu(4).io.pathMetric))
+  acsu(2).io.pathMetrics := VecInit(Seq(acsu(4).io.pathMetric, acsu(6).io.pathMetric, acsu(0).io.pathMetric, acsu(2).io.pathMetric))
+  acsu(3).io.pathMetrics := VecInit(Seq(acsu(6).io.pathMetric, acsu(4).io.pathMetric, acsu(2).io.pathMetric, acsu(0).io.pathMetric))
+  acsu(4).io.pathMetrics := VecInit(Seq(acsu(1).io.pathMetric, acsu(3).io.pathMetric, acsu(5).io.pathMetric, acsu(7).io.pathMetric))
+  acsu(5).io.pathMetrics := VecInit(Seq(acsu(3).io.pathMetric, acsu(1).io.pathMetric, acsu(7).io.pathMetric, acsu(5).io.pathMetric))
+  acsu(6).io.pathMetrics := VecInit(Seq(acsu(5).io.pathMetric, acsu(7).io.pathMetric, acsu(1).io.pathMetric, acsu(3).io.pathMetric))
+  acsu(7).io.pathMetrics := VecInit(Seq(acsu(7).io.pathMetric, acsu(5).io.pathMetric, acsu(3).io.pathMetric, acsu(1).io.pathMetric))
+
+  // not sure how to do SMU <- SMU in the loop
+  smu(0).io.byteInputs(0) := smu(0).io.byteChoices
+  smu(0).io.byteInputs(1) := smu(2).io.byteChoices
+  smu(0).io.byteInputs(2) := smu(4).io.byteChoices
+  smu(0).io.byteInputs(3) := smu(6).io.byteChoices
+
+  smu(1).io.byteInputs(0) := smu(2).io.byteChoices
+  smu(1).io.byteInputs(1) := smu(0).io.byteChoices
+  smu(1).io.byteInputs(2) := smu(6).io.byteChoices
+  smu(1).io.byteInputs(3) := smu(4).io.byteChoices
+
+  smu(2).io.byteInputs(0) := smu(4).io.byteChoices
+  smu(2).io.byteInputs(1) := smu(6).io.byteChoices
+  smu(2).io.byteInputs(2) := smu(0).io.byteChoices
+  smu(2).io.byteInputs(3) := smu(2).io.byteChoices
+
+  smu(3).io.byteInputs(0) := smu(6).io.byteChoices
+  smu(3).io.byteInputs(1) := smu(4).io.byteChoices
+  smu(3).io.byteInputs(2) := smu(2).io.byteChoices
+  smu(3).io.byteInputs(3) := smu(0).io.byteChoices
+  
+  smu(4).io.byteInputs(0) := smu(1).io.byteChoices
+  smu(4).io.byteInputs(1) := smu(3).io.byteChoices
+  smu(4).io.byteInputs(2) := smu(5).io.byteChoices
+  smu(4).io.byteInputs(3) := smu(7).io.byteChoices
+  
+  smu(5).io.byteInputs(0) := smu(3).io.byteChoices
+  smu(5).io.byteInputs(1) := smu(1).io.byteChoices
+  smu(5).io.byteInputs(2) := smu(7).io.byteChoices
+  smu(5).io.byteInputs(3) := smu(5).io.byteChoices
+
+  smu(6).io.byteInputs(0) := smu(5).io.byteChoices
+  smu(6).io.byteInputs(1) := smu(7).io.byteChoices
+  smu(6).io.byteInputs(2) := smu(1).io.byteChoices
+  smu(6).io.byteInputs(3) := smu(3).io.byteChoices
+
+  smu(7).io.byteInputs(0) := smu(7).io.byteChoices
+  smu(7).io.byteInputs(1) := smu(5).io.byteChoices
+  smu(7).io.byteInputs(2) := smu(3).io.byteChoices
+  smu(7).io.byteInputs(3) := smu(1).io.byteChoices
+
 
 
   // SMU -> output
-  // todo need to implement - current solution doesnt work
-  // io.decodedByte := smu(minIndex(VecInit(Seq(acsu(7).io.pathMetric, acsu(6).io.pathMetric, acsu(5).io.pathMetric, acsu(4).io.pathMetric, acsu(3).io.pathMetric, acsu(2).io.pathMetric, acsu(1).io.pathMetric, acsu(0).io.pathMetric)))).io.decodedByte
-  
+  io.rxData := smu(0).io.byteDecision
+  io.rxValid := 1.U
 
 }

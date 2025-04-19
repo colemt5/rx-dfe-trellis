@@ -17,6 +17,9 @@ class ACSU(bmWidth: Int)
     val pathMetric = Output(SInt(bmWidth.W))
   })
   
+  val pathMetricReg = RegInit(0.S(bmWidth.W))
+  io.pathMetric := pathMetricReg
+
   // Modulo to prevent overflow
   val mod_val = 1 << bmWidth // 2^bmWidth
   val pm0 = io.pathMetrics(0) % mod_val.S
@@ -42,18 +45,18 @@ class ACSU(bmWidth: Int)
   when (cmp2 && cmp4 && cmp5) {
     // sum0 < sum3, sum0 < sum2, sum0 < sum1
     io.pathSelect := 0.U
-    io.pathMetric := sum0
+    pathMetricReg := sum0
   } .elsewhen (cmp1 && cmp3 && !cmp5) {
     // sum1 < sum3, sum1 < sum2, !(sum0 < sum1)
     io.pathSelect := 1.U
-    io.pathMetric := sum1
+    pathMetricReg := sum1
   } .elsewhen (cmp0 && !cmp3 && !cmp4) {
     // sum2 < sum3, !(sum1 < sum2), !(sum0 < sum2)
     io.pathSelect := 2.U
-    io.pathMetric := sum2
+    pathMetricReg := sum2
   } .otherwise { // Assume this is when (!cmp0 && !cmp1 && !cmp2)
     // !(sum2 < sum3), !(sum1 < sum3), !(sum0 < sum3)
     io.pathSelect := 3.U
-    io.pathMetric := sum3
+    pathMetricReg := sum3
   }
 }
