@@ -23,15 +23,12 @@ class LaPDFDSpec extends AnyFreeSpec with ChiselScalatestTester {
 
     "Standard SRAM behavioral model should pass BIST" in {
     test(
-      new LaPDFD(
-        18,
-        14
-      )
+      new LaPDFD()
     ).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
-      dut.io.inSymbols(0).poke(0.S(18.W))
-      dut.io.inSymbols(1).poke(0.S(18.W))
-      dut.io.inSymbols(2).poke(0.S(18.W))
-      dut.io.inSymbols(3).poke(0.S(18.W))
+      dut.io.rxSamples(0).poke(0.S(8.W))
+      dut.io.rxSamples(1).poke(0.S(8.W))
+      dut.io.rxSamples(2).poke(0.S(8.W))
+      dut.io.rxSamples(3).poke(0.S(8.W))
     }
   }
 }

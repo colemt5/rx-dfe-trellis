@@ -42,32 +42,48 @@ class SymMux(symBitWidth: Int) extends Module {
     val symSelect = Input(UInt(3.W))
     val symMetricA = Input(Vec(5, SInt(symBitWidth.W)))
     val symMetricB = Input(Vec(5, SInt(symBitWidth.W)))
+    val symsA = Input(Vec(5, UInt(3.W)))
+    val symsB = Input(Vec(5, UInt(3.W)))
     val brMetricA = Output(SInt(symBitWidth.W))
     val brMetricB = Output(SInt(symBitWidth.W))
+    val brSymA = Output(UInt(3.W))
+    val brSymB = Output(UInt(3.W))
   })
 
   when (io.symSelect === 0.U) {
     io.brMetricA := io.symMetricA(0)
     io.brMetricB := io.symMetricB(0)
+    io.brSymA := io.symsA(0)
+    io.brSymB := io.symsB(0)
   }
   .elsewhen (io.symSelect === 1.U) {
     io.brMetricA := io.symMetricA(1)
     io.brMetricB := io.symMetricB(1)
+    io.brSymA := io.symsA(1)
+    io.brSymB := io.symsB(1)
   }
   .elsewhen (io.symSelect === 2.U) {
     io.brMetricA := io.symMetricA(2)
     io.brMetricB := io.symMetricB(2)
+    io.brSymA := io.symsA(2)
+    io.brSymB := io.symsB(2)
   }
   .elsewhen (io.symSelect === 3.U) {
     io.brMetricA := io.symMetricA(3)
     io.brMetricB := io.symMetricB(3)
+    io.brSymA := io.symsA(3)
+    io.brSymB := io.symsB(3)
   }
   .elsewhen (io.symSelect === 4.U) {
     io.brMetricA := io.symMetricA(4)
     io.brMetricB := io.symMetricB(4)
+    io.brSymA := io.symsA(4)
+    io.brSymB := io.symsB(4)
   }
   .otherwise {
     io.brMetricA := 0.S
     io.brMetricB := 0.S
+    io.brSymA := 0.U
+    io.brSymB := 0.U
   }
 }

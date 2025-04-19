@@ -8,33 +8,34 @@ import pdfd.Utils._
   *
   * @param bitWidth the bit width of the input and output signals
   */
-class DFP(bitWidth: Int, numTaps: Int = 14) // todo add parameters 
+class DFP(numTaps: Int = 14, tapWidth: Int, sampleWidth: Int, upSizeWidth: Int, pam5: Seq[SInt], pam5Thresholds: Seq[SInt])
     extends Module {
   val io = IO(new Bundle {
-    val inSymbol = Input(SInt(bitWidth.W)) // todo need to verify if int or fixed point
-    val chanCoeffs = Input(Vec(numTaps, SInt(bitWidth.W))) // todo need to verify if int or fixed point
-    val preFilteredSymbol = Output(SInt(bitWidth.W)) // todo need to verify if int or fixed point
+    val rxSample = Input(SInt(sampleWidth.W)) // todo need to verify if int or fixed point
+    val taps = Input(Vec(numTaps, SInt(tapWidth.W))) // todo need to verify if int or fixed point
+    val rxFilter = Output(SInt(upSizeWidth.W)) // todo need to verify if int or fixed point
   })
+  /* Assumptions
+    *  - The input symbol is 8 bits with DC at 0
+    *  - The channel coefficients are signed 8 bits
+    *  - The output symbol is 
+    */
+  val filtSample = RegInit(0.S(upSizeWidth.W))
+  val softSym = RegInit(0.S(3.W))
+  val feedbackPath = RegInit(VecInit(Seq.fill(numTaps - 2)(0.S(upSizeWidth.W)))) // 13 bits to hold
 
-  /* 
-  // Slice input symbol
-  val a = RegInit(0.S(bitWidth.W))
-
-  // Register chain 
-  val y = RegInit(VecInit(Seq.fill(numTaps-1)(0.S(bitWidth.W))))
-
-  // Compute each stage
-  y(0) := -io.chanCoeffs(13) * a // f14
-  for (i <- 1 until 11) { 
-    y(i) := y(i - 1) + (io.chanCoeffs(13-i) * a) // f13 to f3
+  softSym := levelSlicer(decData, pam5, pam5Thresholds)
+  // f14
+  feedbackPath(0) := softSym * -io.taps(numTaps - 1)
+  // f13 to f3
+  for (i <- 1 until numTaps - 3) {
+    feedbackPath(i) := feedbackPath(i - 1) + (softSym * -io.taps(numTaps - 1 - i))
   }
-  y(12) := io.inSymbol + y(11) + (io.chanCoeffs(1) * a) // f2
+  // f2
+  filtSample := io.rxSample + feedbackPath(numTaps - 2) + (softSym * -io.taps(1))
 
-  // Compute a
-  a := pam5Slice(y(12) + (io.chanCoeffs(0) * a)) // f1
+  // f1
+  val decData = filtSample + softSym * -io.taps(0)
 
-  // Set output symbol
-  io.preFilteredSymbol := y(12)
-  */
-
+  io.rxFilter := filtSample
 }

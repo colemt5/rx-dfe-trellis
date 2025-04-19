@@ -7,17 +7,22 @@ import pdfd.Utils._
 /** 4d BMU module that computes the combined branch metric for all 4 channels
   * from the 1D LaBMU modules.
   *
-  * @param symBitWidth the bit width of the input and output signals
+  * @param bmWidth the bit width of the input and output signals
   */
-class FourDimBMU(symBitWidth: Int, isEvenState: Boolean)
+class FourDimBMU(bmWidth: Int, isEvenState: Boolean)
     extends Module {
   val io = IO(new Bundle { // [0] is Channel 1, [1] is Channel 2, [2] is Channel 3, [3] is Channel 4
-    val brMetricsA = Input(Vec(4, SInt(symBitWidth.W))) // todo need to verify if int or fixed point
-    val brMetricsB = Input(Vec(4, SInt(symBitWidth.W))) // todo need to verify if int or fixed point
-    val brMetrics4D = Output(Vec(4, SInt(symBitWidth.W))) // todo need to verify if int or fixed point
+    val brMetricsA = Input(Vec(4, SInt(bmWidth.W))) // todo need to verify if int or fixed point
+    val brMetricsB = Input(Vec(4, SInt(bmWidth.W))) // todo need to verify if int or fixed point
+    val brSymsA = Input(Vec(4, UInt(3.W)))
+    val brSymsB = Input(Vec(4, UInt(3.W)))
+    val brMetrics4D = Output(Vec(4, SInt(bmWidth.W))) // todo need to verify if int or fixed point
+    val brSyms4D = Output(Vec(4, Vec(4, UInt(3.W))))
   })
-  val sumBrMetricA = Vec(4, SInt(symBitWidth.W))
-  val sumBrMetricB = Vec(4, SInt(symBitWidth.W))
+  val sumBrMetricA = Vec(4, SInt(bmWidth.W))
+  val sumBrMetricB = Vec(4, SInt(bmWidth.W))
+  val brSymsA = Vec(4, Vec(4, UInt(3.W)))
+  val brSymsB = Vec(4, Vec(4, UInt(3.W)))
 
   if (isEvenState) {
     sumBrMetricA(0) := io.brMetricsA(0) + io.brMetricsA(1) + io.brMetricsA(2) + io.brMetricsA(3) // AAAA S0
@@ -28,6 +33,14 @@ class FourDimBMU(symBitWidth: Int, isEvenState: Boolean)
     sumBrMetricB(2) := io.brMetricsB(0) + io.brMetricsA(1) + io.brMetricsA(2) + io.brMetricsB(3) // BAAB S4
     sumBrMetricA(3) := io.brMetricsA(0) + io.brMetricsB(1) + io.brMetricsA(2) + io.brMetricsB(3) // ABAB S6
     sumBrMetricB(3) := io.brMetricsB(0) + io.brMetricsA(1) + io.brMetricsB(2) + io.brMetricsA(3) // BABA S6
+    brSymsA(0) := VecInit(Seq(io.brSymsA(0), io.brSymsA(1), io.brSymsA(2), io.brSymsA(3))) // AAAA S0
+    brSymsB(0) := VecInit(Seq(io.brSymsB(0), io.brSymsB(1), io.brSymsB(2), io.brSymsB(3))) // BBBB S0
+    brSymsA(1) := VecInit(Seq(io.brSymsA(0), io.brSymsA(1), io.brSymsB(2), io.brSymsB(3))) // AABB S2
+    brSymsB(1) := VecInit(Seq(io.brSymsB(0), io.brSymsB(1), io.brSymsA(2), io.brSymsA(3))) // BBAA S2
+    brSymsA(2) := VecInit(Seq(io.brSymsA(0), io.brSymsB(1), io.brSymsB(2), io.brSymsA(3))) // ABBA S4
+    brSymsB(2) := VecInit(Seq(io.brSymsB(0), io.brSymsA(1), io.brSymsA(2), io.brSymsB(3))) // BAAB S4
+    brSymsA(3) := VecInit(Seq(io.brSymsA(0), io.brSymsB(1), io.brSymsA(2), io.brSymsB(3))) // ABAB S6
+    brSymsB(3) := VecInit(Seq(io.brSymsB(0), io.brSymsA(1), io.brSymsB(2), io.brSymsA(3))) // BABA S6
   } else {
     sumBrMetricA(0) := io.brMetricsA(0) + io.brMetricsA(1) + io.brMetricsA(2) + io.brMetricsB(3) // AAAB S1
     sumBrMetricB(0) := io.brMetricsB(0) + io.brMetricsB(1) + io.brMetricsB(2) + io.brMetricsA(3) // BBBA S1
@@ -37,9 +50,21 @@ class FourDimBMU(symBitWidth: Int, isEvenState: Boolean)
     sumBrMetricB(2) := io.brMetricsB(0) + io.brMetricsA(1) + io.brMetricsA(2) + io.brMetricsA(3) // BAAA S5
     sumBrMetricA(3) := io.brMetricsA(0) + io.brMetricsB(1) + io.brMetricsA(2) + io.brMetricsA(3) // ABAA S7
     sumBrMetricB(3) := io.brMetricsB(0) + io.brMetricsA(1) + io.brMetricsB(2) + io.brMetricsB(3) // BABB S7
+    brSymsA(0) := VecInit(Seq(io.brSymsA(0), io.brSymsA(1), io.brSymsA(2), io.brSymsB(3))) // AAAB S1
+    brSymsB(0) := VecInit(Seq(io.brSymsB(0), io.brSymsB(1), io.brSymsB(2), io.brSymsA(3))) // BBBA S1
+    brSymsA(1) := VecInit(Seq(io.brSymsA(0), io.brSymsA(1), io.brSymsB(2), io.brSymsA(3))) // AABA S3
+    brSymsB(1) := VecInit(Seq(io.brSymsB(0), io.brSymsB(1), io.brSymsA(2), io.brSymsB(3))) // BBAB S3
+    brSymsA(2) := VecInit(Seq(io.brSymsA(0), io.brSymsB(1), io.brSymsB(2), io.brSymsB(3))) // ABBB S5
+    brSymsB(2) := VecInit(Seq(io.brSymsB(0), io.brSymsA(1), io.brSymsA(2), io.brSymsA(3))) // BAAA S5
+    brSymsA(3) := VecInit(Seq(io.brSymsA(0), io.brSymsB(1), io.brSymsA(2), io.brSymsA(3))) // ABAA S7
+    brSymsB(3) := VecInit(Seq(io.brSymsB(0), io.brSymsA(1), io.brSymsB(2), io.brSymsB(3))) // BABB S7
   }
   io.brMetrics4D(0) := Mux(sumBrMetricA(0) < sumBrMetricB(0), sumBrMetricA(0), sumBrMetricB(0))
   io.brMetrics4D(1) := Mux(sumBrMetricA(1) < sumBrMetricB(1), sumBrMetricA(1), sumBrMetricB(1))
   io.brMetrics4D(2) := Mux(sumBrMetricA(2) < sumBrMetricB(2), sumBrMetricA(2), sumBrMetricB(2))
   io.brMetrics4D(3) := Mux(sumBrMetricA(3) < sumBrMetricB(3), sumBrMetricA(3), sumBrMetricB(3))
+  io.brSyms4D(0) := Mux(sumBrMetricA(0) < sumBrMetricA(0), brSymsA(0), brSymsB(0))
+  io.brSyms4D(1) := Mux(sumBrMetricA(1) < sumBrMetricB(1), brSymsA(1), brSymsB(1))
+  io.brSyms4D(2) := Mux(sumBrMetricA(2) < sumBrMetricB(2), brSymsA(2), brSymsB(2))
+  io.brSyms4D(3) := Mux(sumBrMetricA(3) < sumBrMetricB(3), brSymsA(3), brSymsB(3))
 }
