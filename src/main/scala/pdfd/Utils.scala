@@ -12,12 +12,13 @@ object Utils {
     require(levels.length >= 2, "Need at least 2 levels for slicing.")
     require(thresholds.length == levels.length - 1, s"Expected ${levels.length - 1} thresholds, got ${thresholds.length}")
 
-    val result = WireDefault(levels.head)
+    val result = WireDefault(levels.head) // Default to the lowest level
 
     // Fold in reverse so the highest threshold has the highest priority
     for (i <- thresholds.indices.reverse) {
+      // Set the result only if the threshold condition holds true
       when(data > thresholds(i)) {
-        result := levels(i + 1)
+        result := levels(i + 1)  // Set result to the corresponding level
       }
     }
 
