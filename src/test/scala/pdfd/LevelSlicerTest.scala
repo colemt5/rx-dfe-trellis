@@ -45,7 +45,7 @@ class LevelSlicerTest extends AnyFlatSpec with ChiselScalatestTester {
 
       for ((in, expected) <- testCases) {
         c.io.data.poke(in.S)
-        c.clock.step(1)
+        c.clock.step()
         c.io.out.expect(expected.S, s"Input $in should slice to $expected")
       }
     }
