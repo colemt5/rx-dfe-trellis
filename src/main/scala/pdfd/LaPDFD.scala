@@ -150,3 +150,13 @@ class LaPDFD()
   io.rxValid := 1.U
 
 }
+
+/**
+ * Generate Verilog sources and save it in file GCD.v
+ */
+object Elaborate extends App {
+  ChiselStage.emitSystemVerilogFile(
+    new LaPDFD(),
+    firtoolOpts = Array("-disable-all-randomization", "-strip-debug-info")
+  )
+}
