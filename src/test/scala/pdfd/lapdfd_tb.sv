@@ -1,6 +1,6 @@
 
 `timescale 1ns/1ps
-`include "src/main/scala/pdfd/LaPDFD.scala"
+`include "LaPDFD.sv"
 
 module lapdfd_tb;
 

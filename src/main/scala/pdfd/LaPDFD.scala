@@ -1,6 +1,7 @@
 package pdfd
 
 import chisel3._
+import _root_.circt.stage.ChiselStage
 import chisel3.util._
 import pdfd.Utils._
 
@@ -152,11 +153,11 @@ class LaPDFD()
 }
 
 /**
- * Generate Verilog sources and save it in file GCD.v
+ * Generate Verilog sources and save it in file Elaborate.v
  */
-object Elaborate extends App {
+object LaPDFD extends App {
   ChiselStage.emitSystemVerilogFile(
-    new LaPDFD(),
+    new LaPDFD,
     firtoolOpts = Array("-disable-all-randomization", "-strip-debug-info")
   )
 }
