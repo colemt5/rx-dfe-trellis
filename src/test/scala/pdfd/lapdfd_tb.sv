@@ -63,10 +63,12 @@ reg signed [7:0] tap_in [13:0];
 initial begin
     $dumpfile("lapdfd.vcd");
     $dumpvars(0, lapdfd_tb);
+    $vcdplusfile("lapdfd.vpd");
+    $vcdpluson(0, lapdfd_tb);
 
     // Initialize
     reset = 1;
-    @(posedge clock);
+    repeat(4) @(posedge clock);
     reset = 0;
 
     // Open test vector file
@@ -100,6 +102,7 @@ initial begin
     end
 
     $fclose(vector_file);
+    $vcdplusoff;
     $finish;
 end
 

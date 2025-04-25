@@ -16,8 +16,6 @@ import pdfd.Utils._
   *  - 1 rx valid signal
   */
 
-// todo need to understand how to get 14 channel coefficients
-
 class LaPDFD()
     extends Module {
   val numTaps = 14 // from paper

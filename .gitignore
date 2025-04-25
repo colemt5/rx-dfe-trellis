@@ -343,3 +343,13 @@ hs_err_pid*
 .bloop/
 
 .vscode/
+
+csrc/
+DVEfiles/
+simv.daidir/
+*.vpd
+*.vcd
+verilog.dump
+all
+ucli.key
+simv

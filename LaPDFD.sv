@@ -5,35 +5,108 @@ module DFP(
   input  [7:0]  io_rxSample,
                 io_taps_0,
                 io_taps_1,
+                io_taps_2,
+                io_taps_3,
+                io_taps_4,
+                io_taps_5,
+                io_taps_6,
+                io_taps_7,
+                io_taps_8,
+                io_taps_9,
+                io_taps_10,
+                io_taps_11,
+                io_taps_12,
+                io_taps_13,
   output [12:0] io_rxFilter
 );
 
   reg [12:0] filtSample;
-  reg [2:0]  softSym;
+  reg [7:0]  softSym;
+  reg [12:0] feedbackPath_0;
+  reg [12:0] feedbackPath_1;
+  reg [12:0] feedbackPath_2;
+  reg [12:0] feedbackPath_3;
+  reg [12:0] feedbackPath_4;
+  reg [12:0] feedbackPath_5;
+  reg [12:0] feedbackPath_6;
+  reg [12:0] feedbackPath_7;
+  reg [12:0] feedbackPath_8;
+  reg [12:0] feedbackPath_9;
+  reg [12:0] feedbackPath_10;
+  reg [12:0] feedbackPath_11;
   always @(posedge clock) begin
     if (reset) begin
       filtSample <= 13'h0;
-      softSym <= 3'h0;
+      softSym <= 8'h0;
+      feedbackPath_0 <= 13'h0;
+      feedbackPath_1 <= 13'h0;
+      feedbackPath_2 <= 13'h0;
+      feedbackPath_3 <= 13'h0;
+      feedbackPath_4 <= 13'h0;
+      feedbackPath_5 <= 13'h0;
+      feedbackPath_6 <= 13'h0;
+      feedbackPath_7 <= 13'h0;
+      feedbackPath_8 <= 13'h0;
+      feedbackPath_9 <= 13'h0;
+      feedbackPath_10 <= 13'h0;
+      feedbackPath_11 <= 13'h0;
     end
     else begin
       automatic logic [7:0]  _decSample_T = 8'h0 - io_taps_0;
-      automatic logic [10:0] _GEN = {{8{softSym[2]}}, softSym};
-      automatic logic [10:0] _decSample_T_3 = _GEN * {{3{_decSample_T[7]}}, _decSample_T};
-      automatic logic [12:0] _decSample_T_4 =
-        filtSample + {{2{_decSample_T_3[10]}}, _decSample_T_3};
+      automatic logic [15:0] _decSample_T_4;
+      automatic logic [7:0]  _feedbackPath_0_T = 8'h0 - io_taps_13;
+      automatic logic [12:0] _GEN = {{5{softSym[7]}}, softSym};
+      automatic logic [7:0]  _feedbackPath_1_T = 8'h0 - io_taps_12;
+      automatic logic [7:0]  _feedbackPath_2_T = 8'h0 - io_taps_11;
+      automatic logic [7:0]  _feedbackPath_3_T = 8'h0 - io_taps_10;
+      automatic logic [7:0]  _feedbackPath_4_T = 8'h0 - io_taps_9;
+      automatic logic [7:0]  _feedbackPath_5_T = 8'h0 - io_taps_8;
+      automatic logic [7:0]  _feedbackPath_6_T = 8'h0 - io_taps_7;
+      automatic logic [7:0]  _feedbackPath_7_T = 8'h0 - io_taps_6;
+      automatic logic [7:0]  _feedbackPath_8_T = 8'h0 - io_taps_5;
+      automatic logic [7:0]  _feedbackPath_9_T = 8'h0 - io_taps_4;
+      automatic logic [7:0]  _feedbackPath_10_T = 8'h0 - io_taps_3;
+      automatic logic [7:0]  _feedbackPath_11_T = 8'h0 - io_taps_2;
       automatic logic [7:0]  _filtSample_T_3 = 8'h0 - io_taps_1;
-      automatic logic [10:0] _filtSample_T_6 =
-        _GEN * {{3{_filtSample_T_3[7]}}, _filtSample_T_3};
+      _decSample_T_4 =
+        {{3{filtSample[12]}}, filtSample} + {{8{softSym[7]}}, softSym}
+        * {{8{_decSample_T[7]}}, _decSample_T};
       filtSample <=
-        {{5{io_rxSample[7]}}, io_rxSample} + {{2{_filtSample_T_6[10]}}, _filtSample_T_6};
-      softSym <=
-        $signed(_decSample_T_4) > 13'sh4C
-          ? 3'h5
-          : $signed(_decSample_T_4) > 13'sh19
-              ? 3'h3
-              : $signed(_decSample_T_4) > -13'sh1A
-                  ? 3'h0
-                  : $signed(_decSample_T_4) > -13'sh4D ? 3'h4 : 3'h1;
+        {{5{io_rxSample[7]}}, io_rxSample} + feedbackPath_11 + _GEN
+        * {{5{_filtSample_T_3[7]}}, _filtSample_T_3};
+      if ($signed(_decSample_T_4) > 16'sh4C)
+        softSym <= 8'h65;
+      else if ($signed(_decSample_T_4) > 16'sh19)
+        softSym <= 8'h33;
+      else if ($signed(_decSample_T_4) > -16'sh1A)
+        softSym <= 8'h0;
+      else if ($signed(_decSample_T_4) > -16'sh4D)
+        softSym <= 8'hCC;
+      else
+        softSym <= 8'h99;
+      feedbackPath_0 <= _GEN * {{5{_feedbackPath_0_T[7]}}, _feedbackPath_0_T};
+      feedbackPath_1 <=
+        feedbackPath_0 + _GEN * {{5{_feedbackPath_1_T[7]}}, _feedbackPath_1_T};
+      feedbackPath_2 <=
+        feedbackPath_1 + _GEN * {{5{_feedbackPath_2_T[7]}}, _feedbackPath_2_T};
+      feedbackPath_3 <=
+        feedbackPath_2 + _GEN * {{5{_feedbackPath_3_T[7]}}, _feedbackPath_3_T};
+      feedbackPath_4 <=
+        feedbackPath_3 + _GEN * {{5{_feedbackPath_4_T[7]}}, _feedbackPath_4_T};
+      feedbackPath_5 <=
+        feedbackPath_4 + _GEN * {{5{_feedbackPath_5_T[7]}}, _feedbackPath_5_T};
+      feedbackPath_6 <=
+        feedbackPath_5 + _GEN * {{5{_feedbackPath_6_T[7]}}, _feedbackPath_6_T};
+      feedbackPath_7 <=
+        feedbackPath_6 + _GEN * {{5{_feedbackPath_7_T[7]}}, _feedbackPath_7_T};
+      feedbackPath_8 <=
+        feedbackPath_7 + _GEN * {{5{_feedbackPath_8_T[7]}}, _feedbackPath_8_T};
+      feedbackPath_9 <=
+        feedbackPath_8 + _GEN * {{5{_feedbackPath_9_T[7]}}, _feedbackPath_9_T};
+      feedbackPath_10 <=
+        feedbackPath_9 + _GEN * {{5{_feedbackPath_10_T[7]}}, _feedbackPath_10_T};
+      feedbackPath_11 <=
+        feedbackPath_10 + _GEN * {{5{_feedbackPath_11_T[7]}}, _feedbackPath_11_T};
     end
   end // always @(posedge)
   assign io_rxFilter = filtSample;
@@ -1418,6 +1491,18 @@ module LaPDFD(
     .io_rxSample (io_rxSamples_0),
     .io_taps_0   (io_taps_0),
     .io_taps_1   (io_taps_1),
+    .io_taps_2   (io_taps_2),
+    .io_taps_3   (io_taps_3),
+    .io_taps_4   (io_taps_4),
+    .io_taps_5   (io_taps_5),
+    .io_taps_6   (io_taps_6),
+    .io_taps_7   (io_taps_7),
+    .io_taps_8   (io_taps_8),
+    .io_taps_9   (io_taps_9),
+    .io_taps_10  (io_taps_10),
+    .io_taps_11  (io_taps_11),
+    .io_taps_12  (io_taps_12),
+    .io_taps_13  (io_taps_13),
     .io_rxFilter (_dfp_0_io_rxFilter)
   );
   DFP dfp_1 (
@@ -1426,6 +1511,18 @@ module LaPDFD(
     .io_rxSample (io_rxSamples_1),
     .io_taps_0   (io_taps_0),
     .io_taps_1   (io_taps_1),
+    .io_taps_2   (io_taps_2),
+    .io_taps_3   (io_taps_3),
+    .io_taps_4   (io_taps_4),
+    .io_taps_5   (io_taps_5),
+    .io_taps_6   (io_taps_6),
+    .io_taps_7   (io_taps_7),
+    .io_taps_8   (io_taps_8),
+    .io_taps_9   (io_taps_9),
+    .io_taps_10  (io_taps_10),
+    .io_taps_11  (io_taps_11),
+    .io_taps_12  (io_taps_12),
+    .io_taps_13  (io_taps_13),
     .io_rxFilter (_dfp_1_io_rxFilter)
   );
   DFP dfp_2 (
@@ -1434,6 +1531,18 @@ module LaPDFD(
     .io_rxSample (io_rxSamples_2),
     .io_taps_0   (io_taps_0),
     .io_taps_1   (io_taps_1),
+    .io_taps_2   (io_taps_2),
+    .io_taps_3   (io_taps_3),
+    .io_taps_4   (io_taps_4),
+    .io_taps_5   (io_taps_5),
+    .io_taps_6   (io_taps_6),
+    .io_taps_7   (io_taps_7),
+    .io_taps_8   (io_taps_8),
+    .io_taps_9   (io_taps_9),
+    .io_taps_10  (io_taps_10),
+    .io_taps_11  (io_taps_11),
+    .io_taps_12  (io_taps_12),
+    .io_taps_13  (io_taps_13),
     .io_rxFilter (_dfp_2_io_rxFilter)
   );
   DFP dfp_3 (
@@ -1442,6 +1551,18 @@ module LaPDFD(
     .io_rxSample (io_rxSamples_3),
     .io_taps_0   (io_taps_0),
     .io_taps_1   (io_taps_1),
+    .io_taps_2   (io_taps_2),
+    .io_taps_3   (io_taps_3),
+    .io_taps_4   (io_taps_4),
+    .io_taps_5   (io_taps_5),
+    .io_taps_6   (io_taps_6),
+    .io_taps_7   (io_taps_7),
+    .io_taps_8   (io_taps_8),
+    .io_taps_9   (io_taps_9),
+    .io_taps_10  (io_taps_10),
+    .io_taps_11  (io_taps_11),
+    .io_taps_12  (io_taps_12),
+    .io_taps_13  (io_taps_13),
     .io_rxFilter (_dfp_3_io_rxFilter)
   );
   OneDimLaBMU laBmu_0 (
