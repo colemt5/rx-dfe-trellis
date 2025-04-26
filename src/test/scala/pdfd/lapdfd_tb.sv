@@ -1,4 +1,3 @@
-
 `timescale 1ns/1ps
 `include "LaPDFD.sv"
 
@@ -58,7 +57,6 @@ endtask
 // Reading test vectors from a file
 integer vector_file, status, line;
 reg signed [7:0] sample_in [3:0];
-reg signed [7:0] tap_in [13:0];
 
 initial begin
     $dumpfile("lapdfd.vcd");
@@ -78,17 +76,29 @@ initial begin
         $finish;
     end
 
-    // Read line by line: 4 samples, 14 taps per line
+    // Hardcode taps values (scaled and rounded integers)
+    taps[0] = -51;
+    taps[1] = 38;
+    taps[2] = -3;
+    taps[3] = 23;
+    taps[4] = -18;
+    taps[5] = 13;
+    taps[6] = -10;
+    taps[7] = 8;
+    taps[8] = -5;
+    taps[9] = 5;
+    taps[10] = -3;
+    taps[11] = 3;
+    taps[12] = 0;
+    taps[13] = 0;
+
+    // Read line by line: 4 samples per line
     while (!$feof(vector_file)) begin
         status = $fscanf(vector_file, "%d %d %d %d", 
             sample_in[0], sample_in[1], sample_in[2], sample_in[3]);
-        for (int i = 0; i < 14; i++) begin
-            status = status + $fscanf(vector_file, "%d", tap_in[i]);
-        end
 
         // Apply inputs
         for (int i = 0; i < 4; i++) rxSamples[i] = sample_in[i];
-        for (int i = 0; i < 14; i++) taps[i] = tap_in[i];
 
         // Wait and observe output
         @(posedge clock);
