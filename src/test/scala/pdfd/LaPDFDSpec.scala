@@ -26,10 +26,10 @@ class LaPDFDSpec extends AnyFreeSpec with ChiselScalatestTester {
       new LaPDFD()
     ).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
       for (i <- 0 until 17) {
-        dut.io.rxSamples(0).poke(120.S(8.W))
-        dut.io.rxSamples(1).poke(0.S(8.W))
-        dut.io.rxSamples(2).poke(50.S(8.W))
-        dut.io.rxSamples(3).poke(-70.S(8.W))
+        dut.io.rxSamples(0).poke(100.S(8.W))
+        dut.io.rxSamples(1).poke(100.S(8.W))
+        dut.io.rxSamples(2).poke(100.S(8.W))
+        dut.io.rxSamples(3).poke(100.S(8.W))
         dut.clock.step()
       }
       val outVal = dut.io.rxData.peek().litValue

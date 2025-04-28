@@ -14,8 +14,8 @@ class OneDimLaBMU(tapWidth: Int = 8, sampleWidth: Int, upSizeWidth: Int, pam5: S
   val io = IO(new Bundle {
     val rxFilter = Input(SInt(upSizeWidth.W))
     val tapOne  = Input(SInt(tapWidth.W))
-    val symMetricsA = Output(Vec(5, SInt(upSizeWidth.W))) // todo need to verify if int or fixed point
-    val symMetricsB = Output(Vec(5, SInt(upSizeWidth.W))) // todo need to verify if int or fixed point
+    val symMetricsA = Output(Vec(5, UInt(sampleWidth.W))) // todo need to verify if int or fixed point
+    val symMetricsB = Output(Vec(5, UInt(sampleWidth.W))) // todo need to verify if int or fixed point
     val symsA = Output(Vec(5, SInt(3.W)))
     val symsB = Output(Vec(5, SInt(3.W)))
   })
@@ -38,12 +38,12 @@ class OneDimLaBMU(tapWidth: Int = 8, sampleWidth: Int, upSizeWidth: Int, pam5: S
     estSym(i) := io.rxFilter - pam5Vals(i) * io.tapOne
     diffA(i) := estSym(i) - levelSlicer(estSym(i), pam5A, pam5ThreshA)
     diffB(i) := estSym(i) - levelSlicer(estSym(i), pam5B, pam5ThreshB)
-    io.symMetricsA(i) := diffA(i)*diffA(i)
-    io.symMetricsB(i) := diffB(i)*diffB(i)
-    io.symsA(i) := Mux(diffA(i) === pam5A(0), -1.S, 1.S)
+    io.symMetricsA(i) := saturatingSquare(diffA(i), sampleWidth)
+    io.symMetricsB(i) := saturatingSquare(diffB(i), sampleWidth)
+    io.symsA(i) := Mux(estSym(i) === pam5A(0), -1.S, 1.S)
     io.symsB(i) := MuxCase(0.S, Array(
-      (diffB(i) === pam5B(0)) -> -2.S, 
-      (diffB(i) === pam5B(2)) -> 2.S))
+      (estSym(i) === pam5B(0)) -> -2.S, 
+      (estSym(i) === pam5B(2)) -> 2.S))
   }
 
 }

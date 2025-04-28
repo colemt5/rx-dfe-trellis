@@ -24,4 +24,29 @@ object Utils {
 
     result
   }
+
+  /**
+   * Function to square a signed number and return a saturated unsigned result with specified bitwidth.
+   *
+   * @param data      The signed input data to be squared.
+   * @param outWidth  The output bit width for the saturated unsigned result.
+   * @return          The saturated squared result as UInt with width `outWidth`.
+   */
+  def saturatingSquare(data: SInt, outWidth: Int): UInt = {
+    require(outWidth > 0, "Output width must be positive.")
+
+    val fullSquare = Wire(UInt((2 * data.getWidth).W))
+    fullSquare := (data * data).asUInt
+
+    val maxVal = ((1 << outWidth) - 1).U
+
+    val saturated = Wire(UInt(outWidth.W))
+    when(fullSquare > maxVal) {
+      saturated := maxVal
+    } .otherwise {
+      saturated := fullSquare(outWidth-1, 0)
+    }
+
+    saturated
+  }
 }

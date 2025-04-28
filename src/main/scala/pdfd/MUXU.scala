@@ -16,10 +16,10 @@ class MUXU(symBitWidth: Int)
     val symSelects = Input(Vec(4, SInt(3.W)))
     val symsA = Input(Vec(4, Vec(5, SInt(3.W))))
     val symsB = Input(Vec(4, Vec(5, SInt(3.W))))
-    val symMetricsA = Input(Vec(4, Vec(5, SInt(symBitWidth.W))))
-    val symMetricsB = Input(Vec(4, Vec(5, SInt(symBitWidth.W))))
-    val brMetricsA = Output(Vec(4, SInt(symBitWidth.W)))
-    val brMetricsB = Output(Vec(4, SInt(symBitWidth.W)))
+    val symMetricsA = Input(Vec(4, Vec(5, UInt(symBitWidth.W))))
+    val symMetricsB = Input(Vec(4, Vec(5, UInt(symBitWidth.W))))
+    val brMetricsA = Output(Vec(4, UInt(symBitWidth.W)))
+    val brMetricsB = Output(Vec(4, UInt(symBitWidth.W)))
     val brSymsA = Output(Vec(4, SInt(3.W)))
     val brSymsB = Output(Vec(4, SInt(3.W)))
 })
@@ -48,12 +48,12 @@ for (i <- 0 until 4) {
 class SymMux(symBitWidth: Int) extends Module {
   val io = IO(new Bundle {
     val symSelect = Input(SInt(3.W))
-    val symMetricA = Input(Vec(5, SInt(symBitWidth.W)))
-    val symMetricB = Input(Vec(5, SInt(symBitWidth.W)))
+    val symMetricA = Input(Vec(5, UInt(symBitWidth.W)))
+    val symMetricB = Input(Vec(5, UInt(symBitWidth.W)))
     val symsA = Input(Vec(5, SInt(3.W)))
     val symsB = Input(Vec(5, SInt(3.W)))
-    val brMetricA = Output(SInt(symBitWidth.W))
-    val brMetricB = Output(SInt(symBitWidth.W))
+    val brMetricA = Output(UInt(symBitWidth.W))
+    val brMetricB = Output(UInt(symBitWidth.W))
     val brSymA = Output(SInt(3.W))
     val brSymB = Output(SInt(3.W))
   })
@@ -89,8 +89,8 @@ class SymMux(symBitWidth: Int) extends Module {
     io.brSymB := io.symsB(4)
   }
   .otherwise {
-    io.brMetricA := 0.S
-    io.brMetricB := 0.S
+    io.brMetricA := 0.U
+    io.brMetricB := 0.U
     io.brSymA := 0.S
     io.brSymB := 0.S
   }

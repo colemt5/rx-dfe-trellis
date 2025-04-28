@@ -8,15 +8,15 @@ import pdfd.Utils._
   * likely bit sequence.
   *
   */
-class SMU() // todo add parameters 
+class SMU(bitWidth: Int = 12) // todo change to 8 (12 is just for testing)
     extends Module {
   val io = IO(new Bundle {
     val pathSelect = Input(UInt(2.W))
     val stateSymSelects = Input(Vec(4, Vec(4, SInt(3.W))))
-    val byteInputs = Input(Vec(4, Vec(13, UInt(8.W))))
-    val byteChoices = Output(Vec(13, UInt(8.W)))
+    val byteInputs = Input(Vec(4, Vec(13, UInt(bitWidth.W)))) 
+    val byteChoices = Output(Vec(13, UInt(bitWidth.W))) 
     val symSelects = Output(Vec(4, SInt(3.W)))
-    val byteDecision = Output(UInt(8.W))
+    val byteDecision = Output(UInt(bitWidth.W))
   })
 
   val symSurvivor = RegInit(VecInit(Seq.fill(4)(0.S(3.W))))
@@ -27,21 +27,21 @@ class SMU() // todo add parameters
     2.U -> io.stateSymSelects(2),
     3.U -> io.stateSymSelects(3)))
 
-  val shiftReg = RegInit(VecInit(Seq.fill(13)(0.U(8.W))))
+  val shiftReg = RegInit(VecInit(Seq.fill(13)(0.U(bitWidth.W))))
 
   for (i <- 0 until 13) {
-    shiftReg(i) := MuxLookup(io.pathSelect, 0.U(8.W))(Seq(
+    shiftReg(i) := MuxLookup(io.pathSelect, 0.U(bitWidth.W))(Seq(
       0.U -> io.byteInputs(0)(i), 
       1.U -> io.byteInputs(1)(i), 
       2.U -> io.byteInputs(2)(i), 
       3.U -> io.byteInputs(3)(i)))
   }
 
-  io.byteChoices(0) := Cat(symSurvivor(0)(1,0), symSurvivor(1)(1,0), symSurvivor(2)(1,0), symSurvivor(3)(1,0)) // todo create a function that decodes symSurvivor to byteChoices(0)
-  for (i <- 0 until 12) {
+  io.byteChoices(0) := Cat(symSurvivor(3), symSurvivor(2), symSurvivor(1), symSurvivor(0)) // todo create a function that decodes symSurvivor to byteChoices(0)
+  for (i <- 0 until bitWidth) {
     io.byteChoices(i + 1) := shiftReg(i)
   }
-  io.byteDecision := shiftReg(12)
+  io.byteDecision := shiftReg(bitWidth)
 
   io.symSelects := symSurvivor
 }

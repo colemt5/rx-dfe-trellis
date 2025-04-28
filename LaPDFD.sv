@@ -115,7 +115,7 @@ endmodule
 module OneDimLaBMU(
   input  [12:0] io_rxFilter,
   input  [7:0]  io_tapOne,
-  output [12:0] io_symMetricsA_0,
+  output [7:0]  io_symMetricsA_0,
                 io_symMetricsA_1,
                 io_symMetricsA_2,
                 io_symMetricsA_3,
@@ -146,6 +146,10 @@ module OneDimLaBMU(
       ? 8'h65
       : $signed(_estSym_0_T_1) > -13'sh34 ? 8'h0 : 8'h99;
   wire [12:0] _diffB_0_T_2 = _estSym_0_T_1 - {{5{diffB_0_result[7]}}, diffB_0_result};
+  wire [25:0] _GEN_0 = {{13{_diffA_0_T_1[12]}}, _diffA_0_T_1};
+  wire [25:0] io_symMetricsA_0_fullSquare = _GEN_0 * _GEN_0;
+  wire [25:0] _GEN_1 = {{13{_diffB_0_T_2[12]}}, _diffB_0_T_2};
+  wire [25:0] io_symMetricsB_0_fullSquare = _GEN_1 * _GEN_1;
   wire [12:0] _estSym_1_T_1 = io_rxFilter - _GEN * 13'h1FCC;
   wire [7:0]  diffA_1_result = $signed(_estSym_1_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
   wire [12:0] _diffA_1_T_1 = _estSym_1_T_1 - {{5{diffA_1_result[7]}}, diffA_1_result};
@@ -154,6 +158,10 @@ module OneDimLaBMU(
       ? 8'h65
       : $signed(_estSym_1_T_1) > -13'sh34 ? 8'h0 : 8'h99;
   wire [12:0] _diffB_1_T_2 = _estSym_1_T_1 - {{5{diffB_1_result[7]}}, diffB_1_result};
+  wire [25:0] _GEN_2 = {{13{_diffA_1_T_1[12]}}, _diffA_1_T_1};
+  wire [25:0] io_symMetricsA_1_fullSquare = _GEN_2 * _GEN_2;
+  wire [25:0] _GEN_3 = {{13{_diffB_1_T_2[12]}}, _diffB_1_T_2};
+  wire [25:0] io_symMetricsB_1_fullSquare = _GEN_3 * _GEN_3;
   wire [7:0]  diffA_2_result = $signed(io_rxFilter) > 13'sh0 ? 8'h33 : 8'hCC;
   wire [12:0] _diffA_2_T_1 = io_rxFilter - {{5{diffA_2_result[7]}}, diffA_2_result};
   wire [7:0]  diffB_2_result =
@@ -161,6 +169,10 @@ module OneDimLaBMU(
       ? 8'h65
       : $signed(io_rxFilter) > -13'sh34 ? 8'h0 : 8'h99;
   wire [12:0] _diffB_2_T_2 = io_rxFilter - {{5{diffB_2_result[7]}}, diffB_2_result};
+  wire [25:0] _GEN_4 = {{13{_diffA_2_T_1[12]}}, _diffA_2_T_1};
+  wire [25:0] io_symMetricsA_2_fullSquare = _GEN_4 * _GEN_4;
+  wire [25:0] _GEN_5 = {{13{_diffB_2_T_2[12]}}, _diffB_2_T_2};
+  wire [25:0] io_symMetricsB_2_fullSquare = _GEN_5 * _GEN_5;
   wire [12:0] _estSym_3_T_1 = io_rxFilter - _GEN * 13'h33;
   wire [7:0]  diffA_3_result = $signed(_estSym_3_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
   wire [12:0] _diffA_3_T_1 = _estSym_3_T_1 - {{5{diffA_3_result[7]}}, diffA_3_result};
@@ -169,6 +181,10 @@ module OneDimLaBMU(
       ? 8'h65
       : $signed(_estSym_3_T_1) > -13'sh34 ? 8'h0 : 8'h99;
   wire [12:0] _diffB_3_T_2 = _estSym_3_T_1 - {{5{diffB_3_result[7]}}, diffB_3_result};
+  wire [25:0] _GEN_6 = {{13{_diffA_3_T_1[12]}}, _diffA_3_T_1};
+  wire [25:0] io_symMetricsA_3_fullSquare = _GEN_6 * _GEN_6;
+  wire [25:0] _GEN_7 = {{13{_diffB_3_T_2[12]}}, _diffB_3_T_2};
+  wire [25:0] io_symMetricsB_3_fullSquare = _GEN_7 * _GEN_7;
   wire [12:0] _estSym_4_T_1 = io_rxFilter - _GEN * 13'h65;
   wire [7:0]  diffA_4_result = $signed(_estSym_4_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
   wire [12:0] _diffA_4_T_1 = _estSym_4_T_1 - {{5{diffA_4_result[7]}}, diffA_4_result};
@@ -177,80 +193,94 @@ module OneDimLaBMU(
       ? 8'h65
       : $signed(_estSym_4_T_1) > -13'sh34 ? 8'h0 : 8'h99;
   wire [12:0] _diffB_4_T_2 = _estSym_4_T_1 - {{5{diffB_4_result[7]}}, diffB_4_result};
-  assign io_symMetricsA_0 = _diffA_0_T_1 * _diffA_0_T_1;
-  assign io_symMetricsA_1 = _diffA_1_T_1 * _diffA_1_T_1;
-  assign io_symMetricsA_2 = _diffA_2_T_1 * _diffA_2_T_1;
-  assign io_symMetricsA_3 = _diffA_3_T_1 * _diffA_3_T_1;
-  assign io_symMetricsA_4 = _diffA_4_T_1 * _diffA_4_T_1;
-  assign io_symMetricsB_0 = _diffB_0_T_2 * _diffB_0_T_2;
-  assign io_symMetricsB_1 = _diffB_1_T_2 * _diffB_1_T_2;
-  assign io_symMetricsB_2 = _diffB_2_T_2 * _diffB_2_T_2;
-  assign io_symMetricsB_3 = _diffB_3_T_2 * _diffB_3_T_2;
-  assign io_symMetricsB_4 = _diffB_4_T_2 * _diffB_4_T_2;
-  assign io_symsA_0 = {{2{_diffA_0_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_1 = {{2{_diffA_1_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_2 = {{2{_diffA_2_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_3 = {{2{_diffA_3_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_4 = {{2{_diffA_4_T_1 == 13'h1FCC}}, 1'h1};
+  wire [25:0] _GEN_8 = {{13{_diffA_4_T_1[12]}}, _diffA_4_T_1};
+  wire [25:0] io_symMetricsA_4_fullSquare = _GEN_8 * _GEN_8;
+  wire [25:0] _GEN_9 = {{13{_diffB_4_T_2[12]}}, _diffB_4_T_2};
+  wire [25:0] io_symMetricsB_4_fullSquare = _GEN_9 * _GEN_9;
+  assign io_symMetricsA_0 =
+    (|(io_symMetricsA_0_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_0_fullSquare[7:0];
+  assign io_symMetricsA_1 =
+    (|(io_symMetricsA_1_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_1_fullSquare[7:0];
+  assign io_symMetricsA_2 =
+    (|(io_symMetricsA_2_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_2_fullSquare[7:0];
+  assign io_symMetricsA_3 =
+    (|(io_symMetricsA_3_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_3_fullSquare[7:0];
+  assign io_symMetricsA_4 =
+    (|(io_symMetricsA_4_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_4_fullSquare[7:0];
+  assign io_symMetricsB_0 =
+    (|(io_symMetricsB_0_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_0_fullSquare[7:0];
+  assign io_symMetricsB_1 =
+    (|(io_symMetricsB_1_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_1_fullSquare[7:0];
+  assign io_symMetricsB_2 =
+    (|(io_symMetricsB_2_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_2_fullSquare[7:0];
+  assign io_symMetricsB_3 =
+    (|(io_symMetricsB_3_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_3_fullSquare[7:0];
+  assign io_symMetricsB_4 =
+    (|(io_symMetricsB_4_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_4_fullSquare[7:0];
+  assign io_symsA_0 = {{2{_estSym_0_T_1 == 13'h1FCC}}, 1'h1};
+  assign io_symsA_1 = {{2{_estSym_1_T_1 == 13'h1FCC}}, 1'h1};
+  assign io_symsA_2 = {{2{io_rxFilter == 13'h1FCC}}, 1'h1};
+  assign io_symsA_3 = {{2{_estSym_3_T_1 == 13'h1FCC}}, 1'h1};
+  assign io_symsA_4 = {{2{_estSym_4_T_1 == 13'h1FCC}}, 1'h1};
   assign io_symsB_0 =
-    _diffB_0_T_2 == 13'h1F99 ? 3'h6 : {1'h0, _diffB_0_T_2 == 13'h65, 1'h0};
+    _estSym_0_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_0_T_1 == 13'h65, 1'h0};
   assign io_symsB_1 =
-    _diffB_1_T_2 == 13'h1F99 ? 3'h6 : {1'h0, _diffB_1_T_2 == 13'h65, 1'h0};
+    _estSym_1_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_1_T_1 == 13'h65, 1'h0};
   assign io_symsB_2 =
-    _diffB_2_T_2 == 13'h1F99 ? 3'h6 : {1'h0, _diffB_2_T_2 == 13'h65, 1'h0};
+    io_rxFilter == 13'h1F99 ? 3'h6 : {1'h0, io_rxFilter == 13'h65, 1'h0};
   assign io_symsB_3 =
-    _diffB_3_T_2 == 13'h1F99 ? 3'h6 : {1'h0, _diffB_3_T_2 == 13'h65, 1'h0};
+    _estSym_3_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_3_T_1 == 13'h65, 1'h0};
   assign io_symsB_4 =
-    _diffB_4_T_2 == 13'h1F99 ? 3'h6 : {1'h0, _diffB_4_T_2 == 13'h65, 1'h0};
+    _estSym_4_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_4_T_1 == 13'h65, 1'h0};
 endmodule
 
 module SymMux(
-  input  [2:0]  io_symSelect,
-  input  [12:0] io_symMetricA_0,
-                io_symMetricA_1,
-                io_symMetricA_2,
-                io_symMetricA_3,
-                io_symMetricA_4,
-                io_symMetricB_0,
-                io_symMetricB_1,
-                io_symMetricB_2,
-                io_symMetricB_3,
-                io_symMetricB_4,
-  input  [2:0]  io_symsA_0,
-                io_symsA_1,
-                io_symsA_2,
-                io_symsA_3,
-                io_symsA_4,
-                io_symsB_0,
-                io_symsB_1,
-                io_symsB_2,
-                io_symsB_3,
-                io_symsB_4,
-  output [12:0] io_brMetricA,
-                io_brMetricB,
-  output [2:0]  io_brSymA,
-                io_brSymB
+  input  [2:0] io_symSelect,
+  input  [7:0] io_symMetricA_0,
+               io_symMetricA_1,
+               io_symMetricA_2,
+               io_symMetricA_3,
+               io_symMetricA_4,
+               io_symMetricB_0,
+               io_symMetricB_1,
+               io_symMetricB_2,
+               io_symMetricB_3,
+               io_symMetricB_4,
+  input  [2:0] io_symsA_0,
+               io_symsA_1,
+               io_symsA_2,
+               io_symsA_3,
+               io_symsA_4,
+               io_symsB_0,
+               io_symsB_1,
+               io_symsB_2,
+               io_symsB_3,
+               io_symsB_4,
+  output [7:0] io_brMetricA,
+               io_brMetricB,
+  output [2:0] io_brSymA,
+               io_brSymB
 );
 
-  wire [7:0][12:0] _GEN =
+  wire [7:0][7:0] _GEN =
     {{io_symMetricA_1},
      {io_symMetricA_0},
-     {13'h0},
-     {13'h0},
-     {13'h0},
+     {8'h0},
+     {8'h0},
+     {8'h0},
      {io_symMetricA_4},
      {io_symMetricA_3},
      {io_symMetricA_2}};
-  wire [7:0][12:0] _GEN_0 =
+  wire [7:0][7:0] _GEN_0 =
     {{io_symMetricB_1},
      {io_symMetricB_0},
-     {13'h0},
-     {13'h0},
-     {13'h0},
+     {8'h0},
+     {8'h0},
+     {8'h0},
      {io_symMetricB_4},
      {io_symMetricB_3},
      {io_symMetricB_2}};
-  wire [7:0][2:0]  _GEN_1 =
+  wire [7:0][2:0] _GEN_1 =
     {{io_symsA_1},
      {io_symsA_0},
      {3'h0},
@@ -259,7 +289,7 @@ module SymMux(
      {io_symsA_4},
      {io_symsA_3},
      {io_symsA_2}};
-  wire [7:0][2:0]  _GEN_2 =
+  wire [7:0][2:0] _GEN_2 =
     {{io_symsB_1},
      {io_symsB_0},
      {3'h0},
@@ -275,106 +305,106 @@ module SymMux(
 endmodule
 
 module MUXU(
-  input  [2:0]  io_symSelects_0,
-                io_symSelects_1,
-                io_symSelects_2,
-                io_symSelects_3,
-                io_symsA_0_0,
-                io_symsA_0_1,
-                io_symsA_0_2,
-                io_symsA_0_3,
-                io_symsA_0_4,
-                io_symsA_1_0,
-                io_symsA_1_1,
-                io_symsA_1_2,
-                io_symsA_1_3,
-                io_symsA_1_4,
-                io_symsA_2_0,
-                io_symsA_2_1,
-                io_symsA_2_2,
-                io_symsA_2_3,
-                io_symsA_2_4,
-                io_symsA_3_0,
-                io_symsA_3_1,
-                io_symsA_3_2,
-                io_symsA_3_3,
-                io_symsA_3_4,
-                io_symsB_0_0,
-                io_symsB_0_1,
-                io_symsB_0_2,
-                io_symsB_0_3,
-                io_symsB_0_4,
-                io_symsB_1_0,
-                io_symsB_1_1,
-                io_symsB_1_2,
-                io_symsB_1_3,
-                io_symsB_1_4,
-                io_symsB_2_0,
-                io_symsB_2_1,
-                io_symsB_2_2,
-                io_symsB_2_3,
-                io_symsB_2_4,
-                io_symsB_3_0,
-                io_symsB_3_1,
-                io_symsB_3_2,
-                io_symsB_3_3,
-                io_symsB_3_4,
-  input  [12:0] io_symMetricsA_0_0,
-                io_symMetricsA_0_1,
-                io_symMetricsA_0_2,
-                io_symMetricsA_0_3,
-                io_symMetricsA_0_4,
-                io_symMetricsA_1_0,
-                io_symMetricsA_1_1,
-                io_symMetricsA_1_2,
-                io_symMetricsA_1_3,
-                io_symMetricsA_1_4,
-                io_symMetricsA_2_0,
-                io_symMetricsA_2_1,
-                io_symMetricsA_2_2,
-                io_symMetricsA_2_3,
-                io_symMetricsA_2_4,
-                io_symMetricsA_3_0,
-                io_symMetricsA_3_1,
-                io_symMetricsA_3_2,
-                io_symMetricsA_3_3,
-                io_symMetricsA_3_4,
-                io_symMetricsB_0_0,
-                io_symMetricsB_0_1,
-                io_symMetricsB_0_2,
-                io_symMetricsB_0_3,
-                io_symMetricsB_0_4,
-                io_symMetricsB_1_0,
-                io_symMetricsB_1_1,
-                io_symMetricsB_1_2,
-                io_symMetricsB_1_3,
-                io_symMetricsB_1_4,
-                io_symMetricsB_2_0,
-                io_symMetricsB_2_1,
-                io_symMetricsB_2_2,
-                io_symMetricsB_2_3,
-                io_symMetricsB_2_4,
-                io_symMetricsB_3_0,
-                io_symMetricsB_3_1,
-                io_symMetricsB_3_2,
-                io_symMetricsB_3_3,
-                io_symMetricsB_3_4,
-  output [12:0] io_brMetricsA_0,
-                io_brMetricsA_1,
-                io_brMetricsA_2,
-                io_brMetricsA_3,
-                io_brMetricsB_0,
-                io_brMetricsB_1,
-                io_brMetricsB_2,
-                io_brMetricsB_3,
-  output [2:0]  io_brSymsA_0,
-                io_brSymsA_1,
-                io_brSymsA_2,
-                io_brSymsA_3,
-                io_brSymsB_0,
-                io_brSymsB_1,
-                io_brSymsB_2,
-                io_brSymsB_3
+  input  [2:0] io_symSelects_0,
+               io_symSelects_1,
+               io_symSelects_2,
+               io_symSelects_3,
+               io_symsA_0_0,
+               io_symsA_0_1,
+               io_symsA_0_2,
+               io_symsA_0_3,
+               io_symsA_0_4,
+               io_symsA_1_0,
+               io_symsA_1_1,
+               io_symsA_1_2,
+               io_symsA_1_3,
+               io_symsA_1_4,
+               io_symsA_2_0,
+               io_symsA_2_1,
+               io_symsA_2_2,
+               io_symsA_2_3,
+               io_symsA_2_4,
+               io_symsA_3_0,
+               io_symsA_3_1,
+               io_symsA_3_2,
+               io_symsA_3_3,
+               io_symsA_3_4,
+               io_symsB_0_0,
+               io_symsB_0_1,
+               io_symsB_0_2,
+               io_symsB_0_3,
+               io_symsB_0_4,
+               io_symsB_1_0,
+               io_symsB_1_1,
+               io_symsB_1_2,
+               io_symsB_1_3,
+               io_symsB_1_4,
+               io_symsB_2_0,
+               io_symsB_2_1,
+               io_symsB_2_2,
+               io_symsB_2_3,
+               io_symsB_2_4,
+               io_symsB_3_0,
+               io_symsB_3_1,
+               io_symsB_3_2,
+               io_symsB_3_3,
+               io_symsB_3_4,
+  input  [7:0] io_symMetricsA_0_0,
+               io_symMetricsA_0_1,
+               io_symMetricsA_0_2,
+               io_symMetricsA_0_3,
+               io_symMetricsA_0_4,
+               io_symMetricsA_1_0,
+               io_symMetricsA_1_1,
+               io_symMetricsA_1_2,
+               io_symMetricsA_1_3,
+               io_symMetricsA_1_4,
+               io_symMetricsA_2_0,
+               io_symMetricsA_2_1,
+               io_symMetricsA_2_2,
+               io_symMetricsA_2_3,
+               io_symMetricsA_2_4,
+               io_symMetricsA_3_0,
+               io_symMetricsA_3_1,
+               io_symMetricsA_3_2,
+               io_symMetricsA_3_3,
+               io_symMetricsA_3_4,
+               io_symMetricsB_0_0,
+               io_symMetricsB_0_1,
+               io_symMetricsB_0_2,
+               io_symMetricsB_0_3,
+               io_symMetricsB_0_4,
+               io_symMetricsB_1_0,
+               io_symMetricsB_1_1,
+               io_symMetricsB_1_2,
+               io_symMetricsB_1_3,
+               io_symMetricsB_1_4,
+               io_symMetricsB_2_0,
+               io_symMetricsB_2_1,
+               io_symMetricsB_2_2,
+               io_symMetricsB_2_3,
+               io_symMetricsB_2_4,
+               io_symMetricsB_3_0,
+               io_symMetricsB_3_1,
+               io_symMetricsB_3_2,
+               io_symMetricsB_3_3,
+               io_symMetricsB_3_4,
+  output [7:0] io_brMetricsA_0,
+               io_brMetricsA_1,
+               io_brMetricsA_2,
+               io_brMetricsA_3,
+               io_brMetricsB_0,
+               io_brMetricsB_1,
+               io_brMetricsB_2,
+               io_brMetricsB_3,
+  output [2:0] io_brSymsA_0,
+               io_brSymsA_1,
+               io_brSymsA_2,
+               io_brSymsA_3,
+               io_brSymsB_0,
+               io_brSymsB_1,
+               io_brSymsB_2,
+               io_brSymsB_3
 );
 
   SymMux mux_0 (
@@ -488,7 +518,7 @@ module MUXU(
 endmodule
 
 module FourDimBMU(
-  input  [12:0] io_brMetricsA_0,
+  input  [7:0]  io_brMetricsA_0,
                 io_brMetricsA_1,
                 io_brMetricsA_2,
                 io_brMetricsA_3,
@@ -526,34 +556,30 @@ module FourDimBMU(
                 io_brSyms4D_3_3
 );
 
-  wire [12:0] _sumBrMetricA_1_T = io_brMetricsA_0 + io_brMetricsA_1;
-  wire [12:0] _sumBrMetricA_0_T_6 = _sumBrMetricA_1_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricB_1_T = io_brMetricsB_0 + io_brMetricsB_1;
-  wire [12:0] _sumBrMetricB_0_T_6 = _sumBrMetricB_1_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricA_1_T_6 = _sumBrMetricA_1_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricB_1_T_6 = _sumBrMetricB_1_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricA_3_T = io_brMetricsA_0 + io_brMetricsB_1;
-  wire [12:0] _sumBrMetricA_2_T_6 = _sumBrMetricA_3_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricB_3_T = io_brMetricsB_0 + io_brMetricsA_1;
-  wire [12:0] _sumBrMetricB_2_T_6 = _sumBrMetricB_3_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricA_3_T_6 = _sumBrMetricA_3_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricB_3_T_6 = _sumBrMetricB_3_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire        _io_brMetrics4D_0_T =
-    $signed(_sumBrMetricA_0_T_6) < $signed(_sumBrMetricB_0_T_6);
-  wire        _io_brMetrics4D_1_T =
-    $signed(_sumBrMetricA_1_T_6) < $signed(_sumBrMetricB_1_T_6);
-  wire        _io_brMetrics4D_2_T =
-    $signed(_sumBrMetricA_2_T_6) < $signed(_sumBrMetricB_2_T_6);
-  wire        _io_brMetrics4D_3_T =
-    $signed(_sumBrMetricA_3_T_6) < $signed(_sumBrMetricB_3_T_6);
+  wire [7:0] _sumBrMetricA_1_T = io_brMetricsA_0 + io_brMetricsA_1;
+  wire [7:0] _sumBrMetricA_0_T_4 = _sumBrMetricA_1_T + io_brMetricsA_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricB_1_T = io_brMetricsB_0 + io_brMetricsB_1;
+  wire [7:0] _sumBrMetricB_0_T_4 = _sumBrMetricB_1_T + io_brMetricsB_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricA_1_T_4 = _sumBrMetricA_1_T + io_brMetricsB_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricB_1_T_4 = _sumBrMetricB_1_T + io_brMetricsA_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricA_3_T = io_brMetricsA_0 + io_brMetricsB_1;
+  wire [7:0] _sumBrMetricA_2_T_4 = _sumBrMetricA_3_T + io_brMetricsB_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricB_3_T = io_brMetricsB_0 + io_brMetricsA_1;
+  wire [7:0] _sumBrMetricB_2_T_4 = _sumBrMetricB_3_T + io_brMetricsA_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricA_3_T_4 = _sumBrMetricA_3_T + io_brMetricsA_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricB_3_T_4 = _sumBrMetricB_3_T + io_brMetricsB_2 + io_brMetricsA_3;
+  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_4 < _sumBrMetricB_0_T_4;
+  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_4 < _sumBrMetricB_1_T_4;
+  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_4 < _sumBrMetricB_2_T_4;
+  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_4 < _sumBrMetricB_3_T_4;
   assign io_brMetrics4D_0 =
-    _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_6 : _sumBrMetricB_0_T_6;
+    {5'h0, _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_4 : _sumBrMetricB_0_T_4};
   assign io_brMetrics4D_1 =
-    _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_6 : _sumBrMetricB_1_T_6;
+    {5'h0, _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_4 : _sumBrMetricB_1_T_4};
   assign io_brMetrics4D_2 =
-    _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_6 : _sumBrMetricB_2_T_6;
+    {5'h0, _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_4 : _sumBrMetricB_2_T_4};
   assign io_brMetrics4D_3 =
-    _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_6 : _sumBrMetricB_3_T_6;
+    {5'h0, _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_4 : _sumBrMetricB_3_T_4};
   assign io_brSyms4D_0_0 = _io_brMetrics4D_0_T ? io_brSymsA_0 : io_brSymsB_0;
   assign io_brSyms4D_0_1 = _io_brMetrics4D_0_T ? io_brSymsA_1 : io_brSymsB_1;
   assign io_brSyms4D_0_2 = _io_brMetrics4D_0_T ? io_brSymsA_2 : io_brSymsB_2;
@@ -573,7 +599,7 @@ module FourDimBMU(
 endmodule
 
 module FourDimBMU_4(
-  input  [12:0] io_brMetricsA_0,
+  input  [7:0]  io_brMetricsA_0,
                 io_brMetricsA_1,
                 io_brMetricsA_2,
                 io_brMetricsA_3,
@@ -611,34 +637,30 @@ module FourDimBMU_4(
                 io_brSyms4D_3_3
 );
 
-  wire [12:0] _sumBrMetricA_1_T = io_brMetricsA_0 + io_brMetricsA_1;
-  wire [12:0] _sumBrMetricA_0_T_6 = _sumBrMetricA_1_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricB_1_T = io_brMetricsB_0 + io_brMetricsB_1;
-  wire [12:0] _sumBrMetricB_0_T_6 = _sumBrMetricB_1_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricA_1_T_6 = _sumBrMetricA_1_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricB_1_T_6 = _sumBrMetricB_1_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricA_3_T = io_brMetricsA_0 + io_brMetricsB_1;
-  wire [12:0] _sumBrMetricA_2_T_6 = _sumBrMetricA_3_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire [12:0] _sumBrMetricB_3_T = io_brMetricsB_0 + io_brMetricsA_1;
-  wire [12:0] _sumBrMetricB_2_T_6 = _sumBrMetricB_3_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricA_3_T_6 = _sumBrMetricA_3_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [12:0] _sumBrMetricB_3_T_6 = _sumBrMetricB_3_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire        _io_brMetrics4D_0_T =
-    $signed(_sumBrMetricA_0_T_6) < $signed(_sumBrMetricB_0_T_6);
-  wire        _io_brMetrics4D_1_T =
-    $signed(_sumBrMetricA_1_T_6) < $signed(_sumBrMetricB_1_T_6);
-  wire        _io_brMetrics4D_2_T =
-    $signed(_sumBrMetricA_2_T_6) < $signed(_sumBrMetricB_2_T_6);
-  wire        _io_brMetrics4D_3_T =
-    $signed(_sumBrMetricA_3_T_6) < $signed(_sumBrMetricB_3_T_6);
+  wire [7:0] _sumBrMetricA_1_T = io_brMetricsA_0 + io_brMetricsA_1;
+  wire [7:0] _sumBrMetricA_0_T_4 = _sumBrMetricA_1_T + io_brMetricsA_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricB_1_T = io_brMetricsB_0 + io_brMetricsB_1;
+  wire [7:0] _sumBrMetricB_0_T_4 = _sumBrMetricB_1_T + io_brMetricsB_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricA_1_T_4 = _sumBrMetricA_1_T + io_brMetricsB_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricB_1_T_4 = _sumBrMetricB_1_T + io_brMetricsA_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricA_3_T = io_brMetricsA_0 + io_brMetricsB_1;
+  wire [7:0] _sumBrMetricA_2_T_4 = _sumBrMetricA_3_T + io_brMetricsB_2 + io_brMetricsB_3;
+  wire [7:0] _sumBrMetricB_3_T = io_brMetricsB_0 + io_brMetricsA_1;
+  wire [7:0] _sumBrMetricB_2_T_4 = _sumBrMetricB_3_T + io_brMetricsA_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricA_3_T_4 = _sumBrMetricA_3_T + io_brMetricsA_2 + io_brMetricsA_3;
+  wire [7:0] _sumBrMetricB_3_T_4 = _sumBrMetricB_3_T + io_brMetricsB_2 + io_brMetricsB_3;
+  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_4 < _sumBrMetricB_0_T_4;
+  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_4 < _sumBrMetricB_1_T_4;
+  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_4 < _sumBrMetricB_2_T_4;
+  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_4 < _sumBrMetricB_3_T_4;
   assign io_brMetrics4D_0 =
-    _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_6 : _sumBrMetricB_0_T_6;
+    {5'h0, _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_4 : _sumBrMetricB_0_T_4};
   assign io_brMetrics4D_1 =
-    _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_6 : _sumBrMetricB_1_T_6;
+    {5'h0, _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_4 : _sumBrMetricB_1_T_4};
   assign io_brMetrics4D_2 =
-    _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_6 : _sumBrMetricB_2_T_6;
+    {5'h0, _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_4 : _sumBrMetricB_2_T_4};
   assign io_brMetrics4D_3 =
-    _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_6 : _sumBrMetricB_3_T_6;
+    {5'h0, _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_4 : _sumBrMetricB_3_T_4};
   assign io_brSyms4D_0_0 = _io_brMetrics4D_0_T ? io_brSymsA_0 : io_brSymsB_0;
   assign io_brSyms4D_0_1 = _io_brMetrics4D_0_T ? io_brSymsA_1 : io_brSymsB_1;
   assign io_brSyms4D_0_2 = _io_brMetrics4D_0_T ? io_brSymsA_2 : io_brSymsB_2;
@@ -673,241 +695,238 @@ module ACSU(
 );
 
   reg  [12:0] pathMetricReg;
-  wire [14:0] pm0 = $signed({{2{io_pathMetrics_0[12]}}, io_pathMetrics_0}) % 15'sh2000;
-  wire [14:0] pm1 = $signed({{2{io_pathMetrics_1[12]}}, io_pathMetrics_1}) % 15'sh2000;
-  wire [14:0] pm2 = $signed({{2{io_pathMetrics_2[12]}}, io_pathMetrics_2}) % 15'sh2000;
-  wire [14:0] pm3 = $signed({{2{io_pathMetrics_3[12]}}, io_pathMetrics_3}) % 15'sh2000;
-  wire [12:0] _sum0_T = pm0[12:0] + io_brMetrics4D_0;
-  wire [12:0] _sum1_T = pm1[12:0] + io_brMetrics4D_1;
-  wire [12:0] _sum2_T = pm2[12:0] + io_brMetrics4D_2;
-  wire [12:0] _sum3_T = pm3[12:0] + io_brMetrics4D_3;
-  wire        cmp3 = $signed(_sum1_T) < $signed(_sum2_T);
-  wire        cmp4 = $signed(_sum0_T) < $signed(_sum2_T);
-  wire        cmp5 = $signed(_sum0_T) < $signed(_sum1_T);
-  wire        _GEN = $signed(_sum0_T) < $signed(_sum3_T) & cmp4 & cmp5;
-  wire        _GEN_0 = $signed(_sum1_T) < $signed(_sum3_T) & cmp3 & ~cmp5;
-  wire        _GEN_1 = $signed(_sum2_T) < $signed(_sum3_T) & ~cmp3 & ~cmp4;
+  wire [12:0] _sum0_T_1 = io_pathMetrics_0 + io_brMetrics4D_0;
+  wire [12:0] _sum1_T_1 = io_pathMetrics_1 + io_brMetrics4D_1;
+  wire [12:0] _sum2_T_1 = io_pathMetrics_2 + io_brMetrics4D_2;
+  wire [12:0] _sum3_T_1 = io_pathMetrics_3 + io_brMetrics4D_3;
+  wire        cmp3 = $signed(_sum1_T_1) < $signed(_sum2_T_1);
+  wire        cmp4 = $signed(_sum0_T_1) < $signed(_sum2_T_1);
+  wire        cmp5 = $signed(_sum0_T_1) < $signed(_sum1_T_1);
+  wire        _GEN = $signed(_sum0_T_1) < $signed(_sum3_T_1) & cmp4 & cmp5;
+  wire        _GEN_0 = $signed(_sum1_T_1) < $signed(_sum3_T_1) & cmp3 & ~cmp5;
+  wire        _GEN_1 = $signed(_sum2_T_1) < $signed(_sum3_T_1) & ~cmp3 & ~cmp4;
   always @(posedge clock) begin
     if (reset)
       pathMetricReg <= 13'h0;
     else
-      pathMetricReg <= _GEN ? _sum0_T : _GEN_0 ? _sum1_T : _GEN_1 ? _sum2_T : _sum3_T;
+      pathMetricReg <=
+        _GEN ? _sum0_T_1 : _GEN_0 ? _sum1_T_1 : _GEN_1 ? _sum2_T_1 : _sum3_T_1;
   end // always @(posedge)
   assign io_pathSelect = _GEN ? 2'h0 : _GEN_0 ? 2'h1 : {1'h1, ~_GEN_1};
   assign io_pathMetric = pathMetricReg;
 endmodule
 
 module SMU(
-  input        clock,
-               reset,
-  input  [1:0] io_pathSelect,
-  input  [2:0] io_stateSymSelects_0_0,
-               io_stateSymSelects_0_1,
-               io_stateSymSelects_0_2,
-               io_stateSymSelects_0_3,
-               io_stateSymSelects_1_0,
-               io_stateSymSelects_1_1,
-               io_stateSymSelects_1_2,
-               io_stateSymSelects_1_3,
-               io_stateSymSelects_2_0,
-               io_stateSymSelects_2_1,
-               io_stateSymSelects_2_2,
-               io_stateSymSelects_2_3,
-               io_stateSymSelects_3_0,
-               io_stateSymSelects_3_1,
-               io_stateSymSelects_3_2,
-               io_stateSymSelects_3_3,
-  input  [7:0] io_byteInputs_0_0,
-               io_byteInputs_0_1,
-               io_byteInputs_0_2,
-               io_byteInputs_0_3,
-               io_byteInputs_0_4,
-               io_byteInputs_0_5,
-               io_byteInputs_0_6,
-               io_byteInputs_0_7,
-               io_byteInputs_0_8,
-               io_byteInputs_0_9,
-               io_byteInputs_0_10,
-               io_byteInputs_0_11,
-               io_byteInputs_0_12,
-               io_byteInputs_1_0,
-               io_byteInputs_1_1,
-               io_byteInputs_1_2,
-               io_byteInputs_1_3,
-               io_byteInputs_1_4,
-               io_byteInputs_1_5,
-               io_byteInputs_1_6,
-               io_byteInputs_1_7,
-               io_byteInputs_1_8,
-               io_byteInputs_1_9,
-               io_byteInputs_1_10,
-               io_byteInputs_1_11,
-               io_byteInputs_1_12,
-               io_byteInputs_2_0,
-               io_byteInputs_2_1,
-               io_byteInputs_2_2,
-               io_byteInputs_2_3,
-               io_byteInputs_2_4,
-               io_byteInputs_2_5,
-               io_byteInputs_2_6,
-               io_byteInputs_2_7,
-               io_byteInputs_2_8,
-               io_byteInputs_2_9,
-               io_byteInputs_2_10,
-               io_byteInputs_2_11,
-               io_byteInputs_2_12,
-               io_byteInputs_3_0,
-               io_byteInputs_3_1,
-               io_byteInputs_3_2,
-               io_byteInputs_3_3,
-               io_byteInputs_3_4,
-               io_byteInputs_3_5,
-               io_byteInputs_3_6,
-               io_byteInputs_3_7,
-               io_byteInputs_3_8,
-               io_byteInputs_3_9,
-               io_byteInputs_3_10,
-               io_byteInputs_3_11,
-               io_byteInputs_3_12,
-  output [7:0] io_byteChoices_0,
-               io_byteChoices_1,
-               io_byteChoices_2,
-               io_byteChoices_3,
-               io_byteChoices_4,
-               io_byteChoices_5,
-               io_byteChoices_6,
-               io_byteChoices_7,
-               io_byteChoices_8,
-               io_byteChoices_9,
-               io_byteChoices_10,
-               io_byteChoices_11,
-               io_byteChoices_12,
-  output [2:0] io_symSelects_0,
-               io_symSelects_1,
-               io_symSelects_2,
-               io_symSelects_3,
-  output [7:0] io_byteDecision
+  input         clock,
+                reset,
+  input  [1:0]  io_pathSelect,
+  input  [2:0]  io_stateSymSelects_0_0,
+                io_stateSymSelects_0_1,
+                io_stateSymSelects_0_2,
+                io_stateSymSelects_0_3,
+                io_stateSymSelects_1_0,
+                io_stateSymSelects_1_1,
+                io_stateSymSelects_1_2,
+                io_stateSymSelects_1_3,
+                io_stateSymSelects_2_0,
+                io_stateSymSelects_2_1,
+                io_stateSymSelects_2_2,
+                io_stateSymSelects_2_3,
+                io_stateSymSelects_3_0,
+                io_stateSymSelects_3_1,
+                io_stateSymSelects_3_2,
+                io_stateSymSelects_3_3,
+  input  [11:0] io_byteInputs_0_0,
+                io_byteInputs_0_1,
+                io_byteInputs_0_2,
+                io_byteInputs_0_3,
+                io_byteInputs_0_4,
+                io_byteInputs_0_5,
+                io_byteInputs_0_6,
+                io_byteInputs_0_7,
+                io_byteInputs_0_8,
+                io_byteInputs_0_9,
+                io_byteInputs_0_10,
+                io_byteInputs_0_11,
+                io_byteInputs_0_12,
+                io_byteInputs_1_0,
+                io_byteInputs_1_1,
+                io_byteInputs_1_2,
+                io_byteInputs_1_3,
+                io_byteInputs_1_4,
+                io_byteInputs_1_5,
+                io_byteInputs_1_6,
+                io_byteInputs_1_7,
+                io_byteInputs_1_8,
+                io_byteInputs_1_9,
+                io_byteInputs_1_10,
+                io_byteInputs_1_11,
+                io_byteInputs_1_12,
+                io_byteInputs_2_0,
+                io_byteInputs_2_1,
+                io_byteInputs_2_2,
+                io_byteInputs_2_3,
+                io_byteInputs_2_4,
+                io_byteInputs_2_5,
+                io_byteInputs_2_6,
+                io_byteInputs_2_7,
+                io_byteInputs_2_8,
+                io_byteInputs_2_9,
+                io_byteInputs_2_10,
+                io_byteInputs_2_11,
+                io_byteInputs_2_12,
+                io_byteInputs_3_0,
+                io_byteInputs_3_1,
+                io_byteInputs_3_2,
+                io_byteInputs_3_3,
+                io_byteInputs_3_4,
+                io_byteInputs_3_5,
+                io_byteInputs_3_6,
+                io_byteInputs_3_7,
+                io_byteInputs_3_8,
+                io_byteInputs_3_9,
+                io_byteInputs_3_10,
+                io_byteInputs_3_11,
+                io_byteInputs_3_12,
+  output [11:0] io_byteChoices_0,
+                io_byteChoices_1,
+                io_byteChoices_2,
+                io_byteChoices_3,
+                io_byteChoices_4,
+                io_byteChoices_5,
+                io_byteChoices_6,
+                io_byteChoices_7,
+                io_byteChoices_8,
+                io_byteChoices_9,
+                io_byteChoices_10,
+                io_byteChoices_11,
+                io_byteChoices_12,
+  output [2:0]  io_symSelects_0,
+                io_symSelects_1,
+                io_symSelects_2,
+                io_symSelects_3,
+  output [11:0] io_byteDecision
 );
 
-  reg [2:0] symSurvivor_0;
-  reg [2:0] symSurvivor_1;
-  reg [2:0] symSurvivor_2;
-  reg [2:0] symSurvivor_3;
-  reg [7:0] shiftReg_0;
-  reg [7:0] shiftReg_1;
-  reg [7:0] shiftReg_2;
-  reg [7:0] shiftReg_3;
-  reg [7:0] shiftReg_4;
-  reg [7:0] shiftReg_5;
-  reg [7:0] shiftReg_6;
-  reg [7:0] shiftReg_7;
-  reg [7:0] shiftReg_8;
-  reg [7:0] shiftReg_9;
-  reg [7:0] shiftReg_10;
-  reg [7:0] shiftReg_11;
-  reg [7:0] shiftReg_12;
+  reg [2:0]  symSurvivor_0;
+  reg [2:0]  symSurvivor_1;
+  reg [2:0]  symSurvivor_2;
+  reg [2:0]  symSurvivor_3;
+  reg [11:0] shiftReg_0;
+  reg [11:0] shiftReg_1;
+  reg [11:0] shiftReg_2;
+  reg [11:0] shiftReg_3;
+  reg [11:0] shiftReg_4;
+  reg [11:0] shiftReg_5;
+  reg [11:0] shiftReg_6;
+  reg [11:0] shiftReg_7;
+  reg [11:0] shiftReg_8;
+  reg [11:0] shiftReg_9;
+  reg [11:0] shiftReg_10;
+  reg [11:0] shiftReg_11;
+  reg [11:0] shiftReg_12;
   always @(posedge clock) begin
     if (reset) begin
       symSurvivor_0 <= 3'h0;
       symSurvivor_1 <= 3'h0;
       symSurvivor_2 <= 3'h0;
       symSurvivor_3 <= 3'h0;
-      shiftReg_0 <= 8'h0;
-      shiftReg_1 <= 8'h0;
-      shiftReg_2 <= 8'h0;
-      shiftReg_3 <= 8'h0;
-      shiftReg_4 <= 8'h0;
-      shiftReg_5 <= 8'h0;
-      shiftReg_6 <= 8'h0;
-      shiftReg_7 <= 8'h0;
-      shiftReg_8 <= 8'h0;
-      shiftReg_9 <= 8'h0;
-      shiftReg_10 <= 8'h0;
-      shiftReg_11 <= 8'h0;
-      shiftReg_12 <= 8'h0;
+      shiftReg_0 <= 12'h0;
+      shiftReg_1 <= 12'h0;
+      shiftReg_2 <= 12'h0;
+      shiftReg_3 <= 12'h0;
+      shiftReg_4 <= 12'h0;
+      shiftReg_5 <= 12'h0;
+      shiftReg_6 <= 12'h0;
+      shiftReg_7 <= 12'h0;
+      shiftReg_8 <= 12'h0;
+      shiftReg_9 <= 12'h0;
+      shiftReg_10 <= 12'h0;
+      shiftReg_11 <= 12'h0;
+      shiftReg_12 <= 12'h0;
     end
     else begin
-      automatic logic [3:0][2:0] _GEN =
+      automatic logic [3:0][2:0]  _GEN =
         {{io_stateSymSelects_3_0},
          {io_stateSymSelects_2_0},
          {io_stateSymSelects_1_0},
          {io_stateSymSelects_0_0}};
-      automatic logic [3:0][2:0] _GEN_0 =
+      automatic logic [3:0][2:0]  _GEN_0 =
         {{io_stateSymSelects_3_1},
          {io_stateSymSelects_2_1},
          {io_stateSymSelects_1_1},
          {io_stateSymSelects_0_1}};
-      automatic logic [3:0][2:0] _GEN_1 =
+      automatic logic [3:0][2:0]  _GEN_1 =
         {{io_stateSymSelects_3_2},
          {io_stateSymSelects_2_2},
          {io_stateSymSelects_1_2},
          {io_stateSymSelects_0_2}};
-      automatic logic [3:0][2:0] _GEN_2 =
+      automatic logic [3:0][2:0]  _GEN_2 =
         {{io_stateSymSelects_3_3},
          {io_stateSymSelects_2_3},
          {io_stateSymSelects_1_3},
          {io_stateSymSelects_0_3}};
-      automatic logic [3:0][7:0] _GEN_3 =
+      automatic logic [3:0][11:0] _GEN_3 =
         {{io_byteInputs_3_0},
          {io_byteInputs_2_0},
          {io_byteInputs_1_0},
          {io_byteInputs_0_0}};
-      automatic logic [3:0][7:0] _GEN_4 =
+      automatic logic [3:0][11:0] _GEN_4 =
         {{io_byteInputs_3_1},
          {io_byteInputs_2_1},
          {io_byteInputs_1_1},
          {io_byteInputs_0_1}};
-      automatic logic [3:0][7:0] _GEN_5 =
+      automatic logic [3:0][11:0] _GEN_5 =
         {{io_byteInputs_3_2},
          {io_byteInputs_2_2},
          {io_byteInputs_1_2},
          {io_byteInputs_0_2}};
-      automatic logic [3:0][7:0] _GEN_6 =
+      automatic logic [3:0][11:0] _GEN_6 =
         {{io_byteInputs_3_3},
          {io_byteInputs_2_3},
          {io_byteInputs_1_3},
          {io_byteInputs_0_3}};
-      automatic logic [3:0][7:0] _GEN_7 =
+      automatic logic [3:0][11:0] _GEN_7 =
         {{io_byteInputs_3_4},
          {io_byteInputs_2_4},
          {io_byteInputs_1_4},
          {io_byteInputs_0_4}};
-      automatic logic [3:0][7:0] _GEN_8 =
+      automatic logic [3:0][11:0] _GEN_8 =
         {{io_byteInputs_3_5},
          {io_byteInputs_2_5},
          {io_byteInputs_1_5},
          {io_byteInputs_0_5}};
-      automatic logic [3:0][7:0] _GEN_9 =
+      automatic logic [3:0][11:0] _GEN_9 =
         {{io_byteInputs_3_6},
          {io_byteInputs_2_6},
          {io_byteInputs_1_6},
          {io_byteInputs_0_6}};
-      automatic logic [3:0][7:0] _GEN_10 =
+      automatic logic [3:0][11:0] _GEN_10 =
         {{io_byteInputs_3_7},
          {io_byteInputs_2_7},
          {io_byteInputs_1_7},
          {io_byteInputs_0_7}};
-      automatic logic [3:0][7:0] _GEN_11 =
+      automatic logic [3:0][11:0] _GEN_11 =
         {{io_byteInputs_3_8},
          {io_byteInputs_2_8},
          {io_byteInputs_1_8},
          {io_byteInputs_0_8}};
-      automatic logic [3:0][7:0] _GEN_12 =
+      automatic logic [3:0][11:0] _GEN_12 =
         {{io_byteInputs_3_9},
          {io_byteInputs_2_9},
          {io_byteInputs_1_9},
          {io_byteInputs_0_9}};
-      automatic logic [3:0][7:0] _GEN_13 =
+      automatic logic [3:0][11:0] _GEN_13 =
         {{io_byteInputs_3_10},
          {io_byteInputs_2_10},
          {io_byteInputs_1_10},
          {io_byteInputs_0_10}};
-      automatic logic [3:0][7:0] _GEN_14 =
+      automatic logic [3:0][11:0] _GEN_14 =
         {{io_byteInputs_3_11},
          {io_byteInputs_2_11},
          {io_byteInputs_1_11},
          {io_byteInputs_0_11}};
-      automatic logic [3:0][7:0] _GEN_15 =
+      automatic logic [3:0][11:0] _GEN_15 =
         {{io_byteInputs_3_12},
          {io_byteInputs_2_12},
          {io_byteInputs_1_12},
@@ -931,8 +950,7 @@ module SMU(
       shiftReg_12 <= _GEN_15[io_pathSelect];
     end
   end // always @(posedge)
-  assign io_byteChoices_0 =
-    {symSurvivor_0[1:0], symSurvivor_1[1:0], symSurvivor_2[1:0], symSurvivor_3[1:0]};
+  assign io_byteChoices_0 = {symSurvivor_3, symSurvivor_2, symSurvivor_1, symSurvivor_0};
   assign io_byteChoices_1 = shiftReg_0;
   assign io_byteChoices_2 = shiftReg_1;
   assign io_byteChoices_3 = shiftReg_2;
@@ -953,162 +971,162 @@ module SMU(
 endmodule
 
 module LaPDFD(
-  input        clock,
-               reset,
-  input  [7:0] io_rxSamples_0,
-               io_rxSamples_1,
-               io_rxSamples_2,
-               io_rxSamples_3,
-               io_taps_0,
-               io_taps_1,
-               io_taps_2,
-               io_taps_3,
-               io_taps_4,
-               io_taps_5,
-               io_taps_6,
-               io_taps_7,
-               io_taps_8,
-               io_taps_9,
-               io_taps_10,
-               io_taps_11,
-               io_taps_12,
-               io_taps_13,
-  output [7:0] io_rxData,
-  output       io_rxValid
+  input         clock,
+                reset,
+  input  [7:0]  io_rxSamples_0,
+                io_rxSamples_1,
+                io_rxSamples_2,
+                io_rxSamples_3,
+                io_taps_0,
+                io_taps_1,
+                io_taps_2,
+                io_taps_3,
+                io_taps_4,
+                io_taps_5,
+                io_taps_6,
+                io_taps_7,
+                io_taps_8,
+                io_taps_9,
+                io_taps_10,
+                io_taps_11,
+                io_taps_12,
+                io_taps_13,
+  output [11:0] io_rxData,
+  output        io_rxValid
 );
 
-  wire [7:0]  _smu_7_io_byteChoices_0;
-  wire [7:0]  _smu_7_io_byteChoices_1;
-  wire [7:0]  _smu_7_io_byteChoices_2;
-  wire [7:0]  _smu_7_io_byteChoices_3;
-  wire [7:0]  _smu_7_io_byteChoices_4;
-  wire [7:0]  _smu_7_io_byteChoices_5;
-  wire [7:0]  _smu_7_io_byteChoices_6;
-  wire [7:0]  _smu_7_io_byteChoices_7;
-  wire [7:0]  _smu_7_io_byteChoices_8;
-  wire [7:0]  _smu_7_io_byteChoices_9;
-  wire [7:0]  _smu_7_io_byteChoices_10;
-  wire [7:0]  _smu_7_io_byteChoices_11;
-  wire [7:0]  _smu_7_io_byteChoices_12;
+  wire [11:0] _smu_7_io_byteChoices_0;
+  wire [11:0] _smu_7_io_byteChoices_1;
+  wire [11:0] _smu_7_io_byteChoices_2;
+  wire [11:0] _smu_7_io_byteChoices_3;
+  wire [11:0] _smu_7_io_byteChoices_4;
+  wire [11:0] _smu_7_io_byteChoices_5;
+  wire [11:0] _smu_7_io_byteChoices_6;
+  wire [11:0] _smu_7_io_byteChoices_7;
+  wire [11:0] _smu_7_io_byteChoices_8;
+  wire [11:0] _smu_7_io_byteChoices_9;
+  wire [11:0] _smu_7_io_byteChoices_10;
+  wire [11:0] _smu_7_io_byteChoices_11;
+  wire [11:0] _smu_7_io_byteChoices_12;
   wire [2:0]  _smu_7_io_symSelects_0;
   wire [2:0]  _smu_7_io_symSelects_1;
   wire [2:0]  _smu_7_io_symSelects_2;
   wire [2:0]  _smu_7_io_symSelects_3;
-  wire [7:0]  _smu_6_io_byteChoices_0;
-  wire [7:0]  _smu_6_io_byteChoices_1;
-  wire [7:0]  _smu_6_io_byteChoices_2;
-  wire [7:0]  _smu_6_io_byteChoices_3;
-  wire [7:0]  _smu_6_io_byteChoices_4;
-  wire [7:0]  _smu_6_io_byteChoices_5;
-  wire [7:0]  _smu_6_io_byteChoices_6;
-  wire [7:0]  _smu_6_io_byteChoices_7;
-  wire [7:0]  _smu_6_io_byteChoices_8;
-  wire [7:0]  _smu_6_io_byteChoices_9;
-  wire [7:0]  _smu_6_io_byteChoices_10;
-  wire [7:0]  _smu_6_io_byteChoices_11;
-  wire [7:0]  _smu_6_io_byteChoices_12;
+  wire [11:0] _smu_6_io_byteChoices_0;
+  wire [11:0] _smu_6_io_byteChoices_1;
+  wire [11:0] _smu_6_io_byteChoices_2;
+  wire [11:0] _smu_6_io_byteChoices_3;
+  wire [11:0] _smu_6_io_byteChoices_4;
+  wire [11:0] _smu_6_io_byteChoices_5;
+  wire [11:0] _smu_6_io_byteChoices_6;
+  wire [11:0] _smu_6_io_byteChoices_7;
+  wire [11:0] _smu_6_io_byteChoices_8;
+  wire [11:0] _smu_6_io_byteChoices_9;
+  wire [11:0] _smu_6_io_byteChoices_10;
+  wire [11:0] _smu_6_io_byteChoices_11;
+  wire [11:0] _smu_6_io_byteChoices_12;
   wire [2:0]  _smu_6_io_symSelects_0;
   wire [2:0]  _smu_6_io_symSelects_1;
   wire [2:0]  _smu_6_io_symSelects_2;
   wire [2:0]  _smu_6_io_symSelects_3;
-  wire [7:0]  _smu_5_io_byteChoices_0;
-  wire [7:0]  _smu_5_io_byteChoices_1;
-  wire [7:0]  _smu_5_io_byteChoices_2;
-  wire [7:0]  _smu_5_io_byteChoices_3;
-  wire [7:0]  _smu_5_io_byteChoices_4;
-  wire [7:0]  _smu_5_io_byteChoices_5;
-  wire [7:0]  _smu_5_io_byteChoices_6;
-  wire [7:0]  _smu_5_io_byteChoices_7;
-  wire [7:0]  _smu_5_io_byteChoices_8;
-  wire [7:0]  _smu_5_io_byteChoices_9;
-  wire [7:0]  _smu_5_io_byteChoices_10;
-  wire [7:0]  _smu_5_io_byteChoices_11;
-  wire [7:0]  _smu_5_io_byteChoices_12;
+  wire [11:0] _smu_5_io_byteChoices_0;
+  wire [11:0] _smu_5_io_byteChoices_1;
+  wire [11:0] _smu_5_io_byteChoices_2;
+  wire [11:0] _smu_5_io_byteChoices_3;
+  wire [11:0] _smu_5_io_byteChoices_4;
+  wire [11:0] _smu_5_io_byteChoices_5;
+  wire [11:0] _smu_5_io_byteChoices_6;
+  wire [11:0] _smu_5_io_byteChoices_7;
+  wire [11:0] _smu_5_io_byteChoices_8;
+  wire [11:0] _smu_5_io_byteChoices_9;
+  wire [11:0] _smu_5_io_byteChoices_10;
+  wire [11:0] _smu_5_io_byteChoices_11;
+  wire [11:0] _smu_5_io_byteChoices_12;
   wire [2:0]  _smu_5_io_symSelects_0;
   wire [2:0]  _smu_5_io_symSelects_1;
   wire [2:0]  _smu_5_io_symSelects_2;
   wire [2:0]  _smu_5_io_symSelects_3;
-  wire [7:0]  _smu_4_io_byteChoices_0;
-  wire [7:0]  _smu_4_io_byteChoices_1;
-  wire [7:0]  _smu_4_io_byteChoices_2;
-  wire [7:0]  _smu_4_io_byteChoices_3;
-  wire [7:0]  _smu_4_io_byteChoices_4;
-  wire [7:0]  _smu_4_io_byteChoices_5;
-  wire [7:0]  _smu_4_io_byteChoices_6;
-  wire [7:0]  _smu_4_io_byteChoices_7;
-  wire [7:0]  _smu_4_io_byteChoices_8;
-  wire [7:0]  _smu_4_io_byteChoices_9;
-  wire [7:0]  _smu_4_io_byteChoices_10;
-  wire [7:0]  _smu_4_io_byteChoices_11;
-  wire [7:0]  _smu_4_io_byteChoices_12;
+  wire [11:0] _smu_4_io_byteChoices_0;
+  wire [11:0] _smu_4_io_byteChoices_1;
+  wire [11:0] _smu_4_io_byteChoices_2;
+  wire [11:0] _smu_4_io_byteChoices_3;
+  wire [11:0] _smu_4_io_byteChoices_4;
+  wire [11:0] _smu_4_io_byteChoices_5;
+  wire [11:0] _smu_4_io_byteChoices_6;
+  wire [11:0] _smu_4_io_byteChoices_7;
+  wire [11:0] _smu_4_io_byteChoices_8;
+  wire [11:0] _smu_4_io_byteChoices_9;
+  wire [11:0] _smu_4_io_byteChoices_10;
+  wire [11:0] _smu_4_io_byteChoices_11;
+  wire [11:0] _smu_4_io_byteChoices_12;
   wire [2:0]  _smu_4_io_symSelects_0;
   wire [2:0]  _smu_4_io_symSelects_1;
   wire [2:0]  _smu_4_io_symSelects_2;
   wire [2:0]  _smu_4_io_symSelects_3;
-  wire [7:0]  _smu_3_io_byteChoices_0;
-  wire [7:0]  _smu_3_io_byteChoices_1;
-  wire [7:0]  _smu_3_io_byteChoices_2;
-  wire [7:0]  _smu_3_io_byteChoices_3;
-  wire [7:0]  _smu_3_io_byteChoices_4;
-  wire [7:0]  _smu_3_io_byteChoices_5;
-  wire [7:0]  _smu_3_io_byteChoices_6;
-  wire [7:0]  _smu_3_io_byteChoices_7;
-  wire [7:0]  _smu_3_io_byteChoices_8;
-  wire [7:0]  _smu_3_io_byteChoices_9;
-  wire [7:0]  _smu_3_io_byteChoices_10;
-  wire [7:0]  _smu_3_io_byteChoices_11;
-  wire [7:0]  _smu_3_io_byteChoices_12;
+  wire [11:0] _smu_3_io_byteChoices_0;
+  wire [11:0] _smu_3_io_byteChoices_1;
+  wire [11:0] _smu_3_io_byteChoices_2;
+  wire [11:0] _smu_3_io_byteChoices_3;
+  wire [11:0] _smu_3_io_byteChoices_4;
+  wire [11:0] _smu_3_io_byteChoices_5;
+  wire [11:0] _smu_3_io_byteChoices_6;
+  wire [11:0] _smu_3_io_byteChoices_7;
+  wire [11:0] _smu_3_io_byteChoices_8;
+  wire [11:0] _smu_3_io_byteChoices_9;
+  wire [11:0] _smu_3_io_byteChoices_10;
+  wire [11:0] _smu_3_io_byteChoices_11;
+  wire [11:0] _smu_3_io_byteChoices_12;
   wire [2:0]  _smu_3_io_symSelects_0;
   wire [2:0]  _smu_3_io_symSelects_1;
   wire [2:0]  _smu_3_io_symSelects_2;
   wire [2:0]  _smu_3_io_symSelects_3;
-  wire [7:0]  _smu_2_io_byteChoices_0;
-  wire [7:0]  _smu_2_io_byteChoices_1;
-  wire [7:0]  _smu_2_io_byteChoices_2;
-  wire [7:0]  _smu_2_io_byteChoices_3;
-  wire [7:0]  _smu_2_io_byteChoices_4;
-  wire [7:0]  _smu_2_io_byteChoices_5;
-  wire [7:0]  _smu_2_io_byteChoices_6;
-  wire [7:0]  _smu_2_io_byteChoices_7;
-  wire [7:0]  _smu_2_io_byteChoices_8;
-  wire [7:0]  _smu_2_io_byteChoices_9;
-  wire [7:0]  _smu_2_io_byteChoices_10;
-  wire [7:0]  _smu_2_io_byteChoices_11;
-  wire [7:0]  _smu_2_io_byteChoices_12;
+  wire [11:0] _smu_2_io_byteChoices_0;
+  wire [11:0] _smu_2_io_byteChoices_1;
+  wire [11:0] _smu_2_io_byteChoices_2;
+  wire [11:0] _smu_2_io_byteChoices_3;
+  wire [11:0] _smu_2_io_byteChoices_4;
+  wire [11:0] _smu_2_io_byteChoices_5;
+  wire [11:0] _smu_2_io_byteChoices_6;
+  wire [11:0] _smu_2_io_byteChoices_7;
+  wire [11:0] _smu_2_io_byteChoices_8;
+  wire [11:0] _smu_2_io_byteChoices_9;
+  wire [11:0] _smu_2_io_byteChoices_10;
+  wire [11:0] _smu_2_io_byteChoices_11;
+  wire [11:0] _smu_2_io_byteChoices_12;
   wire [2:0]  _smu_2_io_symSelects_0;
   wire [2:0]  _smu_2_io_symSelects_1;
   wire [2:0]  _smu_2_io_symSelects_2;
   wire [2:0]  _smu_2_io_symSelects_3;
-  wire [7:0]  _smu_1_io_byteChoices_0;
-  wire [7:0]  _smu_1_io_byteChoices_1;
-  wire [7:0]  _smu_1_io_byteChoices_2;
-  wire [7:0]  _smu_1_io_byteChoices_3;
-  wire [7:0]  _smu_1_io_byteChoices_4;
-  wire [7:0]  _smu_1_io_byteChoices_5;
-  wire [7:0]  _smu_1_io_byteChoices_6;
-  wire [7:0]  _smu_1_io_byteChoices_7;
-  wire [7:0]  _smu_1_io_byteChoices_8;
-  wire [7:0]  _smu_1_io_byteChoices_9;
-  wire [7:0]  _smu_1_io_byteChoices_10;
-  wire [7:0]  _smu_1_io_byteChoices_11;
-  wire [7:0]  _smu_1_io_byteChoices_12;
+  wire [11:0] _smu_1_io_byteChoices_0;
+  wire [11:0] _smu_1_io_byteChoices_1;
+  wire [11:0] _smu_1_io_byteChoices_2;
+  wire [11:0] _smu_1_io_byteChoices_3;
+  wire [11:0] _smu_1_io_byteChoices_4;
+  wire [11:0] _smu_1_io_byteChoices_5;
+  wire [11:0] _smu_1_io_byteChoices_6;
+  wire [11:0] _smu_1_io_byteChoices_7;
+  wire [11:0] _smu_1_io_byteChoices_8;
+  wire [11:0] _smu_1_io_byteChoices_9;
+  wire [11:0] _smu_1_io_byteChoices_10;
+  wire [11:0] _smu_1_io_byteChoices_11;
+  wire [11:0] _smu_1_io_byteChoices_12;
   wire [2:0]  _smu_1_io_symSelects_0;
   wire [2:0]  _smu_1_io_symSelects_1;
   wire [2:0]  _smu_1_io_symSelects_2;
   wire [2:0]  _smu_1_io_symSelects_3;
-  wire [7:0]  _smu_0_io_byteChoices_0;
-  wire [7:0]  _smu_0_io_byteChoices_1;
-  wire [7:0]  _smu_0_io_byteChoices_2;
-  wire [7:0]  _smu_0_io_byteChoices_3;
-  wire [7:0]  _smu_0_io_byteChoices_4;
-  wire [7:0]  _smu_0_io_byteChoices_5;
-  wire [7:0]  _smu_0_io_byteChoices_6;
-  wire [7:0]  _smu_0_io_byteChoices_7;
-  wire [7:0]  _smu_0_io_byteChoices_8;
-  wire [7:0]  _smu_0_io_byteChoices_9;
-  wire [7:0]  _smu_0_io_byteChoices_10;
-  wire [7:0]  _smu_0_io_byteChoices_11;
-  wire [7:0]  _smu_0_io_byteChoices_12;
+  wire [11:0] _smu_0_io_byteChoices_0;
+  wire [11:0] _smu_0_io_byteChoices_1;
+  wire [11:0] _smu_0_io_byteChoices_2;
+  wire [11:0] _smu_0_io_byteChoices_3;
+  wire [11:0] _smu_0_io_byteChoices_4;
+  wire [11:0] _smu_0_io_byteChoices_5;
+  wire [11:0] _smu_0_io_byteChoices_6;
+  wire [11:0] _smu_0_io_byteChoices_7;
+  wire [11:0] _smu_0_io_byteChoices_8;
+  wire [11:0] _smu_0_io_byteChoices_9;
+  wire [11:0] _smu_0_io_byteChoices_10;
+  wire [11:0] _smu_0_io_byteChoices_11;
+  wire [11:0] _smu_0_io_byteChoices_12;
   wire [2:0]  _smu_0_io_symSelects_0;
   wire [2:0]  _smu_0_io_symSelects_1;
   wire [2:0]  _smu_0_io_symSelects_2;
@@ -1273,14 +1291,14 @@ module LaPDFD(
   wire [2:0]  _bmuEven_0_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_0_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_0_io_brSyms4D_3_3;
-  wire [12:0] _muxu_7_io_brMetricsA_0;
-  wire [12:0] _muxu_7_io_brMetricsA_1;
-  wire [12:0] _muxu_7_io_brMetricsA_2;
-  wire [12:0] _muxu_7_io_brMetricsA_3;
-  wire [12:0] _muxu_7_io_brMetricsB_0;
-  wire [12:0] _muxu_7_io_brMetricsB_1;
-  wire [12:0] _muxu_7_io_brMetricsB_2;
-  wire [12:0] _muxu_7_io_brMetricsB_3;
+  wire [7:0]  _muxu_7_io_brMetricsA_0;
+  wire [7:0]  _muxu_7_io_brMetricsA_1;
+  wire [7:0]  _muxu_7_io_brMetricsA_2;
+  wire [7:0]  _muxu_7_io_brMetricsA_3;
+  wire [7:0]  _muxu_7_io_brMetricsB_0;
+  wire [7:0]  _muxu_7_io_brMetricsB_1;
+  wire [7:0]  _muxu_7_io_brMetricsB_2;
+  wire [7:0]  _muxu_7_io_brMetricsB_3;
   wire [2:0]  _muxu_7_io_brSymsA_0;
   wire [2:0]  _muxu_7_io_brSymsA_1;
   wire [2:0]  _muxu_7_io_brSymsA_2;
@@ -1289,14 +1307,14 @@ module LaPDFD(
   wire [2:0]  _muxu_7_io_brSymsB_1;
   wire [2:0]  _muxu_7_io_brSymsB_2;
   wire [2:0]  _muxu_7_io_brSymsB_3;
-  wire [12:0] _muxu_6_io_brMetricsA_0;
-  wire [12:0] _muxu_6_io_brMetricsA_1;
-  wire [12:0] _muxu_6_io_brMetricsA_2;
-  wire [12:0] _muxu_6_io_brMetricsA_3;
-  wire [12:0] _muxu_6_io_brMetricsB_0;
-  wire [12:0] _muxu_6_io_brMetricsB_1;
-  wire [12:0] _muxu_6_io_brMetricsB_2;
-  wire [12:0] _muxu_6_io_brMetricsB_3;
+  wire [7:0]  _muxu_6_io_brMetricsA_0;
+  wire [7:0]  _muxu_6_io_brMetricsA_1;
+  wire [7:0]  _muxu_6_io_brMetricsA_2;
+  wire [7:0]  _muxu_6_io_brMetricsA_3;
+  wire [7:0]  _muxu_6_io_brMetricsB_0;
+  wire [7:0]  _muxu_6_io_brMetricsB_1;
+  wire [7:0]  _muxu_6_io_brMetricsB_2;
+  wire [7:0]  _muxu_6_io_brMetricsB_3;
   wire [2:0]  _muxu_6_io_brSymsA_0;
   wire [2:0]  _muxu_6_io_brSymsA_1;
   wire [2:0]  _muxu_6_io_brSymsA_2;
@@ -1305,14 +1323,14 @@ module LaPDFD(
   wire [2:0]  _muxu_6_io_brSymsB_1;
   wire [2:0]  _muxu_6_io_brSymsB_2;
   wire [2:0]  _muxu_6_io_brSymsB_3;
-  wire [12:0] _muxu_5_io_brMetricsA_0;
-  wire [12:0] _muxu_5_io_brMetricsA_1;
-  wire [12:0] _muxu_5_io_brMetricsA_2;
-  wire [12:0] _muxu_5_io_brMetricsA_3;
-  wire [12:0] _muxu_5_io_brMetricsB_0;
-  wire [12:0] _muxu_5_io_brMetricsB_1;
-  wire [12:0] _muxu_5_io_brMetricsB_2;
-  wire [12:0] _muxu_5_io_brMetricsB_3;
+  wire [7:0]  _muxu_5_io_brMetricsA_0;
+  wire [7:0]  _muxu_5_io_brMetricsA_1;
+  wire [7:0]  _muxu_5_io_brMetricsA_2;
+  wire [7:0]  _muxu_5_io_brMetricsA_3;
+  wire [7:0]  _muxu_5_io_brMetricsB_0;
+  wire [7:0]  _muxu_5_io_brMetricsB_1;
+  wire [7:0]  _muxu_5_io_brMetricsB_2;
+  wire [7:0]  _muxu_5_io_brMetricsB_3;
   wire [2:0]  _muxu_5_io_brSymsA_0;
   wire [2:0]  _muxu_5_io_brSymsA_1;
   wire [2:0]  _muxu_5_io_brSymsA_2;
@@ -1321,14 +1339,14 @@ module LaPDFD(
   wire [2:0]  _muxu_5_io_brSymsB_1;
   wire [2:0]  _muxu_5_io_brSymsB_2;
   wire [2:0]  _muxu_5_io_brSymsB_3;
-  wire [12:0] _muxu_4_io_brMetricsA_0;
-  wire [12:0] _muxu_4_io_brMetricsA_1;
-  wire [12:0] _muxu_4_io_brMetricsA_2;
-  wire [12:0] _muxu_4_io_brMetricsA_3;
-  wire [12:0] _muxu_4_io_brMetricsB_0;
-  wire [12:0] _muxu_4_io_brMetricsB_1;
-  wire [12:0] _muxu_4_io_brMetricsB_2;
-  wire [12:0] _muxu_4_io_brMetricsB_3;
+  wire [7:0]  _muxu_4_io_brMetricsA_0;
+  wire [7:0]  _muxu_4_io_brMetricsA_1;
+  wire [7:0]  _muxu_4_io_brMetricsA_2;
+  wire [7:0]  _muxu_4_io_brMetricsA_3;
+  wire [7:0]  _muxu_4_io_brMetricsB_0;
+  wire [7:0]  _muxu_4_io_brMetricsB_1;
+  wire [7:0]  _muxu_4_io_brMetricsB_2;
+  wire [7:0]  _muxu_4_io_brMetricsB_3;
   wire [2:0]  _muxu_4_io_brSymsA_0;
   wire [2:0]  _muxu_4_io_brSymsA_1;
   wire [2:0]  _muxu_4_io_brSymsA_2;
@@ -1337,14 +1355,14 @@ module LaPDFD(
   wire [2:0]  _muxu_4_io_brSymsB_1;
   wire [2:0]  _muxu_4_io_brSymsB_2;
   wire [2:0]  _muxu_4_io_brSymsB_3;
-  wire [12:0] _muxu_3_io_brMetricsA_0;
-  wire [12:0] _muxu_3_io_brMetricsA_1;
-  wire [12:0] _muxu_3_io_brMetricsA_2;
-  wire [12:0] _muxu_3_io_brMetricsA_3;
-  wire [12:0] _muxu_3_io_brMetricsB_0;
-  wire [12:0] _muxu_3_io_brMetricsB_1;
-  wire [12:0] _muxu_3_io_brMetricsB_2;
-  wire [12:0] _muxu_3_io_brMetricsB_3;
+  wire [7:0]  _muxu_3_io_brMetricsA_0;
+  wire [7:0]  _muxu_3_io_brMetricsA_1;
+  wire [7:0]  _muxu_3_io_brMetricsA_2;
+  wire [7:0]  _muxu_3_io_brMetricsA_3;
+  wire [7:0]  _muxu_3_io_brMetricsB_0;
+  wire [7:0]  _muxu_3_io_brMetricsB_1;
+  wire [7:0]  _muxu_3_io_brMetricsB_2;
+  wire [7:0]  _muxu_3_io_brMetricsB_3;
   wire [2:0]  _muxu_3_io_brSymsA_0;
   wire [2:0]  _muxu_3_io_brSymsA_1;
   wire [2:0]  _muxu_3_io_brSymsA_2;
@@ -1353,14 +1371,14 @@ module LaPDFD(
   wire [2:0]  _muxu_3_io_brSymsB_1;
   wire [2:0]  _muxu_3_io_brSymsB_2;
   wire [2:0]  _muxu_3_io_brSymsB_3;
-  wire [12:0] _muxu_2_io_brMetricsA_0;
-  wire [12:0] _muxu_2_io_brMetricsA_1;
-  wire [12:0] _muxu_2_io_brMetricsA_2;
-  wire [12:0] _muxu_2_io_brMetricsA_3;
-  wire [12:0] _muxu_2_io_brMetricsB_0;
-  wire [12:0] _muxu_2_io_brMetricsB_1;
-  wire [12:0] _muxu_2_io_brMetricsB_2;
-  wire [12:0] _muxu_2_io_brMetricsB_3;
+  wire [7:0]  _muxu_2_io_brMetricsA_0;
+  wire [7:0]  _muxu_2_io_brMetricsA_1;
+  wire [7:0]  _muxu_2_io_brMetricsA_2;
+  wire [7:0]  _muxu_2_io_brMetricsA_3;
+  wire [7:0]  _muxu_2_io_brMetricsB_0;
+  wire [7:0]  _muxu_2_io_brMetricsB_1;
+  wire [7:0]  _muxu_2_io_brMetricsB_2;
+  wire [7:0]  _muxu_2_io_brMetricsB_3;
   wire [2:0]  _muxu_2_io_brSymsA_0;
   wire [2:0]  _muxu_2_io_brSymsA_1;
   wire [2:0]  _muxu_2_io_brSymsA_2;
@@ -1369,14 +1387,14 @@ module LaPDFD(
   wire [2:0]  _muxu_2_io_brSymsB_1;
   wire [2:0]  _muxu_2_io_brSymsB_2;
   wire [2:0]  _muxu_2_io_brSymsB_3;
-  wire [12:0] _muxu_1_io_brMetricsA_0;
-  wire [12:0] _muxu_1_io_brMetricsA_1;
-  wire [12:0] _muxu_1_io_brMetricsA_2;
-  wire [12:0] _muxu_1_io_brMetricsA_3;
-  wire [12:0] _muxu_1_io_brMetricsB_0;
-  wire [12:0] _muxu_1_io_brMetricsB_1;
-  wire [12:0] _muxu_1_io_brMetricsB_2;
-  wire [12:0] _muxu_1_io_brMetricsB_3;
+  wire [7:0]  _muxu_1_io_brMetricsA_0;
+  wire [7:0]  _muxu_1_io_brMetricsA_1;
+  wire [7:0]  _muxu_1_io_brMetricsA_2;
+  wire [7:0]  _muxu_1_io_brMetricsA_3;
+  wire [7:0]  _muxu_1_io_brMetricsB_0;
+  wire [7:0]  _muxu_1_io_brMetricsB_1;
+  wire [7:0]  _muxu_1_io_brMetricsB_2;
+  wire [7:0]  _muxu_1_io_brMetricsB_3;
   wire [2:0]  _muxu_1_io_brSymsA_0;
   wire [2:0]  _muxu_1_io_brSymsA_1;
   wire [2:0]  _muxu_1_io_brSymsA_2;
@@ -1385,14 +1403,14 @@ module LaPDFD(
   wire [2:0]  _muxu_1_io_brSymsB_1;
   wire [2:0]  _muxu_1_io_brSymsB_2;
   wire [2:0]  _muxu_1_io_brSymsB_3;
-  wire [12:0] _muxu_0_io_brMetricsA_0;
-  wire [12:0] _muxu_0_io_brMetricsA_1;
-  wire [12:0] _muxu_0_io_brMetricsA_2;
-  wire [12:0] _muxu_0_io_brMetricsA_3;
-  wire [12:0] _muxu_0_io_brMetricsB_0;
-  wire [12:0] _muxu_0_io_brMetricsB_1;
-  wire [12:0] _muxu_0_io_brMetricsB_2;
-  wire [12:0] _muxu_0_io_brMetricsB_3;
+  wire [7:0]  _muxu_0_io_brMetricsA_0;
+  wire [7:0]  _muxu_0_io_brMetricsA_1;
+  wire [7:0]  _muxu_0_io_brMetricsA_2;
+  wire [7:0]  _muxu_0_io_brMetricsA_3;
+  wire [7:0]  _muxu_0_io_brMetricsB_0;
+  wire [7:0]  _muxu_0_io_brMetricsB_1;
+  wire [7:0]  _muxu_0_io_brMetricsB_2;
+  wire [7:0]  _muxu_0_io_brMetricsB_3;
   wire [2:0]  _muxu_0_io_brSymsA_0;
   wire [2:0]  _muxu_0_io_brSymsA_1;
   wire [2:0]  _muxu_0_io_brSymsA_2;
@@ -1401,16 +1419,16 @@ module LaPDFD(
   wire [2:0]  _muxu_0_io_brSymsB_1;
   wire [2:0]  _muxu_0_io_brSymsB_2;
   wire [2:0]  _muxu_0_io_brSymsB_3;
-  wire [12:0] _laBmu_3_io_symMetricsA_0;
-  wire [12:0] _laBmu_3_io_symMetricsA_1;
-  wire [12:0] _laBmu_3_io_symMetricsA_2;
-  wire [12:0] _laBmu_3_io_symMetricsA_3;
-  wire [12:0] _laBmu_3_io_symMetricsA_4;
-  wire [12:0] _laBmu_3_io_symMetricsB_0;
-  wire [12:0] _laBmu_3_io_symMetricsB_1;
-  wire [12:0] _laBmu_3_io_symMetricsB_2;
-  wire [12:0] _laBmu_3_io_symMetricsB_3;
-  wire [12:0] _laBmu_3_io_symMetricsB_4;
+  wire [7:0]  _laBmu_3_io_symMetricsA_0;
+  wire [7:0]  _laBmu_3_io_symMetricsA_1;
+  wire [7:0]  _laBmu_3_io_symMetricsA_2;
+  wire [7:0]  _laBmu_3_io_symMetricsA_3;
+  wire [7:0]  _laBmu_3_io_symMetricsA_4;
+  wire [7:0]  _laBmu_3_io_symMetricsB_0;
+  wire [7:0]  _laBmu_3_io_symMetricsB_1;
+  wire [7:0]  _laBmu_3_io_symMetricsB_2;
+  wire [7:0]  _laBmu_3_io_symMetricsB_3;
+  wire [7:0]  _laBmu_3_io_symMetricsB_4;
   wire [2:0]  _laBmu_3_io_symsA_0;
   wire [2:0]  _laBmu_3_io_symsA_1;
   wire [2:0]  _laBmu_3_io_symsA_2;
@@ -1421,16 +1439,16 @@ module LaPDFD(
   wire [2:0]  _laBmu_3_io_symsB_2;
   wire [2:0]  _laBmu_3_io_symsB_3;
   wire [2:0]  _laBmu_3_io_symsB_4;
-  wire [12:0] _laBmu_2_io_symMetricsA_0;
-  wire [12:0] _laBmu_2_io_symMetricsA_1;
-  wire [12:0] _laBmu_2_io_symMetricsA_2;
-  wire [12:0] _laBmu_2_io_symMetricsA_3;
-  wire [12:0] _laBmu_2_io_symMetricsA_4;
-  wire [12:0] _laBmu_2_io_symMetricsB_0;
-  wire [12:0] _laBmu_2_io_symMetricsB_1;
-  wire [12:0] _laBmu_2_io_symMetricsB_2;
-  wire [12:0] _laBmu_2_io_symMetricsB_3;
-  wire [12:0] _laBmu_2_io_symMetricsB_4;
+  wire [7:0]  _laBmu_2_io_symMetricsA_0;
+  wire [7:0]  _laBmu_2_io_symMetricsA_1;
+  wire [7:0]  _laBmu_2_io_symMetricsA_2;
+  wire [7:0]  _laBmu_2_io_symMetricsA_3;
+  wire [7:0]  _laBmu_2_io_symMetricsA_4;
+  wire [7:0]  _laBmu_2_io_symMetricsB_0;
+  wire [7:0]  _laBmu_2_io_symMetricsB_1;
+  wire [7:0]  _laBmu_2_io_symMetricsB_2;
+  wire [7:0]  _laBmu_2_io_symMetricsB_3;
+  wire [7:0]  _laBmu_2_io_symMetricsB_4;
   wire [2:0]  _laBmu_2_io_symsA_0;
   wire [2:0]  _laBmu_2_io_symsA_1;
   wire [2:0]  _laBmu_2_io_symsA_2;
@@ -1441,16 +1459,16 @@ module LaPDFD(
   wire [2:0]  _laBmu_2_io_symsB_2;
   wire [2:0]  _laBmu_2_io_symsB_3;
   wire [2:0]  _laBmu_2_io_symsB_4;
-  wire [12:0] _laBmu_1_io_symMetricsA_0;
-  wire [12:0] _laBmu_1_io_symMetricsA_1;
-  wire [12:0] _laBmu_1_io_symMetricsA_2;
-  wire [12:0] _laBmu_1_io_symMetricsA_3;
-  wire [12:0] _laBmu_1_io_symMetricsA_4;
-  wire [12:0] _laBmu_1_io_symMetricsB_0;
-  wire [12:0] _laBmu_1_io_symMetricsB_1;
-  wire [12:0] _laBmu_1_io_symMetricsB_2;
-  wire [12:0] _laBmu_1_io_symMetricsB_3;
-  wire [12:0] _laBmu_1_io_symMetricsB_4;
+  wire [7:0]  _laBmu_1_io_symMetricsA_0;
+  wire [7:0]  _laBmu_1_io_symMetricsA_1;
+  wire [7:0]  _laBmu_1_io_symMetricsA_2;
+  wire [7:0]  _laBmu_1_io_symMetricsA_3;
+  wire [7:0]  _laBmu_1_io_symMetricsA_4;
+  wire [7:0]  _laBmu_1_io_symMetricsB_0;
+  wire [7:0]  _laBmu_1_io_symMetricsB_1;
+  wire [7:0]  _laBmu_1_io_symMetricsB_2;
+  wire [7:0]  _laBmu_1_io_symMetricsB_3;
+  wire [7:0]  _laBmu_1_io_symMetricsB_4;
   wire [2:0]  _laBmu_1_io_symsA_0;
   wire [2:0]  _laBmu_1_io_symsA_1;
   wire [2:0]  _laBmu_1_io_symsA_2;
@@ -1461,16 +1479,16 @@ module LaPDFD(
   wire [2:0]  _laBmu_1_io_symsB_2;
   wire [2:0]  _laBmu_1_io_symsB_3;
   wire [2:0]  _laBmu_1_io_symsB_4;
-  wire [12:0] _laBmu_0_io_symMetricsA_0;
-  wire [12:0] _laBmu_0_io_symMetricsA_1;
-  wire [12:0] _laBmu_0_io_symMetricsA_2;
-  wire [12:0] _laBmu_0_io_symMetricsA_3;
-  wire [12:0] _laBmu_0_io_symMetricsA_4;
-  wire [12:0] _laBmu_0_io_symMetricsB_0;
-  wire [12:0] _laBmu_0_io_symMetricsB_1;
-  wire [12:0] _laBmu_0_io_symMetricsB_2;
-  wire [12:0] _laBmu_0_io_symMetricsB_3;
-  wire [12:0] _laBmu_0_io_symMetricsB_4;
+  wire [7:0]  _laBmu_0_io_symMetricsA_0;
+  wire [7:0]  _laBmu_0_io_symMetricsA_1;
+  wire [7:0]  _laBmu_0_io_symMetricsA_2;
+  wire [7:0]  _laBmu_0_io_symMetricsA_3;
+  wire [7:0]  _laBmu_0_io_symMetricsA_4;
+  wire [7:0]  _laBmu_0_io_symMetricsB_0;
+  wire [7:0]  _laBmu_0_io_symMetricsB_1;
+  wire [7:0]  _laBmu_0_io_symMetricsB_2;
+  wire [7:0]  _laBmu_0_io_symMetricsB_3;
+  wire [7:0]  _laBmu_0_io_symMetricsB_4;
   wire [2:0]  _laBmu_0_io_symsA_0;
   wire [2:0]  _laBmu_0_io_symsA_1;
   wire [2:0]  _laBmu_0_io_symsA_2;

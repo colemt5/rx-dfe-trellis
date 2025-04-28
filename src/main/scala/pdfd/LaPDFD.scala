@@ -24,7 +24,7 @@ class LaPDFD()
   val io = IO(new Bundle {
     val rxSamples  = Input(Vec(4, SInt(sampleWidth.W))) // From DFF/ECHO
     val taps = Input(Vec(numTaps, SInt(tapWidth.W))) //todo maybe from TL MMIO instead
-    val rxData  = Output(UInt(8.W)) 
+    val rxData  = Output(UInt(12.W)) 
     val rxValid = Output(Bool())
   })
   // local parameters
@@ -36,9 +36,9 @@ class LaPDFD()
   val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, sampleWidth, upSizeWidth, pam5)))
 
   // one unit per state 
-  val muxu    = Seq.fill(8)(Module(new MUXU(upSizeWidth)))
-  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(upSizeWidth, true)))
-  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(upSizeWidth, false)))
+  val muxu    = Seq.fill(8)(Module(new MUXU(sampleWidth)))
+  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, upSizeWidth, true)))
+  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, upSizeWidth, false)))
   val acsu    = Seq.fill(8)(Module(new ACSU(upSizeWidth)))
   val smu     = Seq.fill(8)(Module(new SMU()))
   
