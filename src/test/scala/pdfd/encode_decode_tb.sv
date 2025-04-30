@@ -1,5 +1,6 @@
 `timescale 1ns/1ps
 `include "LaPDFD.sv"
+`include "Encoder.sv"
 
 module lapdfd_tb;
 
@@ -8,8 +9,14 @@ parameter CLOCK_PERIOD = 10;
 reg clock;
 reg reset;
 
-// Inputs
+// Input random data
+logic [7:0] random_data;
+logic mode;
+logic tx_enable;
+
+// Connect Encoder to DUT
 logic signed [7:0] rx_syms[3:0];
+logic signed [2:0] tx_syms[3:0];
 logic signed [7:0] taps[13:0];
 logic signed [2:0] sym0, sym1, sym2, sym3;
 
@@ -24,11 +31,30 @@ typedef struct {
     int sym3;
 } SymbolEntry;
 
+// Buffer encoded symbols for comparison
 SymbolEntry expected_syms [$];
 SymbolEntry exp;
 
 int sym_table[5] = '{-103, -52, 0, 51, 101};
 int ref_table[5] = '{-2, -1, 0, 1, 2};
+
+
+// Encoder instance
+Encoder encoder (
+    .clock(clock),
+    .reset(reset),
+    .io_tx_enable(tx_enable),
+    .io_tx_mode(0),
+    .io_tx_error(0),
+    .io_tx_data(random_data),
+    .io_n(0),
+    .io_n0(0),
+    .io_loc_rcvr_status(1),
+    .io_A(tx_syms[0]),
+    .io_B(tx_syms[1]),
+    .io_C(tx_syms[2]),
+    .io_D(tx_syms[3])
+);
 
 // DUT instance
 LaPDFD dut (
@@ -56,6 +82,7 @@ LaPDFD dut (
     .io_rxValid(rxValid)
 );
 
+
 // Clock generation
 initial clock = 0;
 always #(CLOCK_PERIOD / 2) clock = ~clock;
@@ -63,6 +90,8 @@ always #(CLOCK_PERIOD / 2) clock = ~clock;
 // Reset task
 task reset_DUT();
     reset <= 1;
+    @(posedge clock);
+    @(posedge clock);
     @(posedge clock);
     @(posedge clock);
     reset <= 0;
@@ -79,18 +108,16 @@ function automatic signed [7:0] lookup_table(input signed [2:0] symbol);
     endcase
 endfunction
 
-reg signed [7:0] sample_in [3:0];
-reg signed [7:0] ref_in [3:0];
 
 // map standard PAM5 to sampled values
 always_comb begin
     for (int i = 0; i < 4; i++) begin
-        rx_syms[i] = sample_in[i];
+        rx_syms[i] = lookup_table(tx_syms[i]);
     end
 end
 
-// Reading test vectors from a file
-integer tap_file, vector_file, ref_file, line, ref_line;
+// Used for reading taps from file
+integer tap_file, status;
 integer cycle_count = 0;
 
 initial begin
@@ -99,6 +126,7 @@ initial begin
     $vcdplusfile("lapdfd.vpd");
     $vcdpluson(0, lapdfd_tb);
 
+
     // Read taps from tap_vector.txt
     tap_file = $fopen("tap_vector.txt", "r");
     if (!tap_file) begin
@@ -106,43 +134,35 @@ initial begin
         $finish;
     end
     for (int i = 0; i < 14; i++) begin
-        line = $fscanf(tap_file, "%d", taps[i]);
+        status = $fscanf(tap_file, "%d", taps[i]);
     end
     $fclose(tap_file);
 
-    // Open test vector file
-    vector_file = $fopen("test_vectors.txt", "r");
-    if (!vector_file) begin
-        $display("ERROR: Cannot open input file!");
-        $finish;
-    end
-    // Open reference vector file
-    ref_file = $fopen("ref_vectors.txt", "r");
-    if (!ref_file) begin
-        $display("ERROR: Cannot open input file!");
-        $finish;
-    end
-
-    for (int i = 0; i < 4; i++) begin
-        sample_in[i] = 0;
-    end
-    
+    tx_enable = 0;
     // Initialize
-    reset = 1;
-    repeat(4) @(posedge clock);
-    reset = 0;
+    reset_DUT();
+    @(posedge clock);
+    tx_enable = 1;
+    @(posedge clock);
 
-    // Read line by line: 4 samples per line
-    while (!$feof(vector_file)) begin
+    // Training sequence
+    // for (int i = 0; i < 14; i++) begin
+    //     random_data = 0;
+    //     mode = 0;
+    //     $display("Symbols: %0d %0d %0d %0d", tx_syms[3], tx_syms[2], tx_syms[1], tx_syms[0]);
+    //     @(posedge clock);
+    // end
+
+
+    for (int i = 0; i < 100; i++) begin
         cycle_count += 1;
-        line = $fscanf(vector_file, "%d %d %d %d", 
-            sample_in[0], sample_in[1], sample_in[2], sample_in[3]);
+        mode = 0;
 
-        ref_line = $fscanf(ref_file, "%d %d %d %d", 
-            ref_in[0], ref_in[1], ref_in[2], ref_in[3]);
+        // Generate random data
+        random_data = $urandom_range(0, 255); // 240
         
         // Buffer input samples
-        expected_syms.push_back('{ref_in[0], ref_in[1], ref_in[2], ref_in[3]});
+        expected_syms.push_back('{tx_syms[0], tx_syms[1], tx_syms[2], tx_syms[3]});
 
         sym3 = rxData[2:0];
         sym2 = rxData[5:3];
@@ -150,7 +170,7 @@ initial begin
         sym0 = rxData[11:9];
         
         // Check output against expected values
-        if (cycle_count > 17) begin
+        if (cycle_count > 15) begin
             exp = expected_syms.pop_front();
             if (rxValid) begin
                 if (sym0 !== exp.sym0 || sym1 !== exp.sym1 || sym2 !== exp.sym2 || sym3 !== exp.sym3) begin
@@ -161,9 +181,10 @@ initial begin
                     $display("Cycle %0d: Symbols: %0d %0d %0d %0d", cycle_count, sym0, sym1, sym2, sym3);
                 end
             end
-        end 
+        end
         else begin
-            $display("Cycle %0d: sym in: %0d %0d %0d %0d", cycle_count, ref_in[0], ref_in[1], ref_in[2], ref_in[3]);
+            $display("Cycle %0d: Input %0d %0d %0d %0d, Output %0d %0d %0d %0d",
+                     cycle_count, tx_syms[0], tx_syms[1], tx_syms[2], tx_syms[3], sym0, sym1, sym2, sym3);
         end
 
         @(posedge clock);
@@ -172,6 +193,7 @@ initial begin
     // Wait for a few cycles to observe the remaining output
     for (int n = 0; n < 14; n++) begin
         cycle_count += 1;
+        mode = 0;
 
         sym3 = rxData[2:0];
         sym2 = rxData[5:3];
@@ -185,13 +207,14 @@ initial begin
                 $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
                             cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
             end
+            else begin
+                $display("Cycle %0d: Symbols: %0d %0d %0d %0d", cycle_count, sym0, sym1, sym2, sym3);
+            end
         end
 
         @(posedge clock);
     end
 
-    $fclose(vector_file);
-    $fclose(ref_file);
     $vcdplusoff;
     $finish;
 end

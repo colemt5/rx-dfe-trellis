@@ -59,12 +59,8 @@ class FourDimBMU(sampleWidth: Int, bmWidth: Int, isEvenState: Boolean)
     brSymsA(3) := VecInit(Seq(io.brSymsA(0), io.brSymsB(1), io.brSymsA(2), io.brSymsA(3))) // ABAA S7
     brSymsB(3) := VecInit(Seq(io.brSymsB(0), io.brSymsA(1), io.brSymsB(2), io.brSymsB(3))) // BABB S7
   }
-  io.brMetrics4D(0) := Mux(sumBrMetricA(0) < sumBrMetricB(0), sumBrMetricA(0), sumBrMetricB(0))
-  io.brMetrics4D(1) := Mux(sumBrMetricA(1) < sumBrMetricB(1), sumBrMetricA(1), sumBrMetricB(1))
-  io.brMetrics4D(2) := Mux(sumBrMetricA(2) < sumBrMetricB(2), sumBrMetricA(2), sumBrMetricB(2))
-  io.brMetrics4D(3) := Mux(sumBrMetricA(3) < sumBrMetricB(3), sumBrMetricA(3), sumBrMetricB(3))
-  io.brSyms4D(0) := Mux(sumBrMetricA(0) < sumBrMetricB(0), brSymsA(0), brSymsB(0))
-  io.brSyms4D(1) := Mux(sumBrMetricA(1) < sumBrMetricB(1), brSymsA(1), brSymsB(1))
-  io.brSyms4D(2) := Mux(sumBrMetricA(2) < sumBrMetricB(2), brSymsA(2), brSymsB(2))
-  io.brSyms4D(3) := Mux(sumBrMetricA(3) < sumBrMetricB(3), brSymsA(3), brSymsB(3))
+  for (i <- 0 until 4) {
+    io.brMetrics4D(i) := Mux(sumBrMetricA(i) < sumBrMetricB(i), sumBrMetricA(i), sumBrMetricB(i))
+    io.brSyms4D(i) := Mux(sumBrMetricA(i) < sumBrMetricB(i), brSymsA(i), brSymsB(i))
+  }
 }

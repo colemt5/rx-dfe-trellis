@@ -37,7 +37,7 @@ class SMU(bitWidth: Int = 12) // todo change to 8 (12 is just for testing)
       3.U -> io.byteInputs(3)(i)))
   }
 
-  io.byteChoices(0) := Cat(symSurvivor(3), symSurvivor(2), symSurvivor(1), symSurvivor(0)) // todo create a function that decodes symSurvivor to byteChoices(0)
+  io.byteChoices(0) := Cat(symSurvivor(0), symSurvivor(1), symSurvivor(2), symSurvivor(3)) // todo create a function that decodes symSurvivor to byteChoices(0)
   for (i <- 0 until bitWidth) {
     io.byteChoices(i + 1) := shiftReg(i)
   }

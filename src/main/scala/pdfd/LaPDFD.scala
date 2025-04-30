@@ -51,14 +51,17 @@ class LaPDFD()
     laBmu(i).io.rxFilter := dfp(i).io.rxFilter
     laBmu(i).io.tapOne := io.taps(0)
   }
+  
+  val symMetrics_init = VecInit(Seq.fill(5)(0.U(sampleWidth.W)))
+  val syms_init = VecInit(Seq.fill(5)(0.S(3.W)))
 
   for (i <- 0 until 8) {
     // MUXU <- LaBMU (SMU survivor symbols)
     for (j <- 0 until 4) {
-      muxu(i).io.symsA(j) := laBmu(j).io.symsA
-      muxu(i).io.symsB(j) := laBmu(j).io.symsB
-      muxu(i).io.symMetricsA(j) := laBmu(j).io.symMetricsA
-      muxu(i).io.symMetricsB(j) := laBmu(j).io.symMetricsB
+      muxu(i).io.symsA(j) := RegNext(laBmu(j).io.symsA, syms_init)
+      muxu(i).io.symsB(j) := RegNext(laBmu(j).io.symsB, syms_init)
+      muxu(i).io.symMetricsA(j) := RegNext(laBmu(j).io.symMetricsA, symMetrics_init)
+      muxu(i).io.symMetricsB(j) := RegNext(laBmu(j).io.symMetricsB, symMetrics_init)
     }
     muxu(i).io.symSelects := smu(i).io.symSelects
 
@@ -75,74 +78,87 @@ class LaPDFD()
       bmuOdd(i / 2).io.brSymsB := muxu(i).io.brSymsB
     }
 
-    // ACSU <- 4D-BMU
-    if (i < 4) {
-      acsu(i).io.brMetrics4D := bmuEven(i / 2).io.brMetrics4D
-    } else {
-      acsu(i).io.brMetrics4D := bmuOdd(i / 2).io.brMetrics4D
-    }
-
-    // SMU <- ACSU (4D-BMU survivor symbols)
     smu(i).io.pathSelect := acsu(i).io.pathSelect
-    if (i % 2 == 0) {
-      smu(i).io.stateSymSelects := bmuEven(i / 2).io.brSyms4D
-    } else {
-      smu(i).io.stateSymSelects := bmuOdd(i / 2).io.brSyms4D
-    }
-
   }
   // not sure how to do ACSU <- ACSU in the loop
   acsu(0).io.pathMetrics := VecInit(Seq(acsu(0).io.pathMetric, acsu(2).io.pathMetric, acsu(4).io.pathMetric, acsu(6).io.pathMetric))
-  acsu(1).io.pathMetrics := VecInit(Seq(acsu(2).io.pathMetric, acsu(0).io.pathMetric, acsu(6).io.pathMetric, acsu(4).io.pathMetric))
-  acsu(2).io.pathMetrics := VecInit(Seq(acsu(4).io.pathMetric, acsu(6).io.pathMetric, acsu(0).io.pathMetric, acsu(2).io.pathMetric))
-  acsu(3).io.pathMetrics := VecInit(Seq(acsu(6).io.pathMetric, acsu(4).io.pathMetric, acsu(2).io.pathMetric, acsu(0).io.pathMetric))
+  acsu(0).io.brMetrics4D := VecInit(Seq(bmuEven(0).io.brMetrics4D(0), bmuEven(1).io.brMetrics4D(1), bmuEven(2).io.brMetrics4D(2), bmuEven(3).io.brMetrics4D(3)))
+
+  acsu(1).io.pathMetrics := VecInit(Seq(acsu(0).io.pathMetric, acsu(2).io.pathMetric, acsu(4).io.pathMetric, acsu(6).io.pathMetric))
+  acsu(1).io.brMetrics4D := VecInit(Seq(bmuEven(0).io.brMetrics4D(1), bmuEven(1).io.brMetrics4D(0), bmuEven(2).io.brMetrics4D(3), bmuEven(3).io.brMetrics4D(2)))
+
+  acsu(2).io.pathMetrics := VecInit(Seq(acsu(0).io.pathMetric, acsu(2).io.pathMetric, acsu(4).io.pathMetric, acsu(6).io.pathMetric))
+  acsu(2).io.brMetrics4D := VecInit(Seq(bmuEven(0).io.brMetrics4D(2), bmuEven(1).io.brMetrics4D(3), bmuEven(2).io.brMetrics4D(0), bmuEven(3).io.brMetrics4D(1)))
+
+  acsu(3).io.pathMetrics := VecInit(Seq(acsu(0).io.pathMetric, acsu(2).io.pathMetric, acsu(4).io.pathMetric, acsu(6).io.pathMetric))
+  acsu(3).io.brMetrics4D := VecInit(Seq(bmuEven(0).io.brMetrics4D(3), bmuEven(1).io.brMetrics4D(2), bmuEven(2).io.brMetrics4D(1), bmuEven(3).io.brMetrics4D(0)))
+
   acsu(4).io.pathMetrics := VecInit(Seq(acsu(1).io.pathMetric, acsu(3).io.pathMetric, acsu(5).io.pathMetric, acsu(7).io.pathMetric))
-  acsu(5).io.pathMetrics := VecInit(Seq(acsu(3).io.pathMetric, acsu(1).io.pathMetric, acsu(7).io.pathMetric, acsu(5).io.pathMetric))
-  acsu(6).io.pathMetrics := VecInit(Seq(acsu(5).io.pathMetric, acsu(7).io.pathMetric, acsu(1).io.pathMetric, acsu(3).io.pathMetric))
-  acsu(7).io.pathMetrics := VecInit(Seq(acsu(7).io.pathMetric, acsu(5).io.pathMetric, acsu(3).io.pathMetric, acsu(1).io.pathMetric))
+  acsu(4).io.brMetrics4D := VecInit(Seq(bmuOdd(0).io.brMetrics4D(0), bmuOdd(1).io.brMetrics4D(1), bmuOdd(2).io.brMetrics4D(2), bmuOdd(3).io.brMetrics4D(3)))
+
+  acsu(5).io.pathMetrics := VecInit(Seq(acsu(1).io.pathMetric, acsu(3).io.pathMetric, acsu(5).io.pathMetric, acsu(7).io.pathMetric))
+  acsu(5).io.brMetrics4D := VecInit(Seq(bmuOdd(0).io.brMetrics4D(1), bmuOdd(1).io.brMetrics4D(0), bmuOdd(2).io.brMetrics4D(3), bmuOdd(3).io.brMetrics4D(2)))
+
+  acsu(6).io.pathMetrics := VecInit(Seq(acsu(1).io.pathMetric, acsu(3).io.pathMetric, acsu(5).io.pathMetric, acsu(7).io.pathMetric))
+  acsu(6).io.brMetrics4D := VecInit(Seq(bmuOdd(0).io.brMetrics4D(2), bmuOdd(1).io.brMetrics4D(3), bmuOdd(2).io.brMetrics4D(0), bmuOdd(3).io.brMetrics4D(1)))
+
+  acsu(7).io.pathMetrics := VecInit(Seq(acsu(1).io.pathMetric, acsu(3).io.pathMetric, acsu(5).io.pathMetric, acsu(7).io.pathMetric))
+  acsu(7).io.brMetrics4D := VecInit(Seq(bmuOdd(0).io.brMetrics4D(3), bmuOdd(1).io.brMetrics4D(2), bmuOdd(2).io.brMetrics4D(1), bmuOdd(3).io.brMetrics4D(0)))
 
   // not sure how to do SMU <- SMU in the loop
-  smu(0).io.byteInputs(0) := smu(0).io.byteChoices
-  smu(0).io.byteInputs(1) := smu(2).io.byteChoices
-  smu(0).io.byteInputs(2) := smu(4).io.byteChoices
-  smu(0).io.byteInputs(3) := smu(6).io.byteChoices
+  for (i <- 0 until 4) {
+    smu(i).io.byteInputs(0) := smu(0).io.byteChoices
+    smu(i).io.byteInputs(1) := smu(2).io.byteChoices
+    smu(i).io.byteInputs(2) := smu(4).io.byteChoices
+    smu(i).io.byteInputs(3) := smu(6).io.byteChoices
+  }
 
-  smu(1).io.byteInputs(0) := smu(2).io.byteChoices
-  smu(1).io.byteInputs(1) := smu(0).io.byteChoices
-  smu(1).io.byteInputs(2) := smu(6).io.byteChoices
-  smu(1).io.byteInputs(3) := smu(4).io.byteChoices
+  for (i <- 4 until 8) {
+    smu(i).io.byteInputs(0) := smu(1).io.byteChoices
+    smu(i).io.byteInputs(1) := smu(3).io.byteChoices
+    smu(i).io.byteInputs(2) := smu(5).io.byteChoices
+    smu(i).io.byteInputs(3) := smu(7).io.byteChoices
+  }
 
-  smu(2).io.byteInputs(0) := smu(4).io.byteChoices
-  smu(2).io.byteInputs(1) := smu(6).io.byteChoices
-  smu(2).io.byteInputs(2) := smu(0).io.byteChoices
-  smu(2).io.byteInputs(3) := smu(2).io.byteChoices
+  smu(0).io.stateSymSelects(0) := bmuEven(0).io.brSyms4D(0)
+  smu(0).io.stateSymSelects(1) := bmuEven(1).io.brSyms4D(1)
+  smu(0).io.stateSymSelects(2) := bmuEven(2).io.brSyms4D(2)
+  smu(0).io.stateSymSelects(3) := bmuEven(3).io.brSyms4D(3)
 
-  smu(3).io.byteInputs(0) := smu(6).io.byteChoices
-  smu(3).io.byteInputs(1) := smu(4).io.byteChoices
-  smu(3).io.byteInputs(2) := smu(2).io.byteChoices
-  smu(3).io.byteInputs(3) := smu(0).io.byteChoices
+  smu(1).io.stateSymSelects(0) := bmuEven(0).io.brSyms4D(1)
+  smu(1).io.stateSymSelects(1) := bmuEven(1).io.brSyms4D(0)
+  smu(1).io.stateSymSelects(2) := bmuEven(2).io.brSyms4D(3)
+  smu(1).io.stateSymSelects(3) := bmuEven(3).io.brSyms4D(2)
+
+  smu(2).io.stateSymSelects(0) := bmuEven(0).io.brSyms4D(2)
+  smu(2).io.stateSymSelects(1) := bmuEven(1).io.brSyms4D(3)
+  smu(2).io.stateSymSelects(2) := bmuEven(2).io.brSyms4D(0)
+  smu(2).io.stateSymSelects(3) := bmuEven(3).io.brSyms4D(1)
+
+  smu(3).io.stateSymSelects(0) := bmuEven(0).io.brSyms4D(3)
+  smu(3).io.stateSymSelects(1) := bmuEven(1).io.brSyms4D(2)
+  smu(3).io.stateSymSelects(2) := bmuEven(2).io.brSyms4D(1)
+  smu(3).io.stateSymSelects(3) := bmuEven(3).io.brSyms4D(0)
+
+  smu(4).io.stateSymSelects(0) := bmuOdd(0).io.brSyms4D(0)
+  smu(4).io.stateSymSelects(1) := bmuOdd(1).io.brSyms4D(1)
+  smu(4).io.stateSymSelects(2) := bmuOdd(2).io.brSyms4D(2)
+  smu(4).io.stateSymSelects(3) := bmuOdd(3).io.brSyms4D(3)
+
+  smu(5).io.stateSymSelects(0) := bmuOdd(0).io.brSyms4D(1)
+  smu(5).io.stateSymSelects(1) := bmuOdd(1).io.brSyms4D(0)
+  smu(5).io.stateSymSelects(2) := bmuOdd(2).io.brSyms4D(3)
+  smu(5).io.stateSymSelects(3) := bmuOdd(3).io.brSyms4D(2)
   
-  smu(4).io.byteInputs(0) := smu(1).io.byteChoices
-  smu(4).io.byteInputs(1) := smu(3).io.byteChoices
-  smu(4).io.byteInputs(2) := smu(5).io.byteChoices
-  smu(4).io.byteInputs(3) := smu(7).io.byteChoices
-  
-  smu(5).io.byteInputs(0) := smu(3).io.byteChoices
-  smu(5).io.byteInputs(1) := smu(1).io.byteChoices
-  smu(5).io.byteInputs(2) := smu(7).io.byteChoices
-  smu(5).io.byteInputs(3) := smu(5).io.byteChoices
+  smu(6).io.stateSymSelects(0) := bmuOdd(0).io.brSyms4D(2)
+  smu(6).io.stateSymSelects(1) := bmuOdd(1).io.brSyms4D(3)
+  smu(6).io.stateSymSelects(2) := bmuOdd(2).io.brSyms4D(0)
+  smu(6).io.stateSymSelects(3) := bmuOdd(3).io.brSyms4D(1)
 
-  smu(6).io.byteInputs(0) := smu(5).io.byteChoices
-  smu(6).io.byteInputs(1) := smu(7).io.byteChoices
-  smu(6).io.byteInputs(2) := smu(1).io.byteChoices
-  smu(6).io.byteInputs(3) := smu(3).io.byteChoices
-
-  smu(7).io.byteInputs(0) := smu(7).io.byteChoices
-  smu(7).io.byteInputs(1) := smu(5).io.byteChoices
-  smu(7).io.byteInputs(2) := smu(3).io.byteChoices
-  smu(7).io.byteInputs(3) := smu(1).io.byteChoices
-
-
+  smu(7).io.stateSymSelects(0) := bmuOdd(0).io.brSyms4D(3)
+  smu(7).io.stateSymSelects(1) := bmuOdd(1).io.brSyms4D(2)
+  smu(7).io.stateSymSelects(2) := bmuOdd(2).io.brSyms4D(1)
+  smu(7).io.stateSymSelects(3) := bmuOdd(3).io.brSyms4D(0)
 
   // SMU -> output
   io.rxData := smu(0).io.byteDecision
