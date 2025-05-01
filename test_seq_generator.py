@@ -5,13 +5,13 @@ import random
 pam5_syms = [-2, -1, 0, 1, 2]
 pam5_refs = [-2, -1, 0, 1, 2]
 
-pam5_syms_A = [-50, 50]
-pam5_syms_B = [-100, 0, 100]
+pam5_syms_A = [-52, 51]
+pam5_syms_B = [-103, 0, 101]
 pam5_refs_A = [-1, 1]
 pam5_refs_B = [-2, 0, 2]
 
 # Postcursor taps
-postcursor_taps = [1, -0.4, -0.28, -0.196, -0.1372, -0.096, -0.0672, -0.047, -0.033, -0.023, -0.016, -0.011, -0.0079, -0.0055, -0.0038]
+postcursor_taps = [1, 0.2, -0.12, 0.06, -0.03, 0.15, -0.008, 0.008, 0.004, -0.002, 0, 0, 0, 0, 0]
 #postcursor_taps = [1, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0]
 
 
@@ -157,7 +157,7 @@ for i in range(100):
 # Save the convolved output
 with open("test_vectors.txt", "w") as f_conv:
     for n in range(100):
-        outputs = [str(min(127, max(-128, int(round(channels_syms_conv[ch][n]))))) for ch in range(4)]
+        outputs = [str(int(round(channels_syms_conv[ch][n]))) for ch in range(4)]
         f_conv.write(" ".join(outputs) + "\n")
 
 #Save the reference symbols
@@ -169,6 +169,7 @@ with open("ref_vectors.txt", "w") as f_ref:
 print("Generated test_vectors.txt and ref_vectors.txt")
 
 # Save the postcursor taps (ignoring the first tap)
-# with open("tap_vector.txt", "w") as f_tap:
-#     taps_to_write = postcursor_taps[1:]  # Ignore the first tap
-#     f_tap.write(" ".join(str(tap) for tap in taps_to_write))
+with open("tap_vector.txt", "w") as f_tap:
+    taps_to_write = postcursor_taps[1:]  # Ignore the first tap
+    scaled_taps = [int(round(tap * 128)) for tap in taps_to_write]
+    f_tap.write(" ".join(str(tap) for tap in scaled_taps))

@@ -22,91 +22,117 @@ module DFP(
 
   reg [12:0] filtSample;
   reg [7:0]  softSym;
-  reg [12:0] feedbackPath_0;
-  reg [12:0] feedbackPath_1;
-  reg [12:0] feedbackPath_2;
-  reg [12:0] feedbackPath_3;
-  reg [12:0] feedbackPath_4;
-  reg [12:0] feedbackPath_5;
-  reg [12:0] feedbackPath_6;
-  reg [12:0] feedbackPath_7;
-  reg [12:0] feedbackPath_8;
-  reg [12:0] feedbackPath_9;
-  reg [12:0] feedbackPath_10;
-  reg [12:0] feedbackPath_11;
+  reg [19:0] feedbackPath_0;
+  reg [19:0] feedbackPath_1;
+  reg [19:0] feedbackPath_2;
+  reg [19:0] feedbackPath_3;
+  reg [19:0] feedbackPath_4;
+  reg [19:0] feedbackPath_5;
+  reg [19:0] feedbackPath_6;
+  reg [19:0] feedbackPath_7;
+  reg [19:0] feedbackPath_8;
+  reg [19:0] feedbackPath_9;
+  reg [19:0] feedbackPath_10;
+  reg [19:0] feedbackPath_11;
   always @(posedge clock) begin
     if (reset) begin
       filtSample <= 13'h0;
       softSym <= 8'h0;
-      feedbackPath_0 <= 13'h0;
-      feedbackPath_1 <= 13'h0;
-      feedbackPath_2 <= 13'h0;
-      feedbackPath_3 <= 13'h0;
-      feedbackPath_4 <= 13'h0;
-      feedbackPath_5 <= 13'h0;
-      feedbackPath_6 <= 13'h0;
-      feedbackPath_7 <= 13'h0;
-      feedbackPath_8 <= 13'h0;
-      feedbackPath_9 <= 13'h0;
-      feedbackPath_10 <= 13'h0;
-      feedbackPath_11 <= 13'h0;
+      feedbackPath_0 <= 20'h0;
+      feedbackPath_1 <= 20'h0;
+      feedbackPath_2 <= 20'h0;
+      feedbackPath_3 <= 20'h0;
+      feedbackPath_4 <= 20'h0;
+      feedbackPath_5 <= 20'h0;
+      feedbackPath_6 <= 20'h0;
+      feedbackPath_7 <= 20'h0;
+      feedbackPath_8 <= 20'h0;
+      feedbackPath_9 <= 20'h0;
+      feedbackPath_10 <= 20'h0;
+      feedbackPath_11 <= 20'h0;
     end
     else begin
       automatic logic [7:0]  _decSample_T = 8'h0 - io_taps_0;
-      automatic logic [15:0] _decSample_T_4;
+      automatic logic [15:0] _GEN = {{8{softSym[7]}}, softSym};
+      automatic logic [14:0] _GEN_0 = {{7{softSym[7]}}, softSym};
+      automatic logic [14:0] _decSample_T_3 =
+        _GEN_0 * {{7{_decSample_T[7]}}, _decSample_T};
+      automatic logic [7:0]  _decSample_T_5;
       automatic logic [7:0]  _feedbackPath_0_T = 8'h0 - io_taps_13;
-      automatic logic [12:0] _GEN = {{5{softSym[7]}}, softSym};
+      automatic logic [15:0] _feedbackPath_0_T_3 =
+        _GEN * {{8{_feedbackPath_0_T[7]}}, _feedbackPath_0_T};
       automatic logic [7:0]  _feedbackPath_1_T = 8'h0 - io_taps_12;
+      automatic logic [15:0] _feedbackPath_1_T_3 =
+        _GEN * {{8{_feedbackPath_1_T[7]}}, _feedbackPath_1_T};
       automatic logic [7:0]  _feedbackPath_2_T = 8'h0 - io_taps_11;
+      automatic logic [15:0] _feedbackPath_2_T_3 =
+        _GEN * {{8{_feedbackPath_2_T[7]}}, _feedbackPath_2_T};
       automatic logic [7:0]  _feedbackPath_3_T = 8'h0 - io_taps_10;
+      automatic logic [15:0] _feedbackPath_3_T_3 =
+        _GEN * {{8{_feedbackPath_3_T[7]}}, _feedbackPath_3_T};
       automatic logic [7:0]  _feedbackPath_4_T = 8'h0 - io_taps_9;
+      automatic logic [15:0] _feedbackPath_4_T_3 =
+        _GEN * {{8{_feedbackPath_4_T[7]}}, _feedbackPath_4_T};
       automatic logic [7:0]  _feedbackPath_5_T = 8'h0 - io_taps_8;
+      automatic logic [15:0] _feedbackPath_5_T_3 =
+        _GEN * {{8{_feedbackPath_5_T[7]}}, _feedbackPath_5_T};
       automatic logic [7:0]  _feedbackPath_6_T = 8'h0 - io_taps_7;
+      automatic logic [15:0] _feedbackPath_6_T_3 =
+        _GEN * {{8{_feedbackPath_6_T[7]}}, _feedbackPath_6_T};
       automatic logic [7:0]  _feedbackPath_7_T = 8'h0 - io_taps_6;
+      automatic logic [15:0] _feedbackPath_7_T_3 =
+        _GEN * {{8{_feedbackPath_7_T[7]}}, _feedbackPath_7_T};
       automatic logic [7:0]  _feedbackPath_8_T = 8'h0 - io_taps_5;
+      automatic logic [15:0] _feedbackPath_8_T_3 =
+        _GEN * {{8{_feedbackPath_8_T[7]}}, _feedbackPath_8_T};
       automatic logic [7:0]  _feedbackPath_9_T = 8'h0 - io_taps_4;
+      automatic logic [15:0] _feedbackPath_9_T_3 =
+        _GEN * {{8{_feedbackPath_9_T[7]}}, _feedbackPath_9_T};
       automatic logic [7:0]  _feedbackPath_10_T = 8'h0 - io_taps_3;
+      automatic logic [15:0] _feedbackPath_10_T_3 =
+        _GEN * {{8{_feedbackPath_10_T[7]}}, _feedbackPath_10_T};
       automatic logic [7:0]  _feedbackPath_11_T = 8'h0 - io_taps_2;
-      automatic logic [7:0]  _filtSample_T_3 = 8'h0 - io_taps_1;
-      _decSample_T_4 =
-        {{3{filtSample[12]}}, filtSample} + {{8{softSym[7]}}, softSym}
-        * {{8{_decSample_T[7]}}, _decSample_T};
-      filtSample <=
-        {{5{io_rxSample[7]}}, io_rxSample} + feedbackPath_11 + _GEN
-        * {{5{_filtSample_T_3[7]}}, _filtSample_T_3};
-      if ($signed(_decSample_T_4) > 16'sh4C)
+      automatic logic [15:0] _feedbackPath_11_T_3 =
+        _GEN * {{8{_feedbackPath_11_T[7]}}, _feedbackPath_11_T};
+      automatic logic [7:0]  _alignedSum_T = 8'h0 - io_taps_1;
+      automatic logic [14:0] _alignedSum_T_4 =
+        feedbackPath_11[14:0] + _GEN_0 * {{7{_alignedSum_T[7]}}, _alignedSum_T};
+      automatic logic [7:0]  _filtSample_T_4 = io_rxSample + _alignedSum_T_4[14:7];
+      _decSample_T_5 = filtSample[7:0] + _decSample_T_3[14:7];
+      filtSample <= {{5{_filtSample_T_4[7]}}, _filtSample_T_4};
+      if ($signed(_decSample_T_5) > 8'sh4C)
         softSym <= 8'h65;
-      else if ($signed(_decSample_T_4) > 16'sh19)
+      else if ($signed(_decSample_T_5) > 8'sh19)
         softSym <= 8'h33;
-      else if ($signed(_decSample_T_4) > -16'sh1A)
+      else if ($signed(_decSample_T_5) > -8'sh1A)
         softSym <= 8'h0;
-      else if ($signed(_decSample_T_4) > -16'sh4D)
+      else if ($signed(_decSample_T_5) > -8'sh4D)
         softSym <= 8'hCC;
       else
         softSym <= 8'h99;
-      feedbackPath_0 <= _GEN * {{5{_feedbackPath_0_T[7]}}, _feedbackPath_0_T};
+      feedbackPath_0 <= {{4{_feedbackPath_0_T_3[15]}}, _feedbackPath_0_T_3};
       feedbackPath_1 <=
-        feedbackPath_0 + _GEN * {{5{_feedbackPath_1_T[7]}}, _feedbackPath_1_T};
+        feedbackPath_0 + {{4{_feedbackPath_1_T_3[15]}}, _feedbackPath_1_T_3};
       feedbackPath_2 <=
-        feedbackPath_1 + _GEN * {{5{_feedbackPath_2_T[7]}}, _feedbackPath_2_T};
+        feedbackPath_1 + {{4{_feedbackPath_2_T_3[15]}}, _feedbackPath_2_T_3};
       feedbackPath_3 <=
-        feedbackPath_2 + _GEN * {{5{_feedbackPath_3_T[7]}}, _feedbackPath_3_T};
+        feedbackPath_2 + {{4{_feedbackPath_3_T_3[15]}}, _feedbackPath_3_T_3};
       feedbackPath_4 <=
-        feedbackPath_3 + _GEN * {{5{_feedbackPath_4_T[7]}}, _feedbackPath_4_T};
+        feedbackPath_3 + {{4{_feedbackPath_4_T_3[15]}}, _feedbackPath_4_T_3};
       feedbackPath_5 <=
-        feedbackPath_4 + _GEN * {{5{_feedbackPath_5_T[7]}}, _feedbackPath_5_T};
+        feedbackPath_4 + {{4{_feedbackPath_5_T_3[15]}}, _feedbackPath_5_T_3};
       feedbackPath_6 <=
-        feedbackPath_5 + _GEN * {{5{_feedbackPath_6_T[7]}}, _feedbackPath_6_T};
+        feedbackPath_5 + {{4{_feedbackPath_6_T_3[15]}}, _feedbackPath_6_T_3};
       feedbackPath_7 <=
-        feedbackPath_6 + _GEN * {{5{_feedbackPath_7_T[7]}}, _feedbackPath_7_T};
+        feedbackPath_6 + {{4{_feedbackPath_7_T_3[15]}}, _feedbackPath_7_T_3};
       feedbackPath_8 <=
-        feedbackPath_7 + _GEN * {{5{_feedbackPath_8_T[7]}}, _feedbackPath_8_T};
+        feedbackPath_7 + {{4{_feedbackPath_8_T_3[15]}}, _feedbackPath_8_T_3};
       feedbackPath_9 <=
-        feedbackPath_8 + _GEN * {{5{_feedbackPath_9_T[7]}}, _feedbackPath_9_T};
+        feedbackPath_8 + {{4{_feedbackPath_9_T_3[15]}}, _feedbackPath_9_T_3};
       feedbackPath_10 <=
-        feedbackPath_9 + _GEN * {{5{_feedbackPath_10_T[7]}}, _feedbackPath_10_T};
+        feedbackPath_9 + {{4{_feedbackPath_10_T_3[15]}}, _feedbackPath_10_T_3};
       feedbackPath_11 <=
-        feedbackPath_10 + _GEN * {{5{_feedbackPath_11_T[7]}}, _feedbackPath_11_T};
+        feedbackPath_10 + {{4{_feedbackPath_11_T_3[15]}}, _feedbackPath_11_T_3};
     end
   end // always @(posedge)
   assign io_rxFilter = filtSample;
@@ -137,66 +163,85 @@ module OneDimLaBMU(
                 io_symsB_4
 );
 
-  wire [12:0] _GEN = {{5{io_tapOne[7]}}, io_tapOne};
-  wire [12:0] _estSym_0_T_1 = io_rxFilter - _GEN * 13'h1F99;
-  wire [7:0]  diffA_0_result = $signed(_estSym_0_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [12:0] _diffA_0_T_1 = _estSym_0_T_1 - {{5{diffA_0_result[7]}}, diffA_0_result};
-  wire [7:0]  diffB_0_result =
-    $signed(_estSym_0_T_1) > 13'sh33
+  wire [15:0] _GEN = {{8{io_tapOne[7]}}, io_tapOne};
+  wire [15:0] _estSym_0_T = _GEN * 16'hFF99;
+  wire [12:0] _estSym_0_T_2 = io_rxFilter - {{4{_estSym_0_T[15]}}, _estSym_0_T[15:7]};
+  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
+  wire [4:0]  _GEN_0 = {5{closeA_0_result[7]}};
+  wire [7:0]  closeB_0_result =
+    $signed(_estSym_0_T_2) > 13'sh33
       ? 8'h65
-      : $signed(_estSym_0_T_1) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [12:0] _diffB_0_T_2 = _estSym_0_T_1 - {{5{diffB_0_result[7]}}, diffB_0_result};
-  wire [25:0] _GEN_0 = {{13{_diffA_0_T_1[12]}}, _diffA_0_T_1};
-  wire [25:0] io_symMetricsA_0_fullSquare = _GEN_0 * _GEN_0;
-  wire [25:0] _GEN_1 = {{13{_diffB_0_T_2[12]}}, _diffB_0_T_2};
-  wire [25:0] io_symMetricsB_0_fullSquare = _GEN_1 * _GEN_1;
-  wire [12:0] _estSym_1_T_1 = io_rxFilter - _GEN * 13'h1FCC;
-  wire [7:0]  diffA_1_result = $signed(_estSym_1_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [12:0] _diffA_1_T_1 = _estSym_1_T_1 - {{5{diffA_1_result[7]}}, diffA_1_result};
-  wire [7:0]  diffB_1_result =
-    $signed(_estSym_1_T_1) > 13'sh33
+      : $signed(_estSym_0_T_2) > -13'sh34 ? 8'h0 : 8'h99;
+  wire [4:0]  _GEN_1 = {5{closeB_0_result[7]}};
+  wire [12:0] _diffA_0_T = _estSym_0_T_2 - {_GEN_0, closeA_0_result};
+  wire [12:0] _diffB_0_T = _estSym_0_T_2 - {_GEN_1, closeB_0_result};
+  wire [25:0] _GEN_2 = {{13{_diffA_0_T[12]}}, _diffA_0_T};
+  wire [25:0] io_symMetricsA_0_fullSquare = _GEN_2 * _GEN_2;
+  wire [25:0] _GEN_3 = {{13{_diffB_0_T[12]}}, _diffB_0_T};
+  wire [25:0] io_symMetricsB_0_fullSquare = _GEN_3 * _GEN_3;
+  wire [11:0] _GEN_4 = {_GEN_1, closeB_0_result[7:2], closeB_0_result[0]};
+  wire [15:0] _estSym_1_T = _GEN * 16'hFFCC;
+  wire [12:0] _estSym_1_T_2 = io_rxFilter - {{4{_estSym_1_T[15]}}, _estSym_1_T[15:7]};
+  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
+  wire [4:0]  _GEN_5 = {5{closeA_1_result[7]}};
+  wire [7:0]  closeB_1_result =
+    $signed(_estSym_1_T_2) > 13'sh33
       ? 8'h65
-      : $signed(_estSym_1_T_1) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [12:0] _diffB_1_T_2 = _estSym_1_T_1 - {{5{diffB_1_result[7]}}, diffB_1_result};
-  wire [25:0] _GEN_2 = {{13{_diffA_1_T_1[12]}}, _diffA_1_T_1};
-  wire [25:0] io_symMetricsA_1_fullSquare = _GEN_2 * _GEN_2;
-  wire [25:0] _GEN_3 = {{13{_diffB_1_T_2[12]}}, _diffB_1_T_2};
-  wire [25:0] io_symMetricsB_1_fullSquare = _GEN_3 * _GEN_3;
-  wire [7:0]  diffA_2_result = $signed(io_rxFilter) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [12:0] _diffA_2_T_1 = io_rxFilter - {{5{diffA_2_result[7]}}, diffA_2_result};
-  wire [7:0]  diffB_2_result =
+      : $signed(_estSym_1_T_2) > -13'sh34 ? 8'h0 : 8'h99;
+  wire [4:0]  _GEN_6 = {5{closeB_1_result[7]}};
+  wire [12:0] _diffA_1_T = _estSym_1_T_2 - {_GEN_5, closeA_1_result};
+  wire [12:0] _diffB_1_T = _estSym_1_T_2 - {_GEN_6, closeB_1_result};
+  wire [25:0] _GEN_7 = {{13{_diffA_1_T[12]}}, _diffA_1_T};
+  wire [25:0] io_symMetricsA_1_fullSquare = _GEN_7 * _GEN_7;
+  wire [25:0] _GEN_8 = {{13{_diffB_1_T[12]}}, _diffB_1_T};
+  wire [25:0] io_symMetricsB_1_fullSquare = _GEN_8 * _GEN_8;
+  wire [11:0] _GEN_9 = {_GEN_6, closeB_1_result[7:2], closeB_1_result[0]};
+  wire [7:0]  closeA_2_result = $signed(io_rxFilter) > 13'sh0 ? 8'h33 : 8'hCC;
+  wire [4:0]  _GEN_10 = {5{closeA_2_result[7]}};
+  wire [7:0]  closeB_2_result =
     $signed(io_rxFilter) > 13'sh33
       ? 8'h65
       : $signed(io_rxFilter) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [12:0] _diffB_2_T_2 = io_rxFilter - {{5{diffB_2_result[7]}}, diffB_2_result};
-  wire [25:0] _GEN_4 = {{13{_diffA_2_T_1[12]}}, _diffA_2_T_1};
-  wire [25:0] io_symMetricsA_2_fullSquare = _GEN_4 * _GEN_4;
-  wire [25:0] _GEN_5 = {{13{_diffB_2_T_2[12]}}, _diffB_2_T_2};
-  wire [25:0] io_symMetricsB_2_fullSquare = _GEN_5 * _GEN_5;
-  wire [12:0] _estSym_3_T_1 = io_rxFilter - _GEN * 13'h33;
-  wire [7:0]  diffA_3_result = $signed(_estSym_3_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [12:0] _diffA_3_T_1 = _estSym_3_T_1 - {{5{diffA_3_result[7]}}, diffA_3_result};
-  wire [7:0]  diffB_3_result =
-    $signed(_estSym_3_T_1) > 13'sh33
+  wire [4:0]  _GEN_11 = {5{closeB_2_result[7]}};
+  wire [12:0] _diffA_2_T = io_rxFilter - {_GEN_10, closeA_2_result};
+  wire [12:0] _diffB_2_T = io_rxFilter - {_GEN_11, closeB_2_result};
+  wire [25:0] _GEN_12 = {{13{_diffA_2_T[12]}}, _diffA_2_T};
+  wire [25:0] io_symMetricsA_2_fullSquare = _GEN_12 * _GEN_12;
+  wire [25:0] _GEN_13 = {{13{_diffB_2_T[12]}}, _diffB_2_T};
+  wire [25:0] io_symMetricsB_2_fullSquare = _GEN_13 * _GEN_13;
+  wire [11:0] _GEN_14 = {_GEN_11, closeB_2_result[7:2], closeB_2_result[0]};
+  wire [15:0] _estSym_3_T = _GEN * 16'h33;
+  wire [12:0] _estSym_3_T_2 = io_rxFilter - {{4{_estSym_3_T[15]}}, _estSym_3_T[15:7]};
+  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
+  wire [4:0]  _GEN_15 = {5{closeA_3_result[7]}};
+  wire [7:0]  closeB_3_result =
+    $signed(_estSym_3_T_2) > 13'sh33
       ? 8'h65
-      : $signed(_estSym_3_T_1) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [12:0] _diffB_3_T_2 = _estSym_3_T_1 - {{5{diffB_3_result[7]}}, diffB_3_result};
-  wire [25:0] _GEN_6 = {{13{_diffA_3_T_1[12]}}, _diffA_3_T_1};
-  wire [25:0] io_symMetricsA_3_fullSquare = _GEN_6 * _GEN_6;
-  wire [25:0] _GEN_7 = {{13{_diffB_3_T_2[12]}}, _diffB_3_T_2};
-  wire [25:0] io_symMetricsB_3_fullSquare = _GEN_7 * _GEN_7;
-  wire [12:0] _estSym_4_T_1 = io_rxFilter - _GEN * 13'h65;
-  wire [7:0]  diffA_4_result = $signed(_estSym_4_T_1) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [12:0] _diffA_4_T_1 = _estSym_4_T_1 - {{5{diffA_4_result[7]}}, diffA_4_result};
-  wire [7:0]  diffB_4_result =
-    $signed(_estSym_4_T_1) > 13'sh33
+      : $signed(_estSym_3_T_2) > -13'sh34 ? 8'h0 : 8'h99;
+  wire [4:0]  _GEN_16 = {5{closeB_3_result[7]}};
+  wire [12:0] _diffA_3_T = _estSym_3_T_2 - {_GEN_15, closeA_3_result};
+  wire [12:0] _diffB_3_T = _estSym_3_T_2 - {_GEN_16, closeB_3_result};
+  wire [25:0] _GEN_17 = {{13{_diffA_3_T[12]}}, _diffA_3_T};
+  wire [25:0] io_symMetricsA_3_fullSquare = _GEN_17 * _GEN_17;
+  wire [25:0] _GEN_18 = {{13{_diffB_3_T[12]}}, _diffB_3_T};
+  wire [25:0] io_symMetricsB_3_fullSquare = _GEN_18 * _GEN_18;
+  wire [11:0] _GEN_19 = {_GEN_16, closeB_3_result[7:2], closeB_3_result[0]};
+  wire [15:0] _estSym_4_T = _GEN * 16'h65;
+  wire [12:0] _estSym_4_T_2 = io_rxFilter - {{4{_estSym_4_T[15]}}, _estSym_4_T[15:7]};
+  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
+  wire [4:0]  _GEN_20 = {5{closeA_4_result[7]}};
+  wire [7:0]  closeB_4_result =
+    $signed(_estSym_4_T_2) > 13'sh33
       ? 8'h65
-      : $signed(_estSym_4_T_1) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [12:0] _diffB_4_T_2 = _estSym_4_T_1 - {{5{diffB_4_result[7]}}, diffB_4_result};
-  wire [25:0] _GEN_8 = {{13{_diffA_4_T_1[12]}}, _diffA_4_T_1};
-  wire [25:0] io_symMetricsA_4_fullSquare = _GEN_8 * _GEN_8;
-  wire [25:0] _GEN_9 = {{13{_diffB_4_T_2[12]}}, _diffB_4_T_2};
-  wire [25:0] io_symMetricsB_4_fullSquare = _GEN_9 * _GEN_9;
+      : $signed(_estSym_4_T_2) > -13'sh34 ? 8'h0 : 8'h99;
+  wire [4:0]  _GEN_21 = {5{closeB_4_result[7]}};
+  wire [12:0] _diffA_4_T = _estSym_4_T_2 - {_GEN_20, closeA_4_result};
+  wire [12:0] _diffB_4_T = _estSym_4_T_2 - {_GEN_21, closeB_4_result};
+  wire [25:0] _GEN_22 = {{13{_diffA_4_T[12]}}, _diffA_4_T};
+  wire [25:0] io_symMetricsA_4_fullSquare = _GEN_22 * _GEN_22;
+  wire [25:0] _GEN_23 = {{13{_diffB_4_T[12]}}, _diffB_4_T};
+  wire [25:0] io_symMetricsB_4_fullSquare = _GEN_23 * _GEN_23;
+  wire [11:0] _GEN_24 = {_GEN_21, closeB_4_result[7:2], closeB_4_result[0]};
   assign io_symMetricsA_0 =
     (|(io_symMetricsA_0_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_0_fullSquare[7:0];
   assign io_symMetricsA_1 =
@@ -217,21 +262,16 @@ module OneDimLaBMU(
     (|(io_symMetricsB_3_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_3_fullSquare[7:0];
   assign io_symMetricsB_4 =
     (|(io_symMetricsB_4_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_4_fullSquare[7:0];
-  assign io_symsA_0 = {{2{_estSym_0_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_1 = {{2{_estSym_1_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_2 = {{2{io_rxFilter == 13'h1FCC}}, 1'h1};
-  assign io_symsA_3 = {{2{_estSym_3_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsA_4 = {{2{_estSym_4_T_1 == 13'h1FCC}}, 1'h1};
-  assign io_symsB_0 =
-    _estSym_0_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_0_T_1 == 13'h65, 1'h0};
-  assign io_symsB_1 =
-    _estSym_1_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_1_T_1 == 13'h65, 1'h0};
-  assign io_symsB_2 =
-    io_rxFilter == 13'h1F99 ? 3'h6 : {1'h0, io_rxFilter == 13'h65, 1'h0};
-  assign io_symsB_3 =
-    _estSym_3_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_3_T_1 == 13'h65, 1'h0};
-  assign io_symsB_4 =
-    _estSym_4_T_1 == 13'h1F99 ? 3'h6 : {1'h0, _estSym_4_T_1 == 13'h65, 1'h0};
+  assign io_symsA_0 = {{2{{_GEN_0, closeA_0_result} == 13'h1FCC}}, 1'h1};
+  assign io_symsA_1 = {{2{{_GEN_5, closeA_1_result} == 13'h1FCC}}, 1'h1};
+  assign io_symsA_2 = {{2{{_GEN_10, closeA_2_result} == 13'h1FCC}}, 1'h1};
+  assign io_symsA_3 = {{2{{_GEN_15, closeA_3_result} == 13'h1FCC}}, 1'h1};
+  assign io_symsA_4 = {{2{{_GEN_20, closeA_4_result} == 13'h1FCC}}, 1'h1};
+  assign io_symsB_0 = _GEN_4 == 12'hFCD ? 3'h6 : {1'h0, _GEN_4 == 12'h33, 1'h0};
+  assign io_symsB_1 = _GEN_9 == 12'hFCD ? 3'h6 : {1'h0, _GEN_9 == 12'h33, 1'h0};
+  assign io_symsB_2 = _GEN_14 == 12'hFCD ? 3'h6 : {1'h0, _GEN_14 == 12'h33, 1'h0};
+  assign io_symsB_3 = _GEN_19 == 12'hFCD ? 3'h6 : {1'h0, _GEN_19 == 12'h33, 1'h0};
+  assign io_symsB_4 = _GEN_24 == 12'hFCD ? 3'h6 : {1'h0, _GEN_24 == 12'h33, 1'h0};
 endmodule
 
 module SymMux(

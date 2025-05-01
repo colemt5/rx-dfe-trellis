@@ -9,7 +9,7 @@ import pdfd.Utils._
   *
   * @param symBitWidth the bit width of the input and output signals
   */
-class OneDimLaBMU(tapWidth: Int = 8, sampleWidth: Int, upSizeWidth: Int, pam5: Seq[Int]) // todo add parameters 
+class OneDimLaBMU(tapWidth: Int, tapScale: Int, sampleWidth: Int, upSizeWidth: Int, pam5: Seq[Int]) // todo add parameters 
     extends Module {
   val io = IO(new Bundle {
     val rxFilter = Input(SInt(upSizeWidth.W))
@@ -30,20 +30,25 @@ class OneDimLaBMU(tapWidth: Int = 8, sampleWidth: Int, upSizeWidth: Int, pam5: S
   val pam5B = Seq(pam5Vals(0), pam5Vals(2), pam5Vals(4))
   
   val estSym = Wire(Vec(5, SInt(upSizeWidth.W)))
+  val closeA = Wire(Vec(5, SInt(upSizeWidth.W)))
+  val closeB = Wire(Vec(5, SInt(upSizeWidth.W)))
   // diff to closest A/B Pam5 symbol
   val diffA = Wire(Vec(5, SInt(upSizeWidth.W)))
   val diffB = Wire(Vec(5, SInt(upSizeWidth.W)))
 
+
   for (i <- 0 until 5) {
-    estSym(i) := io.rxFilter - pam5Vals(i) * io.tapOne
-    diffA(i) := estSym(i) - levelSlicer(estSym(i), pam5A, pam5ThreshA)
-    diffB(i) := estSym(i) - levelSlicer(estSym(i), pam5B, pam5ThreshB)
+    estSym(i) := io.rxFilter - ((pam5Vals(i) * io.tapOne) >> tapScale)
+    closeA(i) := levelSlicer(estSym(i), pam5A, pam5ThreshA)
+    closeB(i) := levelSlicer(estSym(i), pam5B, pam5ThreshB)
+    diffA(i) := estSym(i) - closeA(i)
+    diffB(i) := estSym(i) - closeB(i)
     io.symMetricsA(i) := saturatingSquare(diffA(i), sampleWidth)
     io.symMetricsB(i) := saturatingSquare(diffB(i), sampleWidth)
-    io.symsA(i) := Mux(estSym(i) === pam5A(0), -1.S, 1.S)
+    io.symsA(i) := Mux(closeA(i) === pam5A(0), -1.S, 1.S)
     io.symsB(i) := MuxCase(0.S, Array(
-      (estSym(i) === pam5B(0)) -> -2.S, 
-      (estSym(i) === pam5B(2)) -> 2.S))
+      (closeB(i) === pam5B(0)) -> -2.S, 
+      (closeB(i) === pam5B(2)) -> 2.S))
   }
 
 }

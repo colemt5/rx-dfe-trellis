@@ -14,8 +14,6 @@ object Utils {
 
     val result = WireDefault(levels.head) // Default to the lowest level
 
-    // Fold so the highest threshold has the highest priority
-    // Higher thresholds will overwrite lower ones
     for (i <- thresholds.indices) {
       when(data > thresholds(i)) {
         result := levels(i + 1)

@@ -20,6 +20,7 @@ class LaPDFD()
     extends Module {
   val numTaps = 14 // from paper
   val tapWidth = 8 // guessed
+  val tapScale = 7 
   val sampleWidth = 8 // from ffe team
   val io = IO(new Bundle {
     val rxSamples  = Input(Vec(4, SInt(sampleWidth.W))) // From DFF/ECHO
@@ -32,8 +33,8 @@ class LaPDFD()
   val pam5 = Seq(-103, -52, 0, 51, 101)
   val pam5Thresholds = Seq(-77, -26, 25, 76)
   // one unit per channel
-  val dfp   = Seq.fill(4)(Module(new DFP(numTaps, tapWidth, sampleWidth, upSizeWidth, pam5, pam5Thresholds)))
-  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, sampleWidth, upSizeWidth, pam5)))
+  val dfp   = Seq.fill(4)(Module(new DFP(numTaps, tapWidth, tapScale, sampleWidth, upSizeWidth, pam5, pam5Thresholds)))
+  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, tapScale, sampleWidth, upSizeWidth, pam5)))
 
   // one unit per state 
   val muxu    = Seq.fill(8)(Module(new MUXU(sampleWidth)))

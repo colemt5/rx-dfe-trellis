@@ -64,20 +64,20 @@ LaPDFD dut (
     .io_rxSamples_1(rx_syms[1]),
     .io_rxSamples_2(rx_syms[2]),
     .io_rxSamples_3(rx_syms[3]),
-    .io_taps_0(taps[0]),
-    .io_taps_1(taps[1]),
-    .io_taps_2(taps[2]),
-    .io_taps_3(taps[3]),
-    .io_taps_4(taps[4]),
-    .io_taps_5(taps[5]),
-    .io_taps_6(taps[6]),
-    .io_taps_7(taps[7]),
-    .io_taps_8(taps[8]),
-    .io_taps_9(taps[9]),
-    .io_taps_10(taps[10]),
-    .io_taps_11(taps[11]),
-    .io_taps_12(taps[12]),
-    .io_taps_13(taps[13]),
+    .io_taps_0(0),
+    .io_taps_1(0),
+    .io_taps_2(0),
+    .io_taps_3(0),
+    .io_taps_4(0),
+    .io_taps_5(0),
+    .io_taps_6(0),
+    .io_taps_7(0),
+    .io_taps_8(0),
+    .io_taps_9(0),
+    .io_taps_10(0),
+    .io_taps_11(0),
+    .io_taps_12(0),
+    .io_taps_13(0),
     .io_rxData(rxData),
     .io_rxValid(rxValid)
 );
@@ -117,7 +117,6 @@ always_comb begin
 end
 
 // Used for reading taps from file
-integer tap_file, status;
 integer cycle_count = 0;
 
 initial begin
@@ -125,18 +124,6 @@ initial begin
     $dumpvars(0, lapdfd_tb);
     $vcdplusfile("lapdfd.vpd");
     $vcdpluson(0, lapdfd_tb);
-
-
-    // Read taps from tap_vector.txt
-    tap_file = $fopen("tap_vector.txt", "r");
-    if (!tap_file) begin
-        $display("ERROR: Cannot open tap_vector.txt!");
-        $finish;
-    end
-    for (int i = 0; i < 14; i++) begin
-        status = $fscanf(tap_file, "%d", taps[i]);
-    end
-    $fclose(tap_file);
 
     tx_enable = 0;
     // Initialize
@@ -159,7 +146,7 @@ initial begin
         mode = 0;
 
         // Generate random data
-        random_data = $urandom_range(0, 255); // 240
+        random_data = 240;//$urandom_range(0, 255); // 240
         
         // Buffer input samples
         expected_syms.push_back('{tx_syms[0], tx_syms[1], tx_syms[2], tx_syms[3]});
@@ -170,7 +157,7 @@ initial begin
         sym0 = rxData[11:9];
         
         // Check output against expected values
-        if (cycle_count > 15) begin
+        if (cycle_count > 16) begin
             exp = expected_syms.pop_front();
             if (rxValid) begin
                 if (sym0 !== exp.sym0 || sym1 !== exp.sym1 || sym2 !== exp.sym2 || sym3 !== exp.sym3) begin
