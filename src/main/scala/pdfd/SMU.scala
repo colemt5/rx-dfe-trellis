@@ -8,7 +8,7 @@ import pdfd.Utils._
   * likely bit sequence.
   *
   */
-class SMU(bitWidth: Int = 12) // todo change to 8 (12 is just for testing)
+class SMU(bitWidth: Int = 12) // width of 4 symbols (4 * 3)
     extends Module {
   val io = IO(new Bundle {
     val pathSelect = Input(UInt(2.W))
@@ -37,7 +37,7 @@ class SMU(bitWidth: Int = 12) // todo change to 8 (12 is just for testing)
       3.U -> io.byteInputs(3)(i)))
   }
 
-  io.byteChoices(0) := Cat(symSurvivor(0), symSurvivor(1), symSurvivor(2), symSurvivor(3)) // todo create a function that decodes symSurvivor to byteChoices(0)
+  io.byteChoices(0) := Cat(symSurvivor(0), symSurvivor(1), symSurvivor(2), symSurvivor(3)) 
   for (i <- 0 until bitWidth) {
     io.byteChoices(i + 1) := shiftReg(i)
   }

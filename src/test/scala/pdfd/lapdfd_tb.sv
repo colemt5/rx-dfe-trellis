@@ -52,7 +52,7 @@ LaPDFD dut (
     .io_taps_11(taps[11]),
     .io_taps_12(taps[12]),
     .io_taps_13(taps[13]),
-    .io_rxData(rxData),
+    .io_rxSymbols(rxData),
     .io_rxValid(rxValid)
 );
 
@@ -92,12 +92,15 @@ end
 // Reading test vectors from a file
 integer tap_file, vector_file, ref_file, line, ref_line;
 integer cycle_count = 0;
+integer error_count = 0;
 
 initial begin
-    $dumpfile("lapdfd.vcd");
-    $dumpvars(0, lapdfd_tb);
-    $vcdplusfile("lapdfd.vpd");
-    $vcdpluson(0, lapdfd_tb);
+    if ($test$plusargs("debug")) begin
+        $dumpfile("lapdfd.vcd");
+        $dumpvars(0, lapdfd_tb);
+        $vcdplusfile("lapdfd.vpd");
+        $vcdpluson(0, lapdfd_tb);
+    end
 
     // Read taps from tap_vector.txt
     tap_file = $fopen("tap_vector.txt", "r");
@@ -142,7 +145,9 @@ initial begin
             ref_in[0], ref_in[1], ref_in[2], ref_in[3]);
         
         // Buffer input samples
-        expected_syms.push_back('{ref_in[0], ref_in[1], ref_in[2], ref_in[3]});
+        if (line == 4 && ref_line == 4) begin
+            expected_syms.push_back('{ref_in[0], ref_in[1], ref_in[2], ref_in[3]});
+        end
 
         sym3 = rxData[2:0];
         sym2 = rxData[5:3];
@@ -156,21 +161,21 @@ initial begin
                 if (sym0 !== exp.sym0 || sym1 !== exp.sym1 || sym2 !== exp.sym2 || sym3 !== exp.sym3) begin
                     $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
                              cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
+                    error_count += sym0 !== exp.sym0 + sym1 !== exp.sym1 + sym2 !== exp.sym2 + sym3 !== exp.sym3;
                 end
-                else begin
-                    $display("Cycle %0d: Symbols: %0d %0d %0d %0d", cycle_count, sym0, sym1, sym2, sym3);
-                end
+                // else begin
+                //     $display("Cycle %0d: Symbols: %0d %0d %0d %0d", cycle_count, sym0, sym1, sym2, sym3);
+                // end
             end
         end 
         else begin
-            $display("Cycle %0d: sym in: %0d %0d %0d %0d", cycle_count, ref_in[0], ref_in[1], ref_in[2], ref_in[3]);
         end
 
         @(posedge clock);
     end
 
     // Wait for a few cycles to observe the remaining output
-    for (int n = 0; n < 14; n++) begin
+    while (expected_syms.size() > 0) begin
         cycle_count += 1;
 
         sym3 = rxData[2:0];
@@ -184,15 +189,25 @@ initial begin
             if (sym0 !== exp.sym0 || sym1 !== exp.sym1 || sym2 !== exp.sym2 || sym3 !== exp.sym3) begin
                 $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
                             cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
+                if (sym0 !== exp.sym0) error_count += 1;
+                if (sym1 !== exp.sym1) error_count += 1;
+                if (sym2 !== exp.sym2) error_count += 1;
+                if (sym3 !== exp.sym3) error_count += 1;
             end
+            // else begin
+            //     $display("Cycle %0d: Symbols: %0d %0d %0d %0d", cycle_count, sym0, sym1, sym2, sym3);
+            // end
         end
 
         @(posedge clock);
     end
+    $display("Simulation finished. Total error count: %0d out of %0d", error_count, (cycle_count - 17) * 4);
 
     $fclose(vector_file);
     $fclose(ref_file);
-    $vcdplusoff;
+    if ($test$plusargs("debug")) begin
+        $vcdplusoff;
+    end
     $finish;
 end
 

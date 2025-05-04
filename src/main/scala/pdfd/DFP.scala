@@ -5,32 +5,29 @@ import chisel3.util._
 import pdfd.Utils._
 
 /** DFP module that computes the pre-filtered symbol for each channel
-  *
-  * @param bitWidth the bit width of the input and output signals
   */
-class DFP(numTaps: Int, tapWidth: Int, tapScale: Int, sampleWidth: Int, upSizeWidth: Int, pam5: Seq[Int], pam5Thresholds: Seq[Int])
+class DFP(numTaps: Int, tapWidth: Int, fracWidth: Int, sampleWidth: Int, pam5: Seq[Int], pam5Thresholds: Seq[Int])
     extends Module {
   val io = IO(new Bundle {
     val rxSample = Input(SInt(sampleWidth.W)) 
     val taps = Input(Vec(numTaps, SInt(tapWidth.W)))
-    val rxFilter = Output(SInt(upSizeWidth.W)) 
+    val rxFilter = Output(SInt((sampleWidth + fracWidth).W)) 
   })
-  /* Assumptions
-    *  - The input symbol is 8 bits with DC at 0
-    *  - The channel coefficients are signed 8 bits
-    *  - The output symbol is 
-    */
+
+  // convert to Chisel
   val pam5Vals = pam5.map(_.S(sampleWidth.W))
   val pam5Thresh = pam5Thresholds.map(_.S(sampleWidth.W))
   
-  val filtSample = RegInit(0.S(upSizeWidth.W)) // y
-  val softSym = RegInit(0.S(sampleWidth.W)) // a
-  val feedbackPath = RegInit(VecInit(Seq.fill(numTaps - 2)(0.S(20.W)))) // hold f3 to f14 math
-  
-  val decSample = filtSample + ((softSym * -io.taps(0)) >> tapScale) // y - (f1 * a)
+  val filtSample = RegInit(0.S(18.W))
+  val softSym = RegInit(0.S(sampleWidth.W)) 
+  val feedbackPath = RegInit(VecInit(Seq.fill(numTaps - 2)(0.S(18.W)))) // hold f3 to f14 math
 
-  softSym := levelSlicer(Cat(decSample(sampleWidth-1), decSample(6,0)).asSInt, pam5Vals, pam5Thresh) // d sliced to a
-  
+  // filtSample + softSym * -f1 scaled back to normal by dividing by 128
+  val decSample = (filtSample + (softSym * -io.taps(0))) >> fracWidth 
+
+  softSym := levelSlicer(decSample, pam5Vals, pam5Thresh)
+
+  // sum(softSym * tapScale * tap)
   feedbackPath(0) := softSym * -io.taps(13) // -f14 * a
   feedbackPath(1) := feedbackPath(0) + (softSym * -io.taps(12))
   feedbackPath(2) := feedbackPath(1) + (softSym * -io.taps(11))
@@ -44,9 +41,12 @@ class DFP(numTaps: Int, tapWidth: Int, tapScale: Int, sampleWidth: Int, upSizeWi
   feedbackPath(10) := feedbackPath(9) + (softSym * -io.taps(3))
   feedbackPath(11) := feedbackPath(10) + (softSym * -io.taps(2))
 
-  val alignedSum = (feedbackPath(11) + (softSym * -io.taps(1))) >> tapScale
+  // sample * tapScale
+  val scaledSample = Cat(io.rxSample, 0.U(fracWidth.W)).asSInt
+  
+  // tapScale * sample + tapScale * sum(softSym * tap)
+  filtSample := scaledSample + (feedbackPath(11) + (softSym * -io.taps(1)))
 
-  filtSample := io.rxSample + Cat(alignedSum(sampleWidth-1), alignedSum(6,0)).asSInt // z - sum(fi * a) (i=2 to 14)
-
-  io.rxFilter := filtSample
+  // output is still in fixed point
+  io.rxFilter := filtSample 
 }

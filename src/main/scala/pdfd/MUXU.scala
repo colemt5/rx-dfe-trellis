@@ -5,9 +5,8 @@ import chisel3.util._
 import pdfd.Utils._
 
 /** MUXU module that take all possible branch metrics and selects one of them
-  * based on the input selection signal. Takes in all channels
+  * based on the input selection signal. Computes for all 4 channels.
   * 
-  * @param symBitWidth the bit width of the input and output signals
   */
 
 class MUXU(symBitWidth: Int)
@@ -40,9 +39,8 @@ for (i <- 0 until 4) {
 }
 
 /** SymMux helper module that takes in two sets of branch metrics and selects one
-  * based on the input selection signal. Takes in all channels
+  * based on the input selection signal
   * 
-  * @param symBitWidth the bit width of the input and output signals
   */
 
 class SymMux(symBitWidth: Int) extends Module {

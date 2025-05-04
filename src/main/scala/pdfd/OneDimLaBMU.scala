@@ -6,39 +6,41 @@ import pdfd.Utils._
 
 /** 1D LaBMU module that computes the branch metrics for the 1D Lookahead
   * Branch Metric Unit (LaBMU) for each of the 4 channel symbols.
-  *
-  * @param symBitWidth the bit width of the input and output signals
   */
-class OneDimLaBMU(tapWidth: Int, tapScale: Int, sampleWidth: Int, upSizeWidth: Int, pam5: Seq[Int]) // todo add parameters 
+class OneDimLaBMU(tapWidth: Int, fracWidth: Int, sampleWidth: Int, pam5: Seq[Int])
     extends Module {
   val io = IO(new Bundle {
-    val rxFilter = Input(SInt(upSizeWidth.W))
+    val rxFilter = Input(SInt((tapWidth + fracWidth).W))
     val tapOne  = Input(SInt(tapWidth.W))
-    val symMetricsA = Output(Vec(5, UInt(sampleWidth.W))) // todo need to verify if int or fixed point
-    val symMetricsB = Output(Vec(5, UInt(sampleWidth.W))) // todo need to verify if int or fixed point
+    val symMetricsA = Output(Vec(5, UInt(sampleWidth.W)))
+    val symMetricsB = Output(Vec(5, UInt(sampleWidth.W)))
     val symsA = Output(Vec(5, SInt(3.W)))
     val symsB = Output(Vec(5, SInt(3.W)))
   })
-  
+
+  // convert to Chisel
   val pam5Vals = pam5.map(_.S(sampleWidth.W))
+  
   // the midpoint of {-1, 1} is 0
   val pam5ThreshA = Seq(pam5Vals(2))
+  
   // the midpoints of {-2, 0, 2} is {-1, 1}
   val pam5ThreshB = Seq(pam5Vals(1), pam5Vals(3))
 
   val pam5A = Seq(pam5Vals(1), pam5Vals(3))
   val pam5B = Seq(pam5Vals(0), pam5Vals(2), pam5Vals(4))
   
-  val estSym = Wire(Vec(5, SInt(upSizeWidth.W)))
-  val closeA = Wire(Vec(5, SInt(upSizeWidth.W)))
-  val closeB = Wire(Vec(5, SInt(upSizeWidth.W)))
+  val estSym = Wire(Vec(5, SInt(sampleWidth.W)))
+  val closeA = Wire(Vec(5, SInt(sampleWidth.W)))
+  val closeB = Wire(Vec(5, SInt(sampleWidth.W)))
+  
   // diff to closest A/B Pam5 symbol
-  val diffA = Wire(Vec(5, SInt(upSizeWidth.W)))
-  val diffB = Wire(Vec(5, SInt(upSizeWidth.W)))
+  val diffA = Wire(Vec(5, SInt(sampleWidth.W)))
+  val diffB = Wire(Vec(5, SInt(sampleWidth.W)))
 
 
   for (i <- 0 until 5) {
-    estSym(i) := io.rxFilter - ((pam5Vals(i) * io.tapOne) >> tapScale)
+    estSym(i) := (io.rxFilter - (pam5Vals(i) * io.tapOne)) >> fracWidth
     closeA(i) := levelSlicer(estSym(i), pam5A, pam5ThreshA)
     closeB(i) := levelSlicer(estSym(i), pam5B, pam5ThreshB)
     diffA(i) := estSym(i) - closeA(i)

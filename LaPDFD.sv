@@ -17,10 +17,10 @@ module DFP(
                 io_taps_11,
                 io_taps_12,
                 io_taps_13,
-  output [12:0] io_rxFilter
+  output [14:0] io_rxFilter
 );
 
-  reg [12:0] filtSample;
+  reg [19:0] filtSample;
   reg [7:0]  softSym;
   reg [19:0] feedbackPath_0;
   reg [19:0] feedbackPath_1;
@@ -36,7 +36,7 @@ module DFP(
   reg [19:0] feedbackPath_11;
   always @(posedge clock) begin
     if (reset) begin
-      filtSample <= 13'h0;
+      filtSample <= 20'h0;
       softSym <= 8'h0;
       feedbackPath_0 <= 20'h0;
       feedbackPath_1 <= 20'h0;
@@ -54,10 +54,9 @@ module DFP(
     else begin
       automatic logic [7:0]  _decSample_T = 8'h0 - io_taps_0;
       automatic logic [15:0] _GEN = {{8{softSym[7]}}, softSym};
-      automatic logic [14:0] _GEN_0 = {{7{softSym[7]}}, softSym};
-      automatic logic [14:0] _decSample_T_3 =
-        _GEN_0 * {{7{_decSample_T[7]}}, _decSample_T};
-      automatic logic [7:0]  _decSample_T_5;
+      automatic logic [15:0] _decSample_T_3 = _GEN * {{8{_decSample_T[7]}}, _decSample_T};
+      automatic logic [19:0] _decSample_T_4 =
+        filtSample + {{4{_decSample_T_3[15]}}, _decSample_T_3};
       automatic logic [7:0]  _feedbackPath_0_T = 8'h0 - io_taps_13;
       automatic logic [15:0] _feedbackPath_0_T_3 =
         _GEN * {{8{_feedbackPath_0_T[7]}}, _feedbackPath_0_T};
@@ -94,22 +93,22 @@ module DFP(
       automatic logic [7:0]  _feedbackPath_11_T = 8'h0 - io_taps_2;
       automatic logic [15:0] _feedbackPath_11_T_3 =
         _GEN * {{8{_feedbackPath_11_T[7]}}, _feedbackPath_11_T};
-      automatic logic [7:0]  _alignedSum_T = 8'h0 - io_taps_1;
-      automatic logic [14:0] _alignedSum_T_4 =
-        feedbackPath_11[14:0] + _GEN_0 * {{7{_alignedSum_T[7]}}, _alignedSum_T};
-      automatic logic [7:0]  _filtSample_T_4 = io_rxSample + _alignedSum_T_4[14:7];
-      _decSample_T_5 = filtSample[7:0] + _decSample_T_3[14:7];
-      filtSample <= {{5{_filtSample_T_4[7]}}, _filtSample_T_4};
-      if ($signed(_decSample_T_5) > 8'sh4C)
-        softSym <= 8'h65;
-      else if ($signed(_decSample_T_5) > 8'sh19)
-        softSym <= 8'h33;
-      else if ($signed(_decSample_T_5) > -8'sh1A)
+      automatic logic [7:0]  _filtSample_T = 8'h0 - io_taps_1;
+      automatic logic [15:0] _filtSample_T_3 =
+        _GEN * {{8{_filtSample_T[7]}}, _filtSample_T};
+      filtSample <=
+        {{5{io_rxSample[7]}}, io_rxSample, 7'h0} + feedbackPath_11
+        + {{4{_filtSample_T_3[15]}}, _filtSample_T_3};
+      if ($signed(_decSample_T_4[19:7]) > 13'sh34)
+        softSym <= 8'h46;
+      else if ($signed(_decSample_T_4[19:7]) > 13'sh11)
+        softSym <= 8'h23;
+      else if ($signed(_decSample_T_4[19:7]) > -13'sh11)
         softSym <= 8'h0;
-      else if ($signed(_decSample_T_5) > -8'sh4D)
-        softSym <= 8'hCC;
+      else if ($signed(_decSample_T_4[19:7]) > -13'sh34)
+        softSym <= 8'hDD;
       else
-        softSym <= 8'h99;
+        softSym <= 8'hBA;
       feedbackPath_0 <= {{4{_feedbackPath_0_T_3[15]}}, _feedbackPath_0_T_3};
       feedbackPath_1 <=
         feedbackPath_0 + {{4{_feedbackPath_1_T_3[15]}}, _feedbackPath_1_T_3};
@@ -135,11 +134,11 @@ module DFP(
         feedbackPath_10 + {{4{_feedbackPath_11_T_3[15]}}, _feedbackPath_11_T_3};
     end
   end // always @(posedge)
-  assign io_rxFilter = filtSample;
+  assign io_rxFilter = filtSample[14:0];
 endmodule
 
 module OneDimLaBMU(
-  input  [12:0] io_rxFilter,
+  input  [14:0] io_rxFilter,
   input  [7:0]  io_tapOne,
   output [7:0]  io_symMetricsA_0,
                 io_symMetricsA_1,
@@ -163,115 +162,101 @@ module OneDimLaBMU(
                 io_symsB_4
 );
 
-  wire [15:0] _GEN = {{8{io_tapOne[7]}}, io_tapOne};
-  wire [15:0] _estSym_0_T = _GEN * 16'hFF99;
-  wire [12:0] _estSym_0_T_2 = io_rxFilter - {{4{_estSym_0_T[15]}}, _estSym_0_T[15:7]};
-  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [4:0]  _GEN_0 = {5{closeA_0_result[7]}};
+  wire [14:0] _GEN = {{7{io_tapOne[7]}}, io_tapOne};
+  wire [14:0] _estSym_0_T_1 = io_rxFilter - _GEN * 15'h7FBA;
+  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
   wire [7:0]  closeB_0_result =
-    $signed(_estSym_0_T_2) > 13'sh33
-      ? 8'h65
-      : $signed(_estSym_0_T_2) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [4:0]  _GEN_1 = {5{closeB_0_result[7]}};
-  wire [12:0] _diffA_0_T = _estSym_0_T_2 - {_GEN_0, closeA_0_result};
-  wire [12:0] _diffB_0_T = _estSym_0_T_2 - {_GEN_1, closeB_0_result};
-  wire [25:0] _GEN_2 = {{13{_diffA_0_T[12]}}, _diffA_0_T};
-  wire [25:0] io_symMetricsA_0_fullSquare = _GEN_2 * _GEN_2;
-  wire [25:0] _GEN_3 = {{13{_diffB_0_T[12]}}, _diffB_0_T};
-  wire [25:0] io_symMetricsB_0_fullSquare = _GEN_3 * _GEN_3;
-  wire [11:0] _GEN_4 = {_GEN_1, closeB_0_result[7:2], closeB_0_result[0]};
-  wire [15:0] _estSym_1_T = _GEN * 16'hFFCC;
-  wire [12:0] _estSym_1_T_2 = io_rxFilter - {{4{_estSym_1_T[15]}}, _estSym_1_T[15:7]};
-  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [4:0]  _GEN_5 = {5{closeA_1_result[7]}};
+    $signed(_estSym_0_T_1[14:7]) > 8'sh23
+      ? 8'h46
+      : $signed(_estSym_0_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+  wire [7:0]  _diffA_0_T = _estSym_0_T_1[14:7] - closeA_0_result;
+  wire [7:0]  _diffB_0_T = _estSym_0_T_1[14:7] - closeB_0_result;
+  wire [15:0] _GEN_0 = {{8{_diffA_0_T[7]}}, _diffA_0_T};
+  wire [15:0] io_symMetricsA_0_fullSquare = _GEN_0 * _GEN_0;
+  wire [15:0] _GEN_1 = {{8{_diffB_0_T[7]}}, _diffB_0_T};
+  wire [15:0] io_symMetricsB_0_fullSquare = _GEN_1 * _GEN_1;
+  wire [14:0] _estSym_1_T_1 = io_rxFilter - _GEN * 15'h7FDD;
+  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
   wire [7:0]  closeB_1_result =
-    $signed(_estSym_1_T_2) > 13'sh33
-      ? 8'h65
-      : $signed(_estSym_1_T_2) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [4:0]  _GEN_6 = {5{closeB_1_result[7]}};
-  wire [12:0] _diffA_1_T = _estSym_1_T_2 - {_GEN_5, closeA_1_result};
-  wire [12:0] _diffB_1_T = _estSym_1_T_2 - {_GEN_6, closeB_1_result};
-  wire [25:0] _GEN_7 = {{13{_diffA_1_T[12]}}, _diffA_1_T};
-  wire [25:0] io_symMetricsA_1_fullSquare = _GEN_7 * _GEN_7;
-  wire [25:0] _GEN_8 = {{13{_diffB_1_T[12]}}, _diffB_1_T};
-  wire [25:0] io_symMetricsB_1_fullSquare = _GEN_8 * _GEN_8;
-  wire [11:0] _GEN_9 = {_GEN_6, closeB_1_result[7:2], closeB_1_result[0]};
-  wire [7:0]  closeA_2_result = $signed(io_rxFilter) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [4:0]  _GEN_10 = {5{closeA_2_result[7]}};
+    $signed(_estSym_1_T_1[14:7]) > 8'sh23
+      ? 8'h46
+      : $signed(_estSym_1_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+  wire [7:0]  _diffA_1_T = _estSym_1_T_1[14:7] - closeA_1_result;
+  wire [7:0]  _diffB_1_T = _estSym_1_T_1[14:7] - closeB_1_result;
+  wire [15:0] _GEN_2 = {{8{_diffA_1_T[7]}}, _diffA_1_T};
+  wire [15:0] io_symMetricsA_1_fullSquare = _GEN_2 * _GEN_2;
+  wire [15:0] _GEN_3 = {{8{_diffB_1_T[7]}}, _diffB_1_T};
+  wire [15:0] io_symMetricsB_1_fullSquare = _GEN_3 * _GEN_3;
+  wire [7:0]  closeA_2_result = $signed(io_rxFilter[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
   wire [7:0]  closeB_2_result =
-    $signed(io_rxFilter) > 13'sh33
-      ? 8'h65
-      : $signed(io_rxFilter) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [4:0]  _GEN_11 = {5{closeB_2_result[7]}};
-  wire [12:0] _diffA_2_T = io_rxFilter - {_GEN_10, closeA_2_result};
-  wire [12:0] _diffB_2_T = io_rxFilter - {_GEN_11, closeB_2_result};
-  wire [25:0] _GEN_12 = {{13{_diffA_2_T[12]}}, _diffA_2_T};
-  wire [25:0] io_symMetricsA_2_fullSquare = _GEN_12 * _GEN_12;
-  wire [25:0] _GEN_13 = {{13{_diffB_2_T[12]}}, _diffB_2_T};
-  wire [25:0] io_symMetricsB_2_fullSquare = _GEN_13 * _GEN_13;
-  wire [11:0] _GEN_14 = {_GEN_11, closeB_2_result[7:2], closeB_2_result[0]};
-  wire [15:0] _estSym_3_T = _GEN * 16'h33;
-  wire [12:0] _estSym_3_T_2 = io_rxFilter - {{4{_estSym_3_T[15]}}, _estSym_3_T[15:7]};
-  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [4:0]  _GEN_15 = {5{closeA_3_result[7]}};
+    $signed(io_rxFilter[14:7]) > 8'sh23
+      ? 8'h46
+      : $signed(io_rxFilter[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+  wire [7:0]  _diffA_2_T = io_rxFilter[14:7] - closeA_2_result;
+  wire [7:0]  _diffB_2_T = io_rxFilter[14:7] - closeB_2_result;
+  wire [15:0] _GEN_4 = {{8{_diffA_2_T[7]}}, _diffA_2_T};
+  wire [15:0] io_symMetricsA_2_fullSquare = _GEN_4 * _GEN_4;
+  wire [15:0] _GEN_5 = {{8{_diffB_2_T[7]}}, _diffB_2_T};
+  wire [15:0] io_symMetricsB_2_fullSquare = _GEN_5 * _GEN_5;
+  wire [14:0] _estSym_3_T_1 = io_rxFilter - _GEN * 15'h23;
+  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
   wire [7:0]  closeB_3_result =
-    $signed(_estSym_3_T_2) > 13'sh33
-      ? 8'h65
-      : $signed(_estSym_3_T_2) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [4:0]  _GEN_16 = {5{closeB_3_result[7]}};
-  wire [12:0] _diffA_3_T = _estSym_3_T_2 - {_GEN_15, closeA_3_result};
-  wire [12:0] _diffB_3_T = _estSym_3_T_2 - {_GEN_16, closeB_3_result};
-  wire [25:0] _GEN_17 = {{13{_diffA_3_T[12]}}, _diffA_3_T};
-  wire [25:0] io_symMetricsA_3_fullSquare = _GEN_17 * _GEN_17;
-  wire [25:0] _GEN_18 = {{13{_diffB_3_T[12]}}, _diffB_3_T};
-  wire [25:0] io_symMetricsB_3_fullSquare = _GEN_18 * _GEN_18;
-  wire [11:0] _GEN_19 = {_GEN_16, closeB_3_result[7:2], closeB_3_result[0]};
-  wire [15:0] _estSym_4_T = _GEN * 16'h65;
-  wire [12:0] _estSym_4_T_2 = io_rxFilter - {{4{_estSym_4_T[15]}}, _estSym_4_T[15:7]};
-  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_2) > 13'sh0 ? 8'h33 : 8'hCC;
-  wire [4:0]  _GEN_20 = {5{closeA_4_result[7]}};
+    $signed(_estSym_3_T_1[14:7]) > 8'sh23
+      ? 8'h46
+      : $signed(_estSym_3_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+  wire [7:0]  _diffA_3_T = _estSym_3_T_1[14:7] - closeA_3_result;
+  wire [7:0]  _diffB_3_T = _estSym_3_T_1[14:7] - closeB_3_result;
+  wire [15:0] _GEN_6 = {{8{_diffA_3_T[7]}}, _diffA_3_T};
+  wire [15:0] io_symMetricsA_3_fullSquare = _GEN_6 * _GEN_6;
+  wire [15:0] _GEN_7 = {{8{_diffB_3_T[7]}}, _diffB_3_T};
+  wire [15:0] io_symMetricsB_3_fullSquare = _GEN_7 * _GEN_7;
+  wire [14:0] _estSym_4_T_1 = io_rxFilter - _GEN * 15'h46;
+  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
   wire [7:0]  closeB_4_result =
-    $signed(_estSym_4_T_2) > 13'sh33
-      ? 8'h65
-      : $signed(_estSym_4_T_2) > -13'sh34 ? 8'h0 : 8'h99;
-  wire [4:0]  _GEN_21 = {5{closeB_4_result[7]}};
-  wire [12:0] _diffA_4_T = _estSym_4_T_2 - {_GEN_20, closeA_4_result};
-  wire [12:0] _diffB_4_T = _estSym_4_T_2 - {_GEN_21, closeB_4_result};
-  wire [25:0] _GEN_22 = {{13{_diffA_4_T[12]}}, _diffA_4_T};
-  wire [25:0] io_symMetricsA_4_fullSquare = _GEN_22 * _GEN_22;
-  wire [25:0] _GEN_23 = {{13{_diffB_4_T[12]}}, _diffB_4_T};
-  wire [25:0] io_symMetricsB_4_fullSquare = _GEN_23 * _GEN_23;
-  wire [11:0] _GEN_24 = {_GEN_21, closeB_4_result[7:2], closeB_4_result[0]};
+    $signed(_estSym_4_T_1[14:7]) > 8'sh23
+      ? 8'h46
+      : $signed(_estSym_4_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+  wire [7:0]  _diffA_4_T = _estSym_4_T_1[14:7] - closeA_4_result;
+  wire [7:0]  _diffB_4_T = _estSym_4_T_1[14:7] - closeB_4_result;
+  wire [15:0] _GEN_8 = {{8{_diffA_4_T[7]}}, _diffA_4_T};
+  wire [15:0] io_symMetricsA_4_fullSquare = _GEN_8 * _GEN_8;
+  wire [15:0] _GEN_9 = {{8{_diffB_4_T[7]}}, _diffB_4_T};
+  wire [15:0] io_symMetricsB_4_fullSquare = _GEN_9 * _GEN_9;
   assign io_symMetricsA_0 =
-    (|(io_symMetricsA_0_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_0_fullSquare[7:0];
+    (|(io_symMetricsA_0_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_0_fullSquare[7:0];
   assign io_symMetricsA_1 =
-    (|(io_symMetricsA_1_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_1_fullSquare[7:0];
+    (|(io_symMetricsA_1_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_1_fullSquare[7:0];
   assign io_symMetricsA_2 =
-    (|(io_symMetricsA_2_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_2_fullSquare[7:0];
+    (|(io_symMetricsA_2_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_2_fullSquare[7:0];
   assign io_symMetricsA_3 =
-    (|(io_symMetricsA_3_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_3_fullSquare[7:0];
+    (|(io_symMetricsA_3_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_3_fullSquare[7:0];
   assign io_symMetricsA_4 =
-    (|(io_symMetricsA_4_fullSquare[25:8])) ? 8'hFF : io_symMetricsA_4_fullSquare[7:0];
+    (|(io_symMetricsA_4_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_4_fullSquare[7:0];
   assign io_symMetricsB_0 =
-    (|(io_symMetricsB_0_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_0_fullSquare[7:0];
+    (|(io_symMetricsB_0_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_0_fullSquare[7:0];
   assign io_symMetricsB_1 =
-    (|(io_symMetricsB_1_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_1_fullSquare[7:0];
+    (|(io_symMetricsB_1_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_1_fullSquare[7:0];
   assign io_symMetricsB_2 =
-    (|(io_symMetricsB_2_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_2_fullSquare[7:0];
+    (|(io_symMetricsB_2_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_2_fullSquare[7:0];
   assign io_symMetricsB_3 =
-    (|(io_symMetricsB_3_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_3_fullSquare[7:0];
+    (|(io_symMetricsB_3_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_3_fullSquare[7:0];
   assign io_symMetricsB_4 =
-    (|(io_symMetricsB_4_fullSquare[25:8])) ? 8'hFF : io_symMetricsB_4_fullSquare[7:0];
-  assign io_symsA_0 = {{2{{_GEN_0, closeA_0_result} == 13'h1FCC}}, 1'h1};
-  assign io_symsA_1 = {{2{{_GEN_5, closeA_1_result} == 13'h1FCC}}, 1'h1};
-  assign io_symsA_2 = {{2{{_GEN_10, closeA_2_result} == 13'h1FCC}}, 1'h1};
-  assign io_symsA_3 = {{2{{_GEN_15, closeA_3_result} == 13'h1FCC}}, 1'h1};
-  assign io_symsA_4 = {{2{{_GEN_20, closeA_4_result} == 13'h1FCC}}, 1'h1};
-  assign io_symsB_0 = _GEN_4 == 12'hFCD ? 3'h6 : {1'h0, _GEN_4 == 12'h33, 1'h0};
-  assign io_symsB_1 = _GEN_9 == 12'hFCD ? 3'h6 : {1'h0, _GEN_9 == 12'h33, 1'h0};
-  assign io_symsB_2 = _GEN_14 == 12'hFCD ? 3'h6 : {1'h0, _GEN_14 == 12'h33, 1'h0};
-  assign io_symsB_3 = _GEN_19 == 12'hFCD ? 3'h6 : {1'h0, _GEN_19 == 12'h33, 1'h0};
-  assign io_symsB_4 = _GEN_24 == 12'hFCD ? 3'h6 : {1'h0, _GEN_24 == 12'h33, 1'h0};
+    (|(io_symMetricsB_4_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_4_fullSquare[7:0];
+  assign io_symsA_0 = {{2{closeA_0_result[7:1] == 7'h6E}}, 1'h1};
+  assign io_symsA_1 = {{2{closeA_1_result[7:1] == 7'h6E}}, 1'h1};
+  assign io_symsA_2 = {{2{closeA_2_result[7:1] == 7'h6E}}, 1'h1};
+  assign io_symsA_3 = {{2{closeA_3_result[7:1] == 7'h6E}}, 1'h1};
+  assign io_symsA_4 = {{2{closeA_4_result[7:1] == 7'h6E}}, 1'h1};
+  assign io_symsB_0 =
+    closeB_0_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_0_result[7:1] == 7'h23, 1'h0};
+  assign io_symsB_1 =
+    closeB_1_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_1_result[7:1] == 7'h23, 1'h0};
+  assign io_symsB_2 =
+    closeB_2_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_2_result[7:1] == 7'h23, 1'h0};
+  assign io_symsB_3 =
+    closeB_3_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_3_result[7:1] == 7'h23, 1'h0};
+  assign io_symsB_4 =
+    closeB_4_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_4_result[7:1] == 7'h23, 1'h0};
 endmodule
 
 module SymMux(
@@ -558,68 +543,76 @@ module MUXU(
 endmodule
 
 module FourDimBMU(
-  input  [7:0]  io_brMetricsA_0,
-                io_brMetricsA_1,
-                io_brMetricsA_2,
-                io_brMetricsA_3,
-                io_brMetricsB_0,
-                io_brMetricsB_1,
-                io_brMetricsB_2,
-                io_brMetricsB_3,
-  input  [2:0]  io_brSymsA_0,
-                io_brSymsA_1,
-                io_brSymsA_2,
-                io_brSymsA_3,
-                io_brSymsB_0,
-                io_brSymsB_1,
-                io_brSymsB_2,
-                io_brSymsB_3,
-  output [12:0] io_brMetrics4D_0,
-                io_brMetrics4D_1,
-                io_brMetrics4D_2,
-                io_brMetrics4D_3,
-  output [2:0]  io_brSyms4D_0_0,
-                io_brSyms4D_0_1,
-                io_brSyms4D_0_2,
-                io_brSyms4D_0_3,
-                io_brSyms4D_1_0,
-                io_brSyms4D_1_1,
-                io_brSyms4D_1_2,
-                io_brSyms4D_1_3,
-                io_brSyms4D_2_0,
-                io_brSyms4D_2_1,
-                io_brSyms4D_2_2,
-                io_brSyms4D_2_3,
-                io_brSyms4D_3_0,
-                io_brSyms4D_3_1,
-                io_brSyms4D_3_2,
-                io_brSyms4D_3_3
+  input  [7:0] io_brMetricsA_0,
+               io_brMetricsA_1,
+               io_brMetricsA_2,
+               io_brMetricsA_3,
+               io_brMetricsB_0,
+               io_brMetricsB_1,
+               io_brMetricsB_2,
+               io_brMetricsB_3,
+  input  [2:0] io_brSymsA_0,
+               io_brSymsA_1,
+               io_brSymsA_2,
+               io_brSymsA_3,
+               io_brSymsB_0,
+               io_brSymsB_1,
+               io_brSymsB_2,
+               io_brSymsB_3,
+  output [9:0] io_brMetrics4D_0,
+               io_brMetrics4D_1,
+               io_brMetrics4D_2,
+               io_brMetrics4D_3,
+  output [2:0] io_brSyms4D_0_0,
+               io_brSyms4D_0_1,
+               io_brSyms4D_0_2,
+               io_brSyms4D_0_3,
+               io_brSyms4D_1_0,
+               io_brSyms4D_1_1,
+               io_brSyms4D_1_2,
+               io_brSyms4D_1_3,
+               io_brSyms4D_2_0,
+               io_brSyms4D_2_1,
+               io_brSyms4D_2_2,
+               io_brSyms4D_2_3,
+               io_brSyms4D_3_0,
+               io_brSyms4D_3_1,
+               io_brSyms4D_3_2,
+               io_brSyms4D_3_3
 );
 
-  wire [7:0] _sumBrMetricA_1_T = io_brMetricsA_0 + io_brMetricsA_1;
-  wire [7:0] _sumBrMetricA_0_T_4 = _sumBrMetricA_1_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricB_1_T = io_brMetricsB_0 + io_brMetricsB_1;
-  wire [7:0] _sumBrMetricB_0_T_4 = _sumBrMetricB_1_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricA_1_T_4 = _sumBrMetricA_1_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricB_1_T_4 = _sumBrMetricB_1_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricA_3_T = io_brMetricsA_0 + io_brMetricsB_1;
-  wire [7:0] _sumBrMetricA_2_T_4 = _sumBrMetricA_3_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricB_3_T = io_brMetricsB_0 + io_brMetricsA_1;
-  wire [7:0] _sumBrMetricB_2_T_4 = _sumBrMetricB_3_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricA_3_T_4 = _sumBrMetricA_3_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricB_3_T_4 = _sumBrMetricB_3_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_4 < _sumBrMetricB_0_T_4;
-  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_4 < _sumBrMetricB_1_T_4;
-  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_4 < _sumBrMetricB_2_T_4;
-  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_4 < _sumBrMetricB_3_T_4;
+  wire [8:0] _GEN = {1'h0, io_brMetricsA_0};
+  wire [8:0] _GEN_0 = {1'h0, io_brMetricsA_1};
+  wire [9:0] _GEN_1 = {1'h0, _GEN + _GEN_0};
+  wire [9:0] _GEN_2 = {2'h0, io_brMetricsA_2};
+  wire [9:0] _GEN_3 = {2'h0, io_brMetricsA_3};
+  wire [9:0] _sumBrMetricA_0_T_2 = _GEN_1 + _GEN_2 + _GEN_3;
+  wire [8:0] _GEN_4 = {1'h0, io_brMetricsB_0};
+  wire [8:0] _GEN_5 = {1'h0, io_brMetricsB_1};
+  wire [9:0] _GEN_6 = {1'h0, _GEN_4 + _GEN_5};
+  wire [9:0] _GEN_7 = {2'h0, io_brMetricsB_2};
+  wire [9:0] _GEN_8 = {2'h0, io_brMetricsB_3};
+  wire [9:0] _sumBrMetricB_0_T_2 = _GEN_6 + _GEN_7 + _GEN_8;
+  wire [9:0] _sumBrMetricA_1_T_2 = _GEN_1 + _GEN_7 + _GEN_8;
+  wire [9:0] _sumBrMetricB_1_T_2 = _GEN_6 + _GEN_2 + _GEN_3;
+  wire [9:0] _GEN_9 = {1'h0, _GEN + _GEN_5};
+  wire [9:0] _sumBrMetricA_2_T_2 = _GEN_9 + _GEN_7 + _GEN_3;
+  wire [9:0] _GEN_10 = {1'h0, _GEN_4 + _GEN_0};
+  wire [9:0] _sumBrMetricB_2_T_2 = _GEN_10 + _GEN_2 + _GEN_8;
+  wire [9:0] _sumBrMetricA_3_T_2 = _GEN_9 + _GEN_2 + _GEN_8;
+  wire [9:0] _sumBrMetricB_3_T_2 = _GEN_10 + _GEN_7 + _GEN_3;
+  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_2 < _sumBrMetricB_0_T_2;
+  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_2 < _sumBrMetricB_1_T_2;
+  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_2 < _sumBrMetricB_2_T_2;
+  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_2 < _sumBrMetricB_3_T_2;
   assign io_brMetrics4D_0 =
-    {5'h0, _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_4 : _sumBrMetricB_0_T_4};
+    _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_2 : _sumBrMetricB_0_T_2;
   assign io_brMetrics4D_1 =
-    {5'h0, _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_4 : _sumBrMetricB_1_T_4};
+    _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_2 : _sumBrMetricB_1_T_2;
   assign io_brMetrics4D_2 =
-    {5'h0, _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_4 : _sumBrMetricB_2_T_4};
+    _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_2 : _sumBrMetricB_2_T_2;
   assign io_brMetrics4D_3 =
-    {5'h0, _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_4 : _sumBrMetricB_3_T_4};
+    _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_2 : _sumBrMetricB_3_T_2;
   assign io_brSyms4D_0_0 = _io_brMetrics4D_0_T ? io_brSymsA_0 : io_brSymsB_0;
   assign io_brSyms4D_0_1 = _io_brMetrics4D_0_T ? io_brSymsA_1 : io_brSymsB_1;
   assign io_brSyms4D_0_2 = _io_brMetrics4D_0_T ? io_brSymsA_2 : io_brSymsB_2;
@@ -639,68 +632,76 @@ module FourDimBMU(
 endmodule
 
 module FourDimBMU_4(
-  input  [7:0]  io_brMetricsA_0,
-                io_brMetricsA_1,
-                io_brMetricsA_2,
-                io_brMetricsA_3,
-                io_brMetricsB_0,
-                io_brMetricsB_1,
-                io_brMetricsB_2,
-                io_brMetricsB_3,
-  input  [2:0]  io_brSymsA_0,
-                io_brSymsA_1,
-                io_brSymsA_2,
-                io_brSymsA_3,
-                io_brSymsB_0,
-                io_brSymsB_1,
-                io_brSymsB_2,
-                io_brSymsB_3,
-  output [12:0] io_brMetrics4D_0,
-                io_brMetrics4D_1,
-                io_brMetrics4D_2,
-                io_brMetrics4D_3,
-  output [2:0]  io_brSyms4D_0_0,
-                io_brSyms4D_0_1,
-                io_brSyms4D_0_2,
-                io_brSyms4D_0_3,
-                io_brSyms4D_1_0,
-                io_brSyms4D_1_1,
-                io_brSyms4D_1_2,
-                io_brSyms4D_1_3,
-                io_brSyms4D_2_0,
-                io_brSyms4D_2_1,
-                io_brSyms4D_2_2,
-                io_brSyms4D_2_3,
-                io_brSyms4D_3_0,
-                io_brSyms4D_3_1,
-                io_brSyms4D_3_2,
-                io_brSyms4D_3_3
+  input  [7:0] io_brMetricsA_0,
+               io_brMetricsA_1,
+               io_brMetricsA_2,
+               io_brMetricsA_3,
+               io_brMetricsB_0,
+               io_brMetricsB_1,
+               io_brMetricsB_2,
+               io_brMetricsB_3,
+  input  [2:0] io_brSymsA_0,
+               io_brSymsA_1,
+               io_brSymsA_2,
+               io_brSymsA_3,
+               io_brSymsB_0,
+               io_brSymsB_1,
+               io_brSymsB_2,
+               io_brSymsB_3,
+  output [9:0] io_brMetrics4D_0,
+               io_brMetrics4D_1,
+               io_brMetrics4D_2,
+               io_brMetrics4D_3,
+  output [2:0] io_brSyms4D_0_0,
+               io_brSyms4D_0_1,
+               io_brSyms4D_0_2,
+               io_brSyms4D_0_3,
+               io_brSyms4D_1_0,
+               io_brSyms4D_1_1,
+               io_brSyms4D_1_2,
+               io_brSyms4D_1_3,
+               io_brSyms4D_2_0,
+               io_brSyms4D_2_1,
+               io_brSyms4D_2_2,
+               io_brSyms4D_2_3,
+               io_brSyms4D_3_0,
+               io_brSyms4D_3_1,
+               io_brSyms4D_3_2,
+               io_brSyms4D_3_3
 );
 
-  wire [7:0] _sumBrMetricA_1_T = io_brMetricsA_0 + io_brMetricsA_1;
-  wire [7:0] _sumBrMetricA_0_T_4 = _sumBrMetricA_1_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricB_1_T = io_brMetricsB_0 + io_brMetricsB_1;
-  wire [7:0] _sumBrMetricB_0_T_4 = _sumBrMetricB_1_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricA_1_T_4 = _sumBrMetricA_1_T + io_brMetricsB_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricB_1_T_4 = _sumBrMetricB_1_T + io_brMetricsA_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricA_3_T = io_brMetricsA_0 + io_brMetricsB_1;
-  wire [7:0] _sumBrMetricA_2_T_4 = _sumBrMetricA_3_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire [7:0] _sumBrMetricB_3_T = io_brMetricsB_0 + io_brMetricsA_1;
-  wire [7:0] _sumBrMetricB_2_T_4 = _sumBrMetricB_3_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricA_3_T_4 = _sumBrMetricA_3_T + io_brMetricsA_2 + io_brMetricsA_3;
-  wire [7:0] _sumBrMetricB_3_T_4 = _sumBrMetricB_3_T + io_brMetricsB_2 + io_brMetricsB_3;
-  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_4 < _sumBrMetricB_0_T_4;
-  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_4 < _sumBrMetricB_1_T_4;
-  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_4 < _sumBrMetricB_2_T_4;
-  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_4 < _sumBrMetricB_3_T_4;
+  wire [8:0] _GEN = {1'h0, io_brMetricsA_0};
+  wire [8:0] _GEN_0 = {1'h0, io_brMetricsA_1};
+  wire [9:0] _GEN_1 = {1'h0, _GEN + _GEN_0};
+  wire [9:0] _GEN_2 = {2'h0, io_brMetricsA_2};
+  wire [9:0] _GEN_3 = {2'h0, io_brMetricsB_3};
+  wire [9:0] _sumBrMetricA_0_T_2 = _GEN_1 + _GEN_2 + _GEN_3;
+  wire [8:0] _GEN_4 = {1'h0, io_brMetricsB_0};
+  wire [8:0] _GEN_5 = {1'h0, io_brMetricsB_1};
+  wire [9:0] _GEN_6 = {1'h0, _GEN_4 + _GEN_5};
+  wire [9:0] _GEN_7 = {2'h0, io_brMetricsB_2};
+  wire [9:0] _GEN_8 = {2'h0, io_brMetricsA_3};
+  wire [9:0] _sumBrMetricB_0_T_2 = _GEN_6 + _GEN_7 + _GEN_8;
+  wire [9:0] _sumBrMetricA_1_T_2 = _GEN_1 + _GEN_7 + _GEN_8;
+  wire [9:0] _sumBrMetricB_1_T_2 = _GEN_6 + _GEN_2 + _GEN_3;
+  wire [9:0] _GEN_9 = {1'h0, _GEN + _GEN_5};
+  wire [9:0] _sumBrMetricA_2_T_2 = _GEN_9 + _GEN_7 + _GEN_3;
+  wire [9:0] _GEN_10 = {1'h0, _GEN_4 + _GEN_0};
+  wire [9:0] _sumBrMetricB_2_T_2 = _GEN_10 + _GEN_2 + _GEN_8;
+  wire [9:0] _sumBrMetricA_3_T_2 = _GEN_9 + _GEN_2 + _GEN_8;
+  wire [9:0] _sumBrMetricB_3_T_2 = _GEN_10 + _GEN_7 + _GEN_3;
+  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_2 < _sumBrMetricB_0_T_2;
+  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_2 < _sumBrMetricB_1_T_2;
+  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_2 < _sumBrMetricB_2_T_2;
+  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_2 < _sumBrMetricB_3_T_2;
   assign io_brMetrics4D_0 =
-    {5'h0, _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_4 : _sumBrMetricB_0_T_4};
+    _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_2 : _sumBrMetricB_0_T_2;
   assign io_brMetrics4D_1 =
-    {5'h0, _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_4 : _sumBrMetricB_1_T_4};
+    _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_2 : _sumBrMetricB_1_T_2;
   assign io_brMetrics4D_2 =
-    {5'h0, _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_4 : _sumBrMetricB_2_T_4};
+    _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_2 : _sumBrMetricB_2_T_2;
   assign io_brMetrics4D_3 =
-    {5'h0, _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_4 : _sumBrMetricB_3_T_4};
+    _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_2 : _sumBrMetricB_3_T_2;
   assign io_brSyms4D_0_0 = _io_brMetrics4D_0_T ? io_brSymsA_0 : io_brSymsB_0;
   assign io_brSyms4D_0_1 = _io_brMetrics4D_0_T ? io_brSymsA_1 : io_brSymsB_1;
   assign io_brSyms4D_0_2 = _io_brMetrics4D_0_T ? io_brSymsA_2 : io_brSymsB_2;
@@ -722,35 +723,37 @@ endmodule
 module ACSU(
   input         clock,
                 reset,
-  input  [12:0] io_brMetrics4D_0,
+  input  [9:0]  io_brMetrics4D_0,
                 io_brMetrics4D_1,
                 io_brMetrics4D_2,
                 io_brMetrics4D_3,
-                io_pathMetrics_0,
+  input  [11:0] io_pathMetrics_0,
                 io_pathMetrics_1,
                 io_pathMetrics_2,
                 io_pathMetrics_3,
   output [1:0]  io_pathSelect,
-  output [12:0] io_pathMetric
+  output [11:0] io_pathMetric
 );
 
-  reg  [12:0] pathMetricReg;
-  wire [12:0] _sum0_T_1 = io_pathMetrics_0 + io_brMetrics4D_0;
-  wire [12:0] _sum1_T_1 = io_pathMetrics_1 + io_brMetrics4D_1;
-  wire [12:0] _sum2_T_1 = io_pathMetrics_2 + io_brMetrics4D_2;
-  wire [12:0] _sum3_T_1 = io_pathMetrics_3 + io_brMetrics4D_3;
-  wire        cmp3 = $signed(_sum1_T_1) < $signed(_sum2_T_1);
-  wire        cmp4 = $signed(_sum0_T_1) < $signed(_sum2_T_1);
-  wire        cmp5 = $signed(_sum0_T_1) < $signed(_sum1_T_1);
-  wire        _GEN = $signed(_sum0_T_1) < $signed(_sum3_T_1) & cmp4 & cmp5;
-  wire        _GEN_0 = $signed(_sum1_T_1) < $signed(_sum3_T_1) & cmp3 & ~cmp5;
-  wire        _GEN_1 = $signed(_sum2_T_1) < $signed(_sum3_T_1) & ~cmp3 & ~cmp4;
+  reg  [11:0] pathMetricReg;
+  wire [11:0] _sum0_T = io_pathMetrics_0 + {2'h0, io_brMetrics4D_0};
+  wire [11:0] _sum1_T = io_pathMetrics_1 + {2'h0, io_brMetrics4D_1};
+  wire [11:0] _sum2_T = io_pathMetrics_2 + {2'h0, io_brMetrics4D_2};
+  wire [11:0] _sum3_T = io_pathMetrics_3 + {2'h0, io_brMetrics4D_3};
+  wire [11:0] _dist0_T_2 = _sum2_T - _sum3_T;
+  wire [11:0] _dist1_T_2 = _sum1_T - _sum3_T;
+  wire [11:0] _dist2_T_2 = _sum0_T - _sum3_T;
+  wire [11:0] _dist3_T_2 = _sum1_T - _sum2_T;
+  wire [11:0] _dist4_T_2 = _sum0_T - _sum2_T;
+  wire [11:0] _dist5_T_2 = _sum0_T - _sum1_T;
+  wire        _GEN = _dist2_T_2[11] & _dist4_T_2[11] & _dist5_T_2[11];
+  wire        _GEN_0 = _dist1_T_2[11] & _dist3_T_2[11] & ~(_dist5_T_2[11]);
+  wire        _GEN_1 = _dist0_T_2[11] & ~(_dist3_T_2[11]) & ~(_dist4_T_2[11]);
   always @(posedge clock) begin
     if (reset)
-      pathMetricReg <= 13'h0;
+      pathMetricReg <= 12'h0;
     else
-      pathMetricReg <=
-        _GEN ? _sum0_T_1 : _GEN_0 ? _sum1_T_1 : _GEN_1 ? _sum2_T_1 : _sum3_T_1;
+      pathMetricReg <= _GEN ? _sum0_T : _GEN_0 ? _sum1_T : _GEN_1 ? _sum2_T : _sum3_T;
   end // always @(posedge)
   assign io_pathSelect = _GEN ? 2'h0 : _GEN_0 ? 2'h1 : {1'h1, ~_GEN_1};
   assign io_pathMetric = pathMetricReg;
@@ -1031,7 +1034,7 @@ module LaPDFD(
                 io_taps_11,
                 io_taps_12,
                 io_taps_13,
-  output [11:0] io_rxData,
+  output [11:0] io_rxSymbols,
   output        io_rxValid
 );
 
@@ -1172,25 +1175,25 @@ module LaPDFD(
   wire [2:0]  _smu_0_io_symSelects_2;
   wire [2:0]  _smu_0_io_symSelects_3;
   wire [1:0]  _acsu_7_io_pathSelect;
-  wire [12:0] _acsu_7_io_pathMetric;
+  wire [11:0] _acsu_7_io_pathMetric;
   wire [1:0]  _acsu_6_io_pathSelect;
-  wire [12:0] _acsu_6_io_pathMetric;
+  wire [11:0] _acsu_6_io_pathMetric;
   wire [1:0]  _acsu_5_io_pathSelect;
-  wire [12:0] _acsu_5_io_pathMetric;
+  wire [11:0] _acsu_5_io_pathMetric;
   wire [1:0]  _acsu_4_io_pathSelect;
-  wire [12:0] _acsu_4_io_pathMetric;
+  wire [11:0] _acsu_4_io_pathMetric;
   wire [1:0]  _acsu_3_io_pathSelect;
-  wire [12:0] _acsu_3_io_pathMetric;
+  wire [11:0] _acsu_3_io_pathMetric;
   wire [1:0]  _acsu_2_io_pathSelect;
-  wire [12:0] _acsu_2_io_pathMetric;
+  wire [11:0] _acsu_2_io_pathMetric;
   wire [1:0]  _acsu_1_io_pathSelect;
-  wire [12:0] _acsu_1_io_pathMetric;
+  wire [11:0] _acsu_1_io_pathMetric;
   wire [1:0]  _acsu_0_io_pathSelect;
-  wire [12:0] _acsu_0_io_pathMetric;
-  wire [12:0] _bmuOdd_3_io_brMetrics4D_0;
-  wire [12:0] _bmuOdd_3_io_brMetrics4D_1;
-  wire [12:0] _bmuOdd_3_io_brMetrics4D_2;
-  wire [12:0] _bmuOdd_3_io_brMetrics4D_3;
+  wire [11:0] _acsu_0_io_pathMetric;
+  wire [9:0]  _bmuOdd_3_io_brMetrics4D_0;
+  wire [9:0]  _bmuOdd_3_io_brMetrics4D_1;
+  wire [9:0]  _bmuOdd_3_io_brMetrics4D_2;
+  wire [9:0]  _bmuOdd_3_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_0_2;
@@ -1207,10 +1210,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_3_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_3_3;
-  wire [12:0] _bmuOdd_2_io_brMetrics4D_0;
-  wire [12:0] _bmuOdd_2_io_brMetrics4D_1;
-  wire [12:0] _bmuOdd_2_io_brMetrics4D_2;
-  wire [12:0] _bmuOdd_2_io_brMetrics4D_3;
+  wire [9:0]  _bmuOdd_2_io_brMetrics4D_0;
+  wire [9:0]  _bmuOdd_2_io_brMetrics4D_1;
+  wire [9:0]  _bmuOdd_2_io_brMetrics4D_2;
+  wire [9:0]  _bmuOdd_2_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_0_2;
@@ -1227,10 +1230,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_2_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_3_3;
-  wire [12:0] _bmuOdd_1_io_brMetrics4D_0;
-  wire [12:0] _bmuOdd_1_io_brMetrics4D_1;
-  wire [12:0] _bmuOdd_1_io_brMetrics4D_2;
-  wire [12:0] _bmuOdd_1_io_brMetrics4D_3;
+  wire [9:0]  _bmuOdd_1_io_brMetrics4D_0;
+  wire [9:0]  _bmuOdd_1_io_brMetrics4D_1;
+  wire [9:0]  _bmuOdd_1_io_brMetrics4D_2;
+  wire [9:0]  _bmuOdd_1_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_0_2;
@@ -1247,10 +1250,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_1_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_3_3;
-  wire [12:0] _bmuOdd_0_io_brMetrics4D_0;
-  wire [12:0] _bmuOdd_0_io_brMetrics4D_1;
-  wire [12:0] _bmuOdd_0_io_brMetrics4D_2;
-  wire [12:0] _bmuOdd_0_io_brMetrics4D_3;
+  wire [9:0]  _bmuOdd_0_io_brMetrics4D_0;
+  wire [9:0]  _bmuOdd_0_io_brMetrics4D_1;
+  wire [9:0]  _bmuOdd_0_io_brMetrics4D_2;
+  wire [9:0]  _bmuOdd_0_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_0_2;
@@ -1267,10 +1270,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_0_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_3_3;
-  wire [12:0] _bmuEven_3_io_brMetrics4D_0;
-  wire [12:0] _bmuEven_3_io_brMetrics4D_1;
-  wire [12:0] _bmuEven_3_io_brMetrics4D_2;
-  wire [12:0] _bmuEven_3_io_brMetrics4D_3;
+  wire [9:0]  _bmuEven_3_io_brMetrics4D_0;
+  wire [9:0]  _bmuEven_3_io_brMetrics4D_1;
+  wire [9:0]  _bmuEven_3_io_brMetrics4D_2;
+  wire [9:0]  _bmuEven_3_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_3_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_3_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_3_io_brSyms4D_0_2;
@@ -1287,10 +1290,10 @@ module LaPDFD(
   wire [2:0]  _bmuEven_3_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_3_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_3_io_brSyms4D_3_3;
-  wire [12:0] _bmuEven_2_io_brMetrics4D_0;
-  wire [12:0] _bmuEven_2_io_brMetrics4D_1;
-  wire [12:0] _bmuEven_2_io_brMetrics4D_2;
-  wire [12:0] _bmuEven_2_io_brMetrics4D_3;
+  wire [9:0]  _bmuEven_2_io_brMetrics4D_0;
+  wire [9:0]  _bmuEven_2_io_brMetrics4D_1;
+  wire [9:0]  _bmuEven_2_io_brMetrics4D_2;
+  wire [9:0]  _bmuEven_2_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_2_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_2_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_2_io_brSyms4D_0_2;
@@ -1307,10 +1310,10 @@ module LaPDFD(
   wire [2:0]  _bmuEven_2_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_2_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_2_io_brSyms4D_3_3;
-  wire [12:0] _bmuEven_1_io_brMetrics4D_0;
-  wire [12:0] _bmuEven_1_io_brMetrics4D_1;
-  wire [12:0] _bmuEven_1_io_brMetrics4D_2;
-  wire [12:0] _bmuEven_1_io_brMetrics4D_3;
+  wire [9:0]  _bmuEven_1_io_brMetrics4D_0;
+  wire [9:0]  _bmuEven_1_io_brMetrics4D_1;
+  wire [9:0]  _bmuEven_1_io_brMetrics4D_2;
+  wire [9:0]  _bmuEven_1_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_1_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_1_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_1_io_brSyms4D_0_2;
@@ -1327,10 +1330,10 @@ module LaPDFD(
   wire [2:0]  _bmuEven_1_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_1_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_1_io_brSyms4D_3_3;
-  wire [12:0] _bmuEven_0_io_brMetrics4D_0;
-  wire [12:0] _bmuEven_0_io_brMetrics4D_1;
-  wire [12:0] _bmuEven_0_io_brMetrics4D_2;
-  wire [12:0] _bmuEven_0_io_brMetrics4D_3;
+  wire [9:0]  _bmuEven_0_io_brMetrics4D_0;
+  wire [9:0]  _bmuEven_0_io_brMetrics4D_1;
+  wire [9:0]  _bmuEven_0_io_brMetrics4D_2;
+  wire [9:0]  _bmuEven_0_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_0_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_0_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_0_io_brSyms4D_0_2;
@@ -1555,10 +1558,10 @@ module LaPDFD(
   wire [2:0]  _laBmu_0_io_symsB_2;
   wire [2:0]  _laBmu_0_io_symsB_3;
   wire [2:0]  _laBmu_0_io_symsB_4;
-  wire [12:0] _dfp_3_io_rxFilter;
-  wire [12:0] _dfp_2_io_rxFilter;
-  wire [12:0] _dfp_1_io_rxFilter;
-  wire [12:0] _dfp_0_io_rxFilter;
+  wire [14:0] _dfp_3_io_rxFilter;
+  wire [14:0] _dfp_2_io_rxFilter;
+  wire [14:0] _dfp_1_io_rxFilter;
+  wire [14:0] _dfp_0_io_rxFilter;
   reg  [2:0]  REG_0;
   reg  [2:0]  REG_1;
   reg  [2:0]  REG_2;
@@ -4982,7 +4985,7 @@ module LaPDFD(
     .io_symSelects_1        (_smu_0_io_symSelects_1),
     .io_symSelects_2        (_smu_0_io_symSelects_2),
     .io_symSelects_3        (_smu_0_io_symSelects_3),
-    .io_byteDecision        (io_rxData)
+    .io_byteDecision        (io_rxSymbols)
   );
   SMU smu_1 (
     .clock                  (clock),

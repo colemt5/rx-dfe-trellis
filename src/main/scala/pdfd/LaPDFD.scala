@@ -16,31 +16,41 @@ import pdfd.Utils._
   *  - 1 rx valid signal
   */
 
-class LaPDFD()
+class LaPDFD(level: Int = 35, tapScale: Int = 128, tapWidth: Int = 8, sampleWidth: Int = 8)
     extends Module {
-  val numTaps = 14 // from paper
-  val tapWidth = 8 // guessed
-  val tapScale = 7 
-  val sampleWidth = 8 // from ffe team
+  
+  // require that tapWidth is large enough to hold scaled tap values
+  require(tapWidth > log2Floor(tapScale), 
+    s"tapWidth ($tapWidth) must be greater than log2Floor(tapScale)= ${log2Floor(tapScale)}")
+
+  // local parameters for the LaPDFD
+  val numTaps   = 14 // DONT CHANGE (hardcoded in DFP)
+  val fracWidth = log2Floor(tapScale) // fixed point width
+  val bmWidth   = sampleWidth + 2 // store 255 * 4
+
+  // IO Ports
   val io = IO(new Bundle {
     val rxSamples  = Input(Vec(4, SInt(sampleWidth.W))) // From DFF/ECHO
     val taps = Input(Vec(numTaps, SInt(tapWidth.W))) //todo maybe from TL MMIO instead
-    val rxData  = Output(UInt(12.W)) 
+    val rxSymbols  = Output(UInt(12.W)) 
     val rxValid = Output(Bool())
   })
   // local parameters
   val upSizeWidth = 13 // dictated by DFP
-  val pam5 = Seq(-103, -52, 0, 51, 101)
-  val pam5Thresholds = Seq(-77, -26, 25, 76)
+
+  // PAM5 levels used for slicing
+  val pam5 = Seq(-level*2, -level, 0, level, level*2)
+  val pam5Thresholds = Seq(-(3*level)/2, -level/2, level/2, (3*level)/2)
+  
   // one unit per channel
-  val dfp   = Seq.fill(4)(Module(new DFP(numTaps, tapWidth, tapScale, sampleWidth, upSizeWidth, pam5, pam5Thresholds)))
-  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, tapScale, sampleWidth, upSizeWidth, pam5)))
+  val dfp   = Seq.fill(4)(Module(new DFP(numTaps, tapWidth, fracWidth, sampleWidth, pam5, pam5Thresholds)))
+  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, fracWidth, sampleWidth, pam5)))
 
   // one unit per state 
   val muxu    = Seq.fill(8)(Module(new MUXU(sampleWidth)))
-  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, upSizeWidth, true)))
-  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, upSizeWidth, false)))
-  val acsu    = Seq.fill(8)(Module(new ACSU(upSizeWidth)))
+  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, bmWidth, true)))
+  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, bmWidth, false)))
+  val acsu    = Seq.fill(8)(Module(new ACSU(bmWidth)))
   val smu     = Seq.fill(8)(Module(new SMU()))
   
   for (i <- 0 until 4) {
@@ -162,7 +172,7 @@ class LaPDFD()
   smu(7).io.stateSymSelects(3) := bmuOdd(3).io.brSyms4D(0)
 
   // SMU -> output
-  io.rxData := smu(0).io.byteDecision
+  io.rxSymbols := smu(0).io.byteDecision
   io.rxValid := 1.U
 
 }

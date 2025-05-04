@@ -47,4 +47,65 @@ object Utils {
 
     saturated
   }
+
+  /**
+   * Function to perform saturating addition of two unsigned integers.
+   *
+   * If the result exceeds the maximum representable value of the output width,
+   * it is clamped to the max value.
+   *
+   * @param a         First unsigned operand.
+   * @param b         Second unsigned operand.
+   * @param outWidth  Output width of the result.
+   * @return          Saturated sum as UInt with width `outWidth`.
+   */
+  def saturatingAdd(a: UInt, b: UInt, outWidth: Int): UInt = {
+    require(outWidth > 0, "Output width must be positive.")
+
+    val sumFull = Wire(UInt((a.getWidth max b.getWidth + 1).W))
+    sumFull := a +& b
+
+    val maxVal = ((BigInt(1) << outWidth) - 1).U
+
+    val saturated = Wire(UInt(outWidth.W))
+    when(sumFull > maxVal) {
+      saturated := maxVal
+    }.otherwise {
+      saturated := sumFull(outWidth - 1, 0)
+    }
+
+    saturated
+  }
+
+  /**
+   * Function to perform saturating addition of two signed integers.
+   *
+   * If the result exceeds the representable range of the given output width,
+   * it is clamped to the max or min signed value.
+   *
+   * @param a         First signed operand.
+   * @param b         Second signed operand.
+   * @param outWidth  Output width of the result.
+   * @return          Saturated sum as SInt with width `outWidth`.
+   */
+  def saturatingAddSigned(a: SInt, b: SInt, outWidth: Int): SInt = {
+    require(outWidth > 0, "Output width must be positive.")
+
+    val sumFull = Wire(SInt((a.getWidth max b.getWidth + 1).W))
+    sumFull := a +& b
+
+    val maxVal = ((BigInt(1) << (outWidth - 1)) - 1).S
+    val minVal = (-(BigInt(1) << (outWidth - 1))).S
+
+    val saturated = Wire(SInt(outWidth.W))
+    when(sumFull > maxVal) {
+      saturated := maxVal
+    }.elsewhen(sumFull < minVal) {
+      saturated := minVal
+    }.otherwise {
+      saturated := sumFull(outWidth - 1, 0).asSInt
+    }
+
+    saturated
+  }
 }
