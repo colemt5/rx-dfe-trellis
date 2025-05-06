@@ -16,7 +16,7 @@ import pdfd.Utils._
   *  - 1 rx valid signal
   */
 
-class LaPDFD(level: Int = 35, tapScale: Int = 128, tapWidth: Int = 8, sampleWidth: Int = 8)
+class LaPDFD(level: Int = 52, tapScale: Int = 128, tapWidth: Int = 8, sampleWidth: Int = 8)
     extends Module {
   
   // require that tapWidth is large enough to hold scaled tap values
@@ -26,7 +26,8 @@ class LaPDFD(level: Int = 35, tapScale: Int = 128, tapWidth: Int = 8, sampleWidt
   // local parameters for the LaPDFD
   val numTaps   = 14 // DONT CHANGE (hardcoded in DFP)
   val fracWidth = log2Floor(tapScale) // fixed point width
-  val bmWidth   = sampleWidth + 2 // store 255 * 4
+  val smWidth   = 6 // highest sm width that meets timing
+  val bmWidth   = smWidth + 2 // 1 bit for sign and 1 bit for merge
 
   // IO Ports
   val io = IO(new Bundle {
@@ -35,21 +36,18 @@ class LaPDFD(level: Int = 35, tapScale: Int = 128, tapWidth: Int = 8, sampleWidt
     val rxSymbols  = Output(UInt(12.W)) 
     val rxValid = Output(Bool())
   })
-  // local parameters
-  val upSizeWidth = 13 // dictated by DFP
-
   // PAM5 levels used for slicing
   val pam5 = Seq(-level*2, -level, 0, level, level*2)
   val pam5Thresholds = Seq(-(3*level)/2, -level/2, level/2, (3*level)/2)
   
   // one unit per channel
   val dfp   = Seq.fill(4)(Module(new DFP(numTaps, tapWidth, fracWidth, sampleWidth, pam5, pam5Thresholds)))
-  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, fracWidth, sampleWidth, pam5)))
+  val laBmu = Seq.fill(4)(Module(new OneDimLaBMU(tapWidth, fracWidth, sampleWidth, smWidth, pam5)))
 
   // one unit per state 
-  val muxu    = Seq.fill(8)(Module(new MUXU(sampleWidth)))
-  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, bmWidth, true)))
-  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(sampleWidth, bmWidth, false)))
+  val muxu    = Seq.fill(8)(Module(new MUXU(smWidth)))
+  val bmuEven = Seq.fill(4)(Module(new FourDimBMU(smWidth, bmWidth, true)))
+  val bmuOdd  = Seq.fill(4)(Module(new FourDimBMU(smWidth, bmWidth, false)))
   val acsu    = Seq.fill(8)(Module(new ACSU(bmWidth)))
   val smu     = Seq.fill(8)(Module(new SMU()))
   

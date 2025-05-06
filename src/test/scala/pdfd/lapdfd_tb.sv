@@ -159,9 +159,12 @@ initial begin
             exp = expected_syms.pop_front();
             if (rxValid) begin
                 if (sym0 !== exp.sym0 || sym1 !== exp.sym1 || sym2 !== exp.sym2 || sym3 !== exp.sym3) begin
-                    $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
-                             cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
-                    error_count += sym0 !== exp.sym0 + sym1 !== exp.sym1 + sym2 !== exp.sym2 + sym3 !== exp.sym3;
+                    // $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
+                    //          cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
+                    if (sym0 !== exp.sym0) error_count += 1;
+                    if (sym1 !== exp.sym1) error_count += 1;
+                    if (sym2 !== exp.sym2) error_count += 1;
+                    if (sym3 !== exp.sym3) error_count += 1;
                 end
                 // else begin
                 //     $display("Cycle %0d: Symbols: %0d %0d %0d %0d", cycle_count, sym0, sym1, sym2, sym3);
@@ -187,8 +190,8 @@ initial begin
         exp = expected_syms.pop_front();
         if (rxValid) begin
             if (sym0 !== exp.sym0 || sym1 !== exp.sym1 || sym2 !== exp.sym2 || sym3 !== exp.sym3) begin
-                $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
-                            cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
+                // $display("ERROR at Cycle %0d: Expected %0d %0d %0d %0d, Got %0d %0d %0d %0d",
+                //             cycle_count, exp.sym0, exp.sym1, exp.sym2, exp.sym3, sym0, sym1, sym2, sym3);
                 if (sym0 !== exp.sym0) error_count += 1;
                 if (sym1 !== exp.sym1) error_count += 1;
                 if (sym2 !== exp.sym2) error_count += 1;

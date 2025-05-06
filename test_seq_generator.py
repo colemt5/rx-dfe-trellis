@@ -3,8 +3,8 @@ import math
 import numpy as np
 
 # postcursor_taps = [1, 0.15, -0.04, 0.03, -0.002, 0.001, -0.008, 0.008, 0.004, 0, 0, 0, 0, 0, 0]
-postcursor_taps = [1, 0.4, -0.2, 0.1, -0.05, 0.03, -0.01, 0.009, -0.008, 0.006, 0.0001, 0, 0, 0, 0]
-noise_std_dev = 0.01  # adjust for desired SNR
+postcursor_taps = [1, 0.4, 0.2, 0.1, 0.05, 0.03, 0.01, 0.009, 0.008, 0.006, 0.0001, 0, 0, 0, 0]
+noise_std_dev = 0.10  # adjust for desired SNR
 
 def read_encoder_vectors(filename="ref_vectors.txt"):
     data = np.loadtxt(filename, dtype=int)
@@ -16,11 +16,21 @@ def read_encoder_vectors(filename="ref_vectors.txt"):
 channels_refs = read_encoder_vectors()
 
 channels_syms = np.zeros_like(channels_refs, dtype=float)
+channels_noise = np.zeros_like(channels_refs, dtype=float)
 
 # convolve with channel impulse response and add noise
 for ch in range(4):
     channels_syms[ch] = np.convolve(channels_refs[ch], postcursor_taps, mode='full')[:len(channels_refs[ch])]
-    channels_syms[ch] += np.random.normal(0, noise_std_dev, size=len(channels_refs[ch]))
+    channels_noise[ch] = np.random.normal(0, noise_std_dev, size=len(channels_refs[ch]))
+    channels_syms[ch] += channels_noise[ch]
+
+# Compute and display SNR before scaling
+total_signal_power = np.mean(channels_refs**2)
+total_noise_power = np.mean((channels_syms-channels_refs)**2)
+snr = 10 * np.log10(total_signal_power / total_noise_power)
+print("------")
+print(f"SNR before scaling: {snr:.2f} dB")
+print("------")
 
 max_val = np.max(channels_syms)
 min_val = np.min(channels_syms)

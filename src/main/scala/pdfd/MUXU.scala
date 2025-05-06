@@ -55,41 +55,38 @@ class SymMux(symBitWidth: Int) extends Module {
     val brSymA = Output(SInt(3.W))
     val brSymB = Output(SInt(3.W))
   })
+  
+  val index = (io.symSelect + 2.S).asUInt
 
-  when (io.symSelect === -2.S) {
-    io.brMetricA := io.symMetricA(0)
-    io.brMetricB := io.symMetricB(0)
-    io.brSymA := io.symsA(0)
-    io.brSymB := io.symsB(0)
-  }
-  .elsewhen (io.symSelect === -1.S) {
-    io.brMetricA := io.symMetricA(1)
-    io.brMetricB := io.symMetricB(1)
-    io.brSymA := io.symsA(1)
-    io.brSymB := io.symsB(1)
-  }
-  .elsewhen (io.symSelect === 0.S) {
-    io.brMetricA := io.symMetricA(2)
-    io.brMetricB := io.symMetricB(2)
-    io.brSymA := io.symsA(2)
-    io.brSymB := io.symsB(2)
-  }
-  .elsewhen (io.symSelect === 1.S) {
-    io.brMetricA := io.symMetricA(3)
-    io.brMetricB := io.symMetricB(3)
-    io.brSymA := io.symsA(3)
-    io.brSymB := io.symsB(3)
-  }
-  .elsewhen (io.symSelect === 2.S) {
-    io.brMetricA := io.symMetricA(4)
-    io.brMetricB := io.symMetricB(4)
-    io.brSymA := io.symsA(4)
-    io.brSymB := io.symsB(4)
-  }
-  .otherwise {
-    io.brMetricA := 0.U
-    io.brMetricB := 0.U
-    io.brSymA := 0.S
-    io.brSymB := 0.S
-  }
+  io.brMetricA := MuxLookup(index, 0.U)(Seq(
+    0.U -> io.symMetricA(0),
+    1.U -> io.symMetricA(1),
+    2.U -> io.symMetricA(2),
+    3.U -> io.symMetricA(3),
+    4.U -> io.symMetricA(4),
+  ))
+
+  io.brMetricB := MuxLookup(index, 0.U)(Seq(
+    0.U -> io.symMetricB(0),
+    1.U -> io.symMetricB(1),
+    2.U -> io.symMetricB(2),
+    3.U -> io.symMetricB(3),
+    4.U -> io.symMetricB(4),
+  ))
+
+  io.brSymA := MuxLookup(index, 0.S)(Seq(
+    0.U -> io.symsA(0),
+    1.U -> io.symsA(1),
+    2.U -> io.symsA(2),
+    3.U -> io.symsA(3),
+    4.U -> io.symsA(4),
+  ))
+
+  io.brSymB := MuxLookup(index, 0.S)(Seq(
+    0.U -> io.symsB(0),
+    1.U -> io.symsB(1),
+    2.U -> io.symsB(2),
+    3.U -> io.symsB(3),
+    4.U -> io.symsB(4),
+  ))
 }

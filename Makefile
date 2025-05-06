@@ -16,5 +16,11 @@ run:
 	python test_seq_generator.py
 	$(VCS) src/test/scala/pdfd/lapdfd_tb.sv $(VCS_FLAGS)
 
+run-test-only:
+	$(VCS) src/test/scala/pdfd/lapdfd_tb.sv $(VCS_FLAGS)
+
+seq-gen-only:
+	python test_seq_generator.py
+
 data:
 	$(VCS) src/test/scala/pdfd/encode_data.sv -sverilog +incdir+. +define+NUM_DATA=$(NUM_DATA) -R

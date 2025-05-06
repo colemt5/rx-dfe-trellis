@@ -7,13 +7,13 @@ import pdfd.Utils._
 /** 1D LaBMU module that computes the branch metrics for the 1D Lookahead
   * Branch Metric Unit (LaBMU) for each of the 4 channel symbols.
   */
-class OneDimLaBMU(tapWidth: Int, fracWidth: Int, sampleWidth: Int, pam5: Seq[Int])
+class OneDimLaBMU(tapWidth: Int, fracWidth: Int, sampleWidth: Int, smWidth: Int, pam5: Seq[Int])
     extends Module {
   val io = IO(new Bundle {
     val rxFilter = Input(SInt((tapWidth + fracWidth).W))
     val tapOne  = Input(SInt(tapWidth.W))
-    val symMetricsA = Output(Vec(5, UInt(sampleWidth.W)))
-    val symMetricsB = Output(Vec(5, UInt(sampleWidth.W)))
+    val symMetricsA = Output(Vec(5, UInt(smWidth.W)))
+    val symMetricsB = Output(Vec(5, UInt(smWidth.W)))
     val symsA = Output(Vec(5, SInt(3.W)))
     val symsB = Output(Vec(5, SInt(3.W)))
   })
@@ -45,8 +45,8 @@ class OneDimLaBMU(tapWidth: Int, fracWidth: Int, sampleWidth: Int, pam5: Seq[Int
     closeB(i) := levelSlicer(estSym(i), pam5B, pam5ThreshB)
     diffA(i) := estSym(i) - closeA(i)
     diffB(i) := estSym(i) - closeB(i)
-    io.symMetricsA(i) := saturatingSquare(diffA(i), sampleWidth)
-    io.symMetricsB(i) := saturatingSquare(diffB(i), sampleWidth)
+    io.symMetricsA(i) := saturatingSquare(diffA(i), smWidth)
+    io.symMetricsB(i) := saturatingSquare(diffB(i), smWidth)
     io.symsA(i) := Mux(closeA(i) === pam5A(0), -1.S, 1.S)
     io.symsB(i) := MuxCase(0.S, Array(
       (closeB(i) === pam5B(0)) -> -2.S, 

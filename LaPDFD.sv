@@ -20,43 +20,43 @@ module DFP(
   output [14:0] io_rxFilter
 );
 
-  reg [19:0] filtSample;
+  reg [17:0] filtSample;
   reg [7:0]  softSym;
-  reg [19:0] feedbackPath_0;
-  reg [19:0] feedbackPath_1;
-  reg [19:0] feedbackPath_2;
-  reg [19:0] feedbackPath_3;
-  reg [19:0] feedbackPath_4;
-  reg [19:0] feedbackPath_5;
-  reg [19:0] feedbackPath_6;
-  reg [19:0] feedbackPath_7;
-  reg [19:0] feedbackPath_8;
-  reg [19:0] feedbackPath_9;
-  reg [19:0] feedbackPath_10;
-  reg [19:0] feedbackPath_11;
+  reg [17:0] feedbackPath_0;
+  reg [17:0] feedbackPath_1;
+  reg [17:0] feedbackPath_2;
+  reg [17:0] feedbackPath_3;
+  reg [17:0] feedbackPath_4;
+  reg [17:0] feedbackPath_5;
+  reg [17:0] feedbackPath_6;
+  reg [17:0] feedbackPath_7;
+  reg [17:0] feedbackPath_8;
+  reg [17:0] feedbackPath_9;
+  reg [17:0] feedbackPath_10;
+  reg [17:0] feedbackPath_11;
   always @(posedge clock) begin
     if (reset) begin
-      filtSample <= 20'h0;
+      filtSample <= 18'h0;
       softSym <= 8'h0;
-      feedbackPath_0 <= 20'h0;
-      feedbackPath_1 <= 20'h0;
-      feedbackPath_2 <= 20'h0;
-      feedbackPath_3 <= 20'h0;
-      feedbackPath_4 <= 20'h0;
-      feedbackPath_5 <= 20'h0;
-      feedbackPath_6 <= 20'h0;
-      feedbackPath_7 <= 20'h0;
-      feedbackPath_8 <= 20'h0;
-      feedbackPath_9 <= 20'h0;
-      feedbackPath_10 <= 20'h0;
-      feedbackPath_11 <= 20'h0;
+      feedbackPath_0 <= 18'h0;
+      feedbackPath_1 <= 18'h0;
+      feedbackPath_2 <= 18'h0;
+      feedbackPath_3 <= 18'h0;
+      feedbackPath_4 <= 18'h0;
+      feedbackPath_5 <= 18'h0;
+      feedbackPath_6 <= 18'h0;
+      feedbackPath_7 <= 18'h0;
+      feedbackPath_8 <= 18'h0;
+      feedbackPath_9 <= 18'h0;
+      feedbackPath_10 <= 18'h0;
+      feedbackPath_11 <= 18'h0;
     end
     else begin
       automatic logic [7:0]  _decSample_T = 8'h0 - io_taps_0;
       automatic logic [15:0] _GEN = {{8{softSym[7]}}, softSym};
       automatic logic [15:0] _decSample_T_3 = _GEN * {{8{_decSample_T[7]}}, _decSample_T};
-      automatic logic [19:0] _decSample_T_4 =
-        filtSample + {{4{_decSample_T_3[15]}}, _decSample_T_3};
+      automatic logic [17:0] _decSample_T_4 =
+        filtSample + {{2{_decSample_T_3[15]}}, _decSample_T_3};
       automatic logic [7:0]  _feedbackPath_0_T = 8'h0 - io_taps_13;
       automatic logic [15:0] _feedbackPath_0_T_3 =
         _GEN * {{8{_feedbackPath_0_T[7]}}, _feedbackPath_0_T};
@@ -97,41 +97,39 @@ module DFP(
       automatic logic [15:0] _filtSample_T_3 =
         _GEN * {{8{_filtSample_T[7]}}, _filtSample_T};
       filtSample <=
-        {{5{io_rxSample[7]}}, io_rxSample, 7'h0} + feedbackPath_11
-        + {{4{_filtSample_T_3[15]}}, _filtSample_T_3};
-      if ($signed(_decSample_T_4[19:7]) > 13'sh34)
-        softSym <= 8'h46;
-      else if ($signed(_decSample_T_4[19:7]) > 13'sh11)
-        softSym <= 8'h23;
-      else if ($signed(_decSample_T_4[19:7]) > -13'sh11)
+        {{3{io_rxSample[7]}}, io_rxSample, 7'h0} + feedbackPath_11
+        + {{2{_filtSample_T_3[15]}}, _filtSample_T_3};
+      if ($signed(_decSample_T_4[17:7]) > 11'sh30)
+        softSym <= 8'h40;
+      else if ($signed(_decSample_T_4[17:7]) > 11'sh10)
+        softSym <= 8'h20;
+      else if ($signed(_decSample_T_4[17:7]) > -11'sh10)
         softSym <= 8'h0;
-      else if ($signed(_decSample_T_4[19:7]) > -13'sh34)
-        softSym <= 8'hDD;
       else
-        softSym <= 8'hBA;
-      feedbackPath_0 <= {{4{_feedbackPath_0_T_3[15]}}, _feedbackPath_0_T_3};
+        softSym <= {2'h3, $signed(_decSample_T_4[17:7]) > -11'sh30, 5'h0};
+      feedbackPath_0 <= {{2{_feedbackPath_0_T_3[15]}}, _feedbackPath_0_T_3};
       feedbackPath_1 <=
-        feedbackPath_0 + {{4{_feedbackPath_1_T_3[15]}}, _feedbackPath_1_T_3};
+        feedbackPath_0 + {{2{_feedbackPath_1_T_3[15]}}, _feedbackPath_1_T_3};
       feedbackPath_2 <=
-        feedbackPath_1 + {{4{_feedbackPath_2_T_3[15]}}, _feedbackPath_2_T_3};
+        feedbackPath_1 + {{2{_feedbackPath_2_T_3[15]}}, _feedbackPath_2_T_3};
       feedbackPath_3 <=
-        feedbackPath_2 + {{4{_feedbackPath_3_T_3[15]}}, _feedbackPath_3_T_3};
+        feedbackPath_2 + {{2{_feedbackPath_3_T_3[15]}}, _feedbackPath_3_T_3};
       feedbackPath_4 <=
-        feedbackPath_3 + {{4{_feedbackPath_4_T_3[15]}}, _feedbackPath_4_T_3};
+        feedbackPath_3 + {{2{_feedbackPath_4_T_3[15]}}, _feedbackPath_4_T_3};
       feedbackPath_5 <=
-        feedbackPath_4 + {{4{_feedbackPath_5_T_3[15]}}, _feedbackPath_5_T_3};
+        feedbackPath_4 + {{2{_feedbackPath_5_T_3[15]}}, _feedbackPath_5_T_3};
       feedbackPath_6 <=
-        feedbackPath_5 + {{4{_feedbackPath_6_T_3[15]}}, _feedbackPath_6_T_3};
+        feedbackPath_5 + {{2{_feedbackPath_6_T_3[15]}}, _feedbackPath_6_T_3};
       feedbackPath_7 <=
-        feedbackPath_6 + {{4{_feedbackPath_7_T_3[15]}}, _feedbackPath_7_T_3};
+        feedbackPath_6 + {{2{_feedbackPath_7_T_3[15]}}, _feedbackPath_7_T_3};
       feedbackPath_8 <=
-        feedbackPath_7 + {{4{_feedbackPath_8_T_3[15]}}, _feedbackPath_8_T_3};
+        feedbackPath_7 + {{2{_feedbackPath_8_T_3[15]}}, _feedbackPath_8_T_3};
       feedbackPath_9 <=
-        feedbackPath_8 + {{4{_feedbackPath_9_T_3[15]}}, _feedbackPath_9_T_3};
+        feedbackPath_8 + {{2{_feedbackPath_9_T_3[15]}}, _feedbackPath_9_T_3};
       feedbackPath_10 <=
-        feedbackPath_9 + {{4{_feedbackPath_10_T_3[15]}}, _feedbackPath_10_T_3};
+        feedbackPath_9 + {{2{_feedbackPath_10_T_3[15]}}, _feedbackPath_10_T_3};
       feedbackPath_11 <=
-        feedbackPath_10 + {{4{_feedbackPath_11_T_3[15]}}, _feedbackPath_11_T_3};
+        feedbackPath_10 + {{2{_feedbackPath_11_T_3[15]}}, _feedbackPath_11_T_3};
     end
   end // always @(posedge)
   assign io_rxFilter = filtSample[14:0];
@@ -140,7 +138,7 @@ endmodule
 module OneDimLaBMU(
   input  [14:0] io_rxFilter,
   input  [7:0]  io_tapOne,
-  output [7:0]  io_symMetricsA_0,
+  output [5:0]  io_symMetricsA_0,
                 io_symMetricsA_1,
                 io_symMetricsA_2,
                 io_symMetricsA_3,
@@ -163,59 +161,59 @@ module OneDimLaBMU(
 );
 
   wire [14:0] _GEN = {{7{io_tapOne[7]}}, io_tapOne};
-  wire [14:0] _estSym_0_T_1 = io_rxFilter - _GEN * 15'h7FBA;
-  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
+  wire [14:0] _estSym_0_T_1 = io_rxFilter - _GEN * 15'h7FC0;
+  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
   wire [7:0]  closeB_0_result =
-    $signed(_estSym_0_T_1[14:7]) > 8'sh23
-      ? 8'h46
-      : $signed(_estSym_0_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+    $signed(_estSym_0_T_1[14:7]) > 8'sh20
+      ? 8'h40
+      : $signed(_estSym_0_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
   wire [7:0]  _diffA_0_T = _estSym_0_T_1[14:7] - closeA_0_result;
   wire [7:0]  _diffB_0_T = _estSym_0_T_1[14:7] - closeB_0_result;
   wire [15:0] _GEN_0 = {{8{_diffA_0_T[7]}}, _diffA_0_T};
   wire [15:0] io_symMetricsA_0_fullSquare = _GEN_0 * _GEN_0;
   wire [15:0] _GEN_1 = {{8{_diffB_0_T[7]}}, _diffB_0_T};
   wire [15:0] io_symMetricsB_0_fullSquare = _GEN_1 * _GEN_1;
-  wire [14:0] _estSym_1_T_1 = io_rxFilter - _GEN * 15'h7FDD;
-  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
+  wire [14:0] _estSym_1_T_1 = io_rxFilter - _GEN * 15'h7FE0;
+  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
   wire [7:0]  closeB_1_result =
-    $signed(_estSym_1_T_1[14:7]) > 8'sh23
-      ? 8'h46
-      : $signed(_estSym_1_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+    $signed(_estSym_1_T_1[14:7]) > 8'sh20
+      ? 8'h40
+      : $signed(_estSym_1_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
   wire [7:0]  _diffA_1_T = _estSym_1_T_1[14:7] - closeA_1_result;
   wire [7:0]  _diffB_1_T = _estSym_1_T_1[14:7] - closeB_1_result;
   wire [15:0] _GEN_2 = {{8{_diffA_1_T[7]}}, _diffA_1_T};
   wire [15:0] io_symMetricsA_1_fullSquare = _GEN_2 * _GEN_2;
   wire [15:0] _GEN_3 = {{8{_diffB_1_T[7]}}, _diffB_1_T};
   wire [15:0] io_symMetricsB_1_fullSquare = _GEN_3 * _GEN_3;
-  wire [7:0]  closeA_2_result = $signed(io_rxFilter[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
+  wire [7:0]  closeA_2_result = $signed(io_rxFilter[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
   wire [7:0]  closeB_2_result =
-    $signed(io_rxFilter[14:7]) > 8'sh23
-      ? 8'h46
-      : $signed(io_rxFilter[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+    $signed(io_rxFilter[14:7]) > 8'sh20
+      ? 8'h40
+      : $signed(io_rxFilter[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
   wire [7:0]  _diffA_2_T = io_rxFilter[14:7] - closeA_2_result;
   wire [7:0]  _diffB_2_T = io_rxFilter[14:7] - closeB_2_result;
   wire [15:0] _GEN_4 = {{8{_diffA_2_T[7]}}, _diffA_2_T};
   wire [15:0] io_symMetricsA_2_fullSquare = _GEN_4 * _GEN_4;
   wire [15:0] _GEN_5 = {{8{_diffB_2_T[7]}}, _diffB_2_T};
   wire [15:0] io_symMetricsB_2_fullSquare = _GEN_5 * _GEN_5;
-  wire [14:0] _estSym_3_T_1 = io_rxFilter - _GEN * 15'h23;
-  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
+  wire [14:0] _estSym_3_T_1 = io_rxFilter - {{2{io_tapOne[7]}}, io_tapOne, 5'h0};
+  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
   wire [7:0]  closeB_3_result =
-    $signed(_estSym_3_T_1[14:7]) > 8'sh23
-      ? 8'h46
-      : $signed(_estSym_3_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+    $signed(_estSym_3_T_1[14:7]) > 8'sh20
+      ? 8'h40
+      : $signed(_estSym_3_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
   wire [7:0]  _diffA_3_T = _estSym_3_T_1[14:7] - closeA_3_result;
   wire [7:0]  _diffB_3_T = _estSym_3_T_1[14:7] - closeB_3_result;
   wire [15:0] _GEN_6 = {{8{_diffA_3_T[7]}}, _diffA_3_T};
   wire [15:0] io_symMetricsA_3_fullSquare = _GEN_6 * _GEN_6;
   wire [15:0] _GEN_7 = {{8{_diffB_3_T[7]}}, _diffB_3_T};
   wire [15:0] io_symMetricsB_3_fullSquare = _GEN_7 * _GEN_7;
-  wire [14:0] _estSym_4_T_1 = io_rxFilter - _GEN * 15'h46;
-  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_1[14:7]) > 8'sh0 ? 8'h23 : 8'hDD;
+  wire [14:0] _estSym_4_T_1 = io_rxFilter - {io_tapOne[7], io_tapOne, 6'h0};
+  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
   wire [7:0]  closeB_4_result =
-    $signed(_estSym_4_T_1[14:7]) > 8'sh23
-      ? 8'h46
-      : $signed(_estSym_4_T_1[14:7]) > -8'sh23 ? 8'h0 : 8'hBA;
+    $signed(_estSym_4_T_1[14:7]) > 8'sh20
+      ? 8'h40
+      : $signed(_estSym_4_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
   wire [7:0]  _diffA_4_T = _estSym_4_T_1[14:7] - closeA_4_result;
   wire [7:0]  _diffB_4_T = _estSym_4_T_1[14:7] - closeB_4_result;
   wire [15:0] _GEN_8 = {{8{_diffA_4_T[7]}}, _diffA_4_T};
@@ -223,45 +221,45 @@ module OneDimLaBMU(
   wire [15:0] _GEN_9 = {{8{_diffB_4_T[7]}}, _diffB_4_T};
   wire [15:0] io_symMetricsB_4_fullSquare = _GEN_9 * _GEN_9;
   assign io_symMetricsA_0 =
-    (|(io_symMetricsA_0_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_0_fullSquare[7:0];
+    (|(io_symMetricsA_0_fullSquare[15:6])) ? 6'h3F : io_symMetricsA_0_fullSquare[5:0];
   assign io_symMetricsA_1 =
-    (|(io_symMetricsA_1_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_1_fullSquare[7:0];
+    (|(io_symMetricsA_1_fullSquare[15:6])) ? 6'h3F : io_symMetricsA_1_fullSquare[5:0];
   assign io_symMetricsA_2 =
-    (|(io_symMetricsA_2_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_2_fullSquare[7:0];
+    (|(io_symMetricsA_2_fullSquare[15:6])) ? 6'h3F : io_symMetricsA_2_fullSquare[5:0];
   assign io_symMetricsA_3 =
-    (|(io_symMetricsA_3_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_3_fullSquare[7:0];
+    (|(io_symMetricsA_3_fullSquare[15:6])) ? 6'h3F : io_symMetricsA_3_fullSquare[5:0];
   assign io_symMetricsA_4 =
-    (|(io_symMetricsA_4_fullSquare[15:8])) ? 8'hFF : io_symMetricsA_4_fullSquare[7:0];
+    (|(io_symMetricsA_4_fullSquare[15:6])) ? 6'h3F : io_symMetricsA_4_fullSquare[5:0];
   assign io_symMetricsB_0 =
-    (|(io_symMetricsB_0_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_0_fullSquare[7:0];
+    (|(io_symMetricsB_0_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_0_fullSquare[5:0];
   assign io_symMetricsB_1 =
-    (|(io_symMetricsB_1_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_1_fullSquare[7:0];
+    (|(io_symMetricsB_1_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_1_fullSquare[5:0];
   assign io_symMetricsB_2 =
-    (|(io_symMetricsB_2_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_2_fullSquare[7:0];
+    (|(io_symMetricsB_2_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_2_fullSquare[5:0];
   assign io_symMetricsB_3 =
-    (|(io_symMetricsB_3_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_3_fullSquare[7:0];
+    (|(io_symMetricsB_3_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_3_fullSquare[5:0];
   assign io_symMetricsB_4 =
-    (|(io_symMetricsB_4_fullSquare[15:8])) ? 8'hFF : io_symMetricsB_4_fullSquare[7:0];
-  assign io_symsA_0 = {{2{closeA_0_result[7:1] == 7'h6E}}, 1'h1};
-  assign io_symsA_1 = {{2{closeA_1_result[7:1] == 7'h6E}}, 1'h1};
-  assign io_symsA_2 = {{2{closeA_2_result[7:1] == 7'h6E}}, 1'h1};
-  assign io_symsA_3 = {{2{closeA_3_result[7:1] == 7'h6E}}, 1'h1};
-  assign io_symsA_4 = {{2{closeA_4_result[7:1] == 7'h6E}}, 1'h1};
+    (|(io_symMetricsB_4_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_4_fullSquare[5:0];
+  assign io_symsA_0 = {{2{&(closeA_0_result[7:6])}}, 1'h1};
+  assign io_symsA_1 = {{2{&(closeA_1_result[7:6])}}, 1'h1};
+  assign io_symsA_2 = {{2{&(closeA_2_result[7:6])}}, 1'h1};
+  assign io_symsA_3 = {{2{&(closeA_3_result[7:6])}}, 1'h1};
+  assign io_symsA_4 = {{2{&(closeA_4_result[7:6])}}, 1'h1};
   assign io_symsB_0 =
-    closeB_0_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_0_result[7:1] == 7'h23, 1'h0};
+    (&(closeB_0_result[7:6])) ? 3'h6 : {1'h0, closeB_0_result[7:6] == 2'h1, 1'h0};
   assign io_symsB_1 =
-    closeB_1_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_1_result[7:1] == 7'h23, 1'h0};
+    (&(closeB_1_result[7:6])) ? 3'h6 : {1'h0, closeB_1_result[7:6] == 2'h1, 1'h0};
   assign io_symsB_2 =
-    closeB_2_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_2_result[7:1] == 7'h23, 1'h0};
+    (&(closeB_2_result[7:6])) ? 3'h6 : {1'h0, closeB_2_result[7:6] == 2'h1, 1'h0};
   assign io_symsB_3 =
-    closeB_3_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_3_result[7:1] == 7'h23, 1'h0};
+    (&(closeB_3_result[7:6])) ? 3'h6 : {1'h0, closeB_3_result[7:6] == 2'h1, 1'h0};
   assign io_symsB_4 =
-    closeB_4_result[7:1] == 7'h5D ? 3'h6 : {1'h0, closeB_4_result[7:1] == 7'h23, 1'h0};
+    (&(closeB_4_result[7:6])) ? 3'h6 : {1'h0, closeB_4_result[7:6] == 2'h1, 1'h0};
 endmodule
 
 module SymMux(
   input  [2:0] io_symSelect,
-  input  [7:0] io_symMetricA_0,
+  input  [5:0] io_symMetricA_0,
                io_symMetricA_1,
                io_symMetricA_2,
                io_symMetricA_3,
@@ -281,52 +279,53 @@ module SymMux(
                io_symsB_2,
                io_symsB_3,
                io_symsB_4,
-  output [7:0] io_brMetricA,
+  output [5:0] io_brMetricA,
                io_brMetricB,
   output [2:0] io_brSymA,
                io_brSymB
 );
 
-  wire [7:0][7:0] _GEN =
-    {{io_symMetricA_1},
-     {io_symMetricA_0},
-     {8'h0},
-     {8'h0},
-     {8'h0},
+  wire [2:0]      _index_T = io_symSelect + 3'h2;
+  wire [7:0][5:0] _GEN =
+    {{6'h0},
+     {6'h0},
+     {6'h0},
      {io_symMetricA_4},
      {io_symMetricA_3},
-     {io_symMetricA_2}};
-  wire [7:0][7:0] _GEN_0 =
-    {{io_symMetricB_1},
-     {io_symMetricB_0},
-     {8'h0},
-     {8'h0},
-     {8'h0},
+     {io_symMetricA_2},
+     {io_symMetricA_1},
+     {io_symMetricA_0}};
+  wire [7:0][5:0] _GEN_0 =
+    {{6'h0},
+     {6'h0},
+     {6'h0},
      {io_symMetricB_4},
      {io_symMetricB_3},
-     {io_symMetricB_2}};
+     {io_symMetricB_2},
+     {io_symMetricB_1},
+     {io_symMetricB_0}};
   wire [7:0][2:0] _GEN_1 =
-    {{io_symsA_1},
-     {io_symsA_0},
-     {3'h0},
+    {{3'h0},
      {3'h0},
      {3'h0},
      {io_symsA_4},
      {io_symsA_3},
-     {io_symsA_2}};
+     {io_symsA_2},
+     {io_symsA_1},
+     {io_symsA_0}};
   wire [7:0][2:0] _GEN_2 =
-    {{io_symsB_1},
-     {io_symsB_0},
-     {3'h0},
+    {{3'h0},
      {3'h0},
      {3'h0},
      {io_symsB_4},
      {io_symsB_3},
-     {io_symsB_2}};
-  assign io_brMetricA = _GEN[io_symSelect];
-  assign io_brMetricB = _GEN_0[io_symSelect];
-  assign io_brSymA = _GEN_1[io_symSelect];
-  assign io_brSymB = _GEN_2[io_symSelect];
+     {io_symsB_2},
+     {io_symsB_1},
+     {io_symsB_0}};
+  assign io_brMetricA = _GEN[_index_T];
+  assign io_brMetricB = _GEN_0[_index_T];
+  assign io_brSymA = _GEN_1[_index_T];
+  assign io_brSymB = _GEN_2[_index_T];
 endmodule
 
 module MUXU(
@@ -374,7 +373,7 @@ module MUXU(
                io_symsB_3_2,
                io_symsB_3_3,
                io_symsB_3_4,
-  input  [7:0] io_symMetricsA_0_0,
+  input  [5:0] io_symMetricsA_0_0,
                io_symMetricsA_0_1,
                io_symMetricsA_0_2,
                io_symMetricsA_0_3,
@@ -414,7 +413,7 @@ module MUXU(
                io_symMetricsB_3_2,
                io_symMetricsB_3_3,
                io_symMetricsB_3_4,
-  output [7:0] io_brMetricsA_0,
+  output [5:0] io_brMetricsA_0,
                io_brMetricsA_1,
                io_brMetricsA_2,
                io_brMetricsA_3,
@@ -543,7 +542,7 @@ module MUXU(
 endmodule
 
 module FourDimBMU(
-  input  [7:0] io_brMetricsA_0,
+  input  [5:0] io_brMetricsA_0,
                io_brMetricsA_1,
                io_brMetricsA_2,
                io_brMetricsA_3,
@@ -559,7 +558,7 @@ module FourDimBMU(
                io_brSymsB_1,
                io_brSymsB_2,
                io_brSymsB_3,
-  output [9:0] io_brMetrics4D_0,
+  output [7:0] io_brMetrics4D_0,
                io_brMetrics4D_1,
                io_brMetrics4D_2,
                io_brMetrics4D_3,
@@ -581,38 +580,38 @@ module FourDimBMU(
                io_brSyms4D_3_3
 );
 
-  wire [8:0] _GEN = {1'h0, io_brMetricsA_0};
-  wire [8:0] _GEN_0 = {1'h0, io_brMetricsA_1};
-  wire [9:0] _GEN_1 = {1'h0, _GEN + _GEN_0};
-  wire [9:0] _GEN_2 = {2'h0, io_brMetricsA_2};
-  wire [9:0] _GEN_3 = {2'h0, io_brMetricsA_3};
-  wire [9:0] _sumBrMetricA_0_T_2 = _GEN_1 + _GEN_2 + _GEN_3;
-  wire [8:0] _GEN_4 = {1'h0, io_brMetricsB_0};
-  wire [8:0] _GEN_5 = {1'h0, io_brMetricsB_1};
-  wire [9:0] _GEN_6 = {1'h0, _GEN_4 + _GEN_5};
-  wire [9:0] _GEN_7 = {2'h0, io_brMetricsB_2};
-  wire [9:0] _GEN_8 = {2'h0, io_brMetricsB_3};
-  wire [9:0] _sumBrMetricB_0_T_2 = _GEN_6 + _GEN_7 + _GEN_8;
-  wire [9:0] _sumBrMetricA_1_T_2 = _GEN_1 + _GEN_7 + _GEN_8;
-  wire [9:0] _sumBrMetricB_1_T_2 = _GEN_6 + _GEN_2 + _GEN_3;
-  wire [9:0] _GEN_9 = {1'h0, _GEN + _GEN_5};
-  wire [9:0] _sumBrMetricA_2_T_2 = _GEN_9 + _GEN_7 + _GEN_3;
-  wire [9:0] _GEN_10 = {1'h0, _GEN_4 + _GEN_0};
-  wire [9:0] _sumBrMetricB_2_T_2 = _GEN_10 + _GEN_2 + _GEN_8;
-  wire [9:0] _sumBrMetricA_3_T_2 = _GEN_9 + _GEN_2 + _GEN_8;
-  wire [9:0] _sumBrMetricB_3_T_2 = _GEN_10 + _GEN_7 + _GEN_3;
-  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_2 < _sumBrMetricB_0_T_2;
-  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_2 < _sumBrMetricB_1_T_2;
-  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_2 < _sumBrMetricB_2_T_2;
-  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_2 < _sumBrMetricB_3_T_2;
-  assign io_brMetrics4D_0 =
-    _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_2 : _sumBrMetricB_0_T_2;
-  assign io_brMetrics4D_1 =
-    _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_2 : _sumBrMetricB_1_T_2;
-  assign io_brMetrics4D_2 =
-    _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_2 : _sumBrMetricB_2_T_2;
-  assign io_brMetrics4D_3 =
-    _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_2 : _sumBrMetricB_3_T_2;
+  wire [6:0] _GEN = {1'h0, io_brMetricsA_0};
+  wire [6:0] _GEN_0 = {1'h0, io_brMetricsA_1};
+  wire [6:0] _GEN_1 = {1'h0, io_brMetricsB_0};
+  wire [6:0] _GEN_2 = {1'h0, io_brMetricsB_1};
+  wire [6:0] _GEN_3 = {1'h0, io_brMetricsA_2};
+  wire [6:0] _GEN_4 = {1'h0, io_brMetricsA_3};
+  wire [6:0] _GEN_5 = {1'h0, io_brMetricsB_2};
+  wire [6:0] _GEN_6 = {1'h0, io_brMetricsB_3};
+  wire [7:0] _GEN_7 = {1'h0, _GEN + _GEN_0};
+  wire [7:0] _GEN_8 = {1'h0, _GEN_3 + _GEN_4};
+  wire [7:0] sumBrMetricA_0 = _GEN_7 + _GEN_8;
+  wire [7:0] _GEN_9 = {1'h0, _GEN_1 + _GEN_2};
+  wire [7:0] _GEN_10 = {1'h0, _GEN_5 + _GEN_6};
+  wire [7:0] sumBrMetricB_0 = _GEN_9 + _GEN_10;
+  wire [7:0] sumBrMetricA_1 = _GEN_7 + _GEN_10;
+  wire [7:0] sumBrMetricB_1 = _GEN_9 + _GEN_8;
+  wire [7:0] _GEN_11 = {1'h0, _GEN + _GEN_2};
+  wire [7:0] _GEN_12 = {1'h0, _GEN_5 + _GEN_4};
+  wire [7:0] sumBrMetricA_2 = _GEN_11 + _GEN_12;
+  wire [7:0] _GEN_13 = {1'h0, _GEN_1 + _GEN_0};
+  wire [7:0] _GEN_14 = {1'h0, _GEN_3 + _GEN_6};
+  wire [7:0] sumBrMetricB_2 = _GEN_13 + _GEN_14;
+  wire [7:0] sumBrMetricA_3 = _GEN_11 + _GEN_14;
+  wire [7:0] sumBrMetricB_3 = _GEN_13 + _GEN_12;
+  wire       _io_brMetrics4D_0_T = sumBrMetricA_0 < sumBrMetricB_0;
+  wire       _io_brMetrics4D_1_T = sumBrMetricA_1 < sumBrMetricB_1;
+  wire       _io_brMetrics4D_2_T = sumBrMetricA_2 < sumBrMetricB_2;
+  wire       _io_brMetrics4D_3_T = sumBrMetricA_3 < sumBrMetricB_3;
+  assign io_brMetrics4D_0 = _io_brMetrics4D_0_T ? sumBrMetricA_0 : sumBrMetricB_0;
+  assign io_brMetrics4D_1 = _io_brMetrics4D_1_T ? sumBrMetricA_1 : sumBrMetricB_1;
+  assign io_brMetrics4D_2 = _io_brMetrics4D_2_T ? sumBrMetricA_2 : sumBrMetricB_2;
+  assign io_brMetrics4D_3 = _io_brMetrics4D_3_T ? sumBrMetricA_3 : sumBrMetricB_3;
   assign io_brSyms4D_0_0 = _io_brMetrics4D_0_T ? io_brSymsA_0 : io_brSymsB_0;
   assign io_brSyms4D_0_1 = _io_brMetrics4D_0_T ? io_brSymsA_1 : io_brSymsB_1;
   assign io_brSyms4D_0_2 = _io_brMetrics4D_0_T ? io_brSymsA_2 : io_brSymsB_2;
@@ -632,7 +631,7 @@ module FourDimBMU(
 endmodule
 
 module FourDimBMU_4(
-  input  [7:0] io_brMetricsA_0,
+  input  [5:0] io_brMetricsA_0,
                io_brMetricsA_1,
                io_brMetricsA_2,
                io_brMetricsA_3,
@@ -648,7 +647,7 @@ module FourDimBMU_4(
                io_brSymsB_1,
                io_brSymsB_2,
                io_brSymsB_3,
-  output [9:0] io_brMetrics4D_0,
+  output [7:0] io_brMetrics4D_0,
                io_brMetrics4D_1,
                io_brMetrics4D_2,
                io_brMetrics4D_3,
@@ -670,38 +669,38 @@ module FourDimBMU_4(
                io_brSyms4D_3_3
 );
 
-  wire [8:0] _GEN = {1'h0, io_brMetricsA_0};
-  wire [8:0] _GEN_0 = {1'h0, io_brMetricsA_1};
-  wire [9:0] _GEN_1 = {1'h0, _GEN + _GEN_0};
-  wire [9:0] _GEN_2 = {2'h0, io_brMetricsA_2};
-  wire [9:0] _GEN_3 = {2'h0, io_brMetricsB_3};
-  wire [9:0] _sumBrMetricA_0_T_2 = _GEN_1 + _GEN_2 + _GEN_3;
-  wire [8:0] _GEN_4 = {1'h0, io_brMetricsB_0};
-  wire [8:0] _GEN_5 = {1'h0, io_brMetricsB_1};
-  wire [9:0] _GEN_6 = {1'h0, _GEN_4 + _GEN_5};
-  wire [9:0] _GEN_7 = {2'h0, io_brMetricsB_2};
-  wire [9:0] _GEN_8 = {2'h0, io_brMetricsA_3};
-  wire [9:0] _sumBrMetricB_0_T_2 = _GEN_6 + _GEN_7 + _GEN_8;
-  wire [9:0] _sumBrMetricA_1_T_2 = _GEN_1 + _GEN_7 + _GEN_8;
-  wire [9:0] _sumBrMetricB_1_T_2 = _GEN_6 + _GEN_2 + _GEN_3;
-  wire [9:0] _GEN_9 = {1'h0, _GEN + _GEN_5};
-  wire [9:0] _sumBrMetricA_2_T_2 = _GEN_9 + _GEN_7 + _GEN_3;
-  wire [9:0] _GEN_10 = {1'h0, _GEN_4 + _GEN_0};
-  wire [9:0] _sumBrMetricB_2_T_2 = _GEN_10 + _GEN_2 + _GEN_8;
-  wire [9:0] _sumBrMetricA_3_T_2 = _GEN_9 + _GEN_2 + _GEN_8;
-  wire [9:0] _sumBrMetricB_3_T_2 = _GEN_10 + _GEN_7 + _GEN_3;
-  wire       _io_brMetrics4D_0_T = _sumBrMetricA_0_T_2 < _sumBrMetricB_0_T_2;
-  wire       _io_brMetrics4D_1_T = _sumBrMetricA_1_T_2 < _sumBrMetricB_1_T_2;
-  wire       _io_brMetrics4D_2_T = _sumBrMetricA_2_T_2 < _sumBrMetricB_2_T_2;
-  wire       _io_brMetrics4D_3_T = _sumBrMetricA_3_T_2 < _sumBrMetricB_3_T_2;
-  assign io_brMetrics4D_0 =
-    _io_brMetrics4D_0_T ? _sumBrMetricA_0_T_2 : _sumBrMetricB_0_T_2;
-  assign io_brMetrics4D_1 =
-    _io_brMetrics4D_1_T ? _sumBrMetricA_1_T_2 : _sumBrMetricB_1_T_2;
-  assign io_brMetrics4D_2 =
-    _io_brMetrics4D_2_T ? _sumBrMetricA_2_T_2 : _sumBrMetricB_2_T_2;
-  assign io_brMetrics4D_3 =
-    _io_brMetrics4D_3_T ? _sumBrMetricA_3_T_2 : _sumBrMetricB_3_T_2;
+  wire [6:0] _GEN = {1'h0, io_brMetricsA_0};
+  wire [6:0] _GEN_0 = {1'h0, io_brMetricsA_1};
+  wire [6:0] _GEN_1 = {1'h0, io_brMetricsB_0};
+  wire [6:0] _GEN_2 = {1'h0, io_brMetricsB_1};
+  wire [6:0] _GEN_3 = {1'h0, io_brMetricsA_2};
+  wire [6:0] _GEN_4 = {1'h0, io_brMetricsA_3};
+  wire [6:0] _GEN_5 = {1'h0, io_brMetricsB_2};
+  wire [6:0] _GEN_6 = {1'h0, io_brMetricsB_3};
+  wire [7:0] _GEN_7 = {1'h0, _GEN + _GEN_0};
+  wire [7:0] _GEN_8 = {1'h0, _GEN_3 + _GEN_6};
+  wire [7:0] sumBrMetricA_0 = _GEN_7 + _GEN_8;
+  wire [7:0] _GEN_9 = {1'h0, _GEN_1 + _GEN_2};
+  wire [7:0] _GEN_10 = {1'h0, _GEN_5 + _GEN_4};
+  wire [7:0] sumBrMetricB_0 = _GEN_9 + _GEN_10;
+  wire [7:0] sumBrMetricA_1 = _GEN_7 + _GEN_10;
+  wire [7:0] sumBrMetricB_1 = _GEN_9 + _GEN_8;
+  wire [7:0] _GEN_11 = {1'h0, _GEN + _GEN_2};
+  wire [7:0] _GEN_12 = {1'h0, _GEN_5 + _GEN_6};
+  wire [7:0] sumBrMetricA_2 = _GEN_11 + _GEN_12;
+  wire [7:0] _GEN_13 = {1'h0, _GEN_1 + _GEN_0};
+  wire [7:0] _GEN_14 = {1'h0, _GEN_3 + _GEN_4};
+  wire [7:0] sumBrMetricB_2 = _GEN_13 + _GEN_14;
+  wire [7:0] sumBrMetricA_3 = _GEN_11 + _GEN_14;
+  wire [7:0] sumBrMetricB_3 = _GEN_13 + _GEN_12;
+  wire       _io_brMetrics4D_0_T = sumBrMetricA_0 < sumBrMetricB_0;
+  wire       _io_brMetrics4D_1_T = sumBrMetricA_1 < sumBrMetricB_1;
+  wire       _io_brMetrics4D_2_T = sumBrMetricA_2 < sumBrMetricB_2;
+  wire       _io_brMetrics4D_3_T = sumBrMetricA_3 < sumBrMetricB_3;
+  assign io_brMetrics4D_0 = _io_brMetrics4D_0_T ? sumBrMetricA_0 : sumBrMetricB_0;
+  assign io_brMetrics4D_1 = _io_brMetrics4D_1_T ? sumBrMetricA_1 : sumBrMetricB_1;
+  assign io_brMetrics4D_2 = _io_brMetrics4D_2_T ? sumBrMetricA_2 : sumBrMetricB_2;
+  assign io_brMetrics4D_3 = _io_brMetrics4D_3_T ? sumBrMetricA_3 : sumBrMetricB_3;
   assign io_brSyms4D_0_0 = _io_brMetrics4D_0_T ? io_brSymsA_0 : io_brSymsB_0;
   assign io_brSyms4D_0_1 = _io_brMetrics4D_0_T ? io_brSymsA_1 : io_brSymsB_1;
   assign io_brSyms4D_0_2 = _io_brMetrics4D_0_T ? io_brSymsA_2 : io_brSymsB_2;
@@ -721,37 +720,37 @@ module FourDimBMU_4(
 endmodule
 
 module ACSU(
-  input         clock,
-                reset,
-  input  [9:0]  io_brMetrics4D_0,
-                io_brMetrics4D_1,
-                io_brMetrics4D_2,
-                io_brMetrics4D_3,
-  input  [11:0] io_pathMetrics_0,
-                io_pathMetrics_1,
-                io_pathMetrics_2,
-                io_pathMetrics_3,
-  output [1:0]  io_pathSelect,
-  output [11:0] io_pathMetric
+  input        clock,
+               reset,
+  input  [7:0] io_brMetrics4D_0,
+               io_brMetrics4D_1,
+               io_brMetrics4D_2,
+               io_brMetrics4D_3,
+  input  [9:0] io_pathMetrics_0,
+               io_pathMetrics_1,
+               io_pathMetrics_2,
+               io_pathMetrics_3,
+  output [1:0] io_pathSelect,
+  output [9:0] io_pathMetric
 );
 
-  reg  [11:0] pathMetricReg;
-  wire [11:0] _sum0_T = io_pathMetrics_0 + {2'h0, io_brMetrics4D_0};
-  wire [11:0] _sum1_T = io_pathMetrics_1 + {2'h0, io_brMetrics4D_1};
-  wire [11:0] _sum2_T = io_pathMetrics_2 + {2'h0, io_brMetrics4D_2};
-  wire [11:0] _sum3_T = io_pathMetrics_3 + {2'h0, io_brMetrics4D_3};
-  wire [11:0] _dist0_T_2 = _sum2_T - _sum3_T;
-  wire [11:0] _dist1_T_2 = _sum1_T - _sum3_T;
-  wire [11:0] _dist2_T_2 = _sum0_T - _sum3_T;
-  wire [11:0] _dist3_T_2 = _sum1_T - _sum2_T;
-  wire [11:0] _dist4_T_2 = _sum0_T - _sum2_T;
-  wire [11:0] _dist5_T_2 = _sum0_T - _sum1_T;
-  wire        _GEN = _dist2_T_2[11] & _dist4_T_2[11] & _dist5_T_2[11];
-  wire        _GEN_0 = _dist1_T_2[11] & _dist3_T_2[11] & ~(_dist5_T_2[11]);
-  wire        _GEN_1 = _dist0_T_2[11] & ~(_dist3_T_2[11]) & ~(_dist4_T_2[11]);
+  reg  [9:0] pathMetricReg;
+  wire [9:0] _sum0_T = io_pathMetrics_0 + {2'h0, io_brMetrics4D_0};
+  wire [9:0] _sum1_T = io_pathMetrics_1 + {2'h0, io_brMetrics4D_1};
+  wire [9:0] _sum2_T = io_pathMetrics_2 + {2'h0, io_brMetrics4D_2};
+  wire [9:0] _sum3_T = io_pathMetrics_3 + {2'h0, io_brMetrics4D_3};
+  wire [9:0] _dist0_T_2 = _sum2_T - _sum3_T;
+  wire [9:0] _dist1_T_2 = _sum1_T - _sum3_T;
+  wire [9:0] _dist2_T_2 = _sum0_T - _sum3_T;
+  wire [9:0] _dist3_T_2 = _sum1_T - _sum2_T;
+  wire [9:0] _dist4_T_2 = _sum0_T - _sum2_T;
+  wire [9:0] _dist5_T_2 = _sum0_T - _sum1_T;
+  wire       _GEN = _dist2_T_2[9] & _dist4_T_2[9] & _dist5_T_2[9];
+  wire       _GEN_0 = _dist1_T_2[9] & _dist3_T_2[9] & ~(_dist5_T_2[9]);
+  wire       _GEN_1 = _dist0_T_2[9] & ~(_dist3_T_2[9]) & ~(_dist4_T_2[9]);
   always @(posedge clock) begin
     if (reset)
-      pathMetricReg <= 12'h0;
+      pathMetricReg <= 10'h0;
     else
       pathMetricReg <= _GEN ? _sum0_T : _GEN_0 ? _sum1_T : _GEN_1 ? _sum2_T : _sum3_T;
   end // always @(posedge)
@@ -1175,25 +1174,25 @@ module LaPDFD(
   wire [2:0]  _smu_0_io_symSelects_2;
   wire [2:0]  _smu_0_io_symSelects_3;
   wire [1:0]  _acsu_7_io_pathSelect;
-  wire [11:0] _acsu_7_io_pathMetric;
+  wire [9:0]  _acsu_7_io_pathMetric;
   wire [1:0]  _acsu_6_io_pathSelect;
-  wire [11:0] _acsu_6_io_pathMetric;
+  wire [9:0]  _acsu_6_io_pathMetric;
   wire [1:0]  _acsu_5_io_pathSelect;
-  wire [11:0] _acsu_5_io_pathMetric;
+  wire [9:0]  _acsu_5_io_pathMetric;
   wire [1:0]  _acsu_4_io_pathSelect;
-  wire [11:0] _acsu_4_io_pathMetric;
+  wire [9:0]  _acsu_4_io_pathMetric;
   wire [1:0]  _acsu_3_io_pathSelect;
-  wire [11:0] _acsu_3_io_pathMetric;
+  wire [9:0]  _acsu_3_io_pathMetric;
   wire [1:0]  _acsu_2_io_pathSelect;
-  wire [11:0] _acsu_2_io_pathMetric;
+  wire [9:0]  _acsu_2_io_pathMetric;
   wire [1:0]  _acsu_1_io_pathSelect;
-  wire [11:0] _acsu_1_io_pathMetric;
+  wire [9:0]  _acsu_1_io_pathMetric;
   wire [1:0]  _acsu_0_io_pathSelect;
-  wire [11:0] _acsu_0_io_pathMetric;
-  wire [9:0]  _bmuOdd_3_io_brMetrics4D_0;
-  wire [9:0]  _bmuOdd_3_io_brMetrics4D_1;
-  wire [9:0]  _bmuOdd_3_io_brMetrics4D_2;
-  wire [9:0]  _bmuOdd_3_io_brMetrics4D_3;
+  wire [9:0]  _acsu_0_io_pathMetric;
+  wire [7:0]  _bmuOdd_3_io_brMetrics4D_0;
+  wire [7:0]  _bmuOdd_3_io_brMetrics4D_1;
+  wire [7:0]  _bmuOdd_3_io_brMetrics4D_2;
+  wire [7:0]  _bmuOdd_3_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_0_2;
@@ -1210,10 +1209,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_3_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_3_io_brSyms4D_3_3;
-  wire [9:0]  _bmuOdd_2_io_brMetrics4D_0;
-  wire [9:0]  _bmuOdd_2_io_brMetrics4D_1;
-  wire [9:0]  _bmuOdd_2_io_brMetrics4D_2;
-  wire [9:0]  _bmuOdd_2_io_brMetrics4D_3;
+  wire [7:0]  _bmuOdd_2_io_brMetrics4D_0;
+  wire [7:0]  _bmuOdd_2_io_brMetrics4D_1;
+  wire [7:0]  _bmuOdd_2_io_brMetrics4D_2;
+  wire [7:0]  _bmuOdd_2_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_0_2;
@@ -1230,10 +1229,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_2_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_2_io_brSyms4D_3_3;
-  wire [9:0]  _bmuOdd_1_io_brMetrics4D_0;
-  wire [9:0]  _bmuOdd_1_io_brMetrics4D_1;
-  wire [9:0]  _bmuOdd_1_io_brMetrics4D_2;
-  wire [9:0]  _bmuOdd_1_io_brMetrics4D_3;
+  wire [7:0]  _bmuOdd_1_io_brMetrics4D_0;
+  wire [7:0]  _bmuOdd_1_io_brMetrics4D_1;
+  wire [7:0]  _bmuOdd_1_io_brMetrics4D_2;
+  wire [7:0]  _bmuOdd_1_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_0_2;
@@ -1250,10 +1249,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_1_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_1_io_brSyms4D_3_3;
-  wire [9:0]  _bmuOdd_0_io_brMetrics4D_0;
-  wire [9:0]  _bmuOdd_0_io_brMetrics4D_1;
-  wire [9:0]  _bmuOdd_0_io_brMetrics4D_2;
-  wire [9:0]  _bmuOdd_0_io_brMetrics4D_3;
+  wire [7:0]  _bmuOdd_0_io_brMetrics4D_0;
+  wire [7:0]  _bmuOdd_0_io_brMetrics4D_1;
+  wire [7:0]  _bmuOdd_0_io_brMetrics4D_2;
+  wire [7:0]  _bmuOdd_0_io_brMetrics4D_3;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_0_0;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_0_1;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_0_2;
@@ -1270,10 +1269,10 @@ module LaPDFD(
   wire [2:0]  _bmuOdd_0_io_brSyms4D_3_1;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_3_2;
   wire [2:0]  _bmuOdd_0_io_brSyms4D_3_3;
-  wire [9:0]  _bmuEven_3_io_brMetrics4D_0;
-  wire [9:0]  _bmuEven_3_io_brMetrics4D_1;
-  wire [9:0]  _bmuEven_3_io_brMetrics4D_2;
-  wire [9:0]  _bmuEven_3_io_brMetrics4D_3;
+  wire [7:0]  _bmuEven_3_io_brMetrics4D_0;
+  wire [7:0]  _bmuEven_3_io_brMetrics4D_1;
+  wire [7:0]  _bmuEven_3_io_brMetrics4D_2;
+  wire [7:0]  _bmuEven_3_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_3_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_3_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_3_io_brSyms4D_0_2;
@@ -1290,10 +1289,10 @@ module LaPDFD(
   wire [2:0]  _bmuEven_3_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_3_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_3_io_brSyms4D_3_3;
-  wire [9:0]  _bmuEven_2_io_brMetrics4D_0;
-  wire [9:0]  _bmuEven_2_io_brMetrics4D_1;
-  wire [9:0]  _bmuEven_2_io_brMetrics4D_2;
-  wire [9:0]  _bmuEven_2_io_brMetrics4D_3;
+  wire [7:0]  _bmuEven_2_io_brMetrics4D_0;
+  wire [7:0]  _bmuEven_2_io_brMetrics4D_1;
+  wire [7:0]  _bmuEven_2_io_brMetrics4D_2;
+  wire [7:0]  _bmuEven_2_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_2_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_2_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_2_io_brSyms4D_0_2;
@@ -1310,10 +1309,10 @@ module LaPDFD(
   wire [2:0]  _bmuEven_2_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_2_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_2_io_brSyms4D_3_3;
-  wire [9:0]  _bmuEven_1_io_brMetrics4D_0;
-  wire [9:0]  _bmuEven_1_io_brMetrics4D_1;
-  wire [9:0]  _bmuEven_1_io_brMetrics4D_2;
-  wire [9:0]  _bmuEven_1_io_brMetrics4D_3;
+  wire [7:0]  _bmuEven_1_io_brMetrics4D_0;
+  wire [7:0]  _bmuEven_1_io_brMetrics4D_1;
+  wire [7:0]  _bmuEven_1_io_brMetrics4D_2;
+  wire [7:0]  _bmuEven_1_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_1_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_1_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_1_io_brSyms4D_0_2;
@@ -1330,10 +1329,10 @@ module LaPDFD(
   wire [2:0]  _bmuEven_1_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_1_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_1_io_brSyms4D_3_3;
-  wire [9:0]  _bmuEven_0_io_brMetrics4D_0;
-  wire [9:0]  _bmuEven_0_io_brMetrics4D_1;
-  wire [9:0]  _bmuEven_0_io_brMetrics4D_2;
-  wire [9:0]  _bmuEven_0_io_brMetrics4D_3;
+  wire [7:0]  _bmuEven_0_io_brMetrics4D_0;
+  wire [7:0]  _bmuEven_0_io_brMetrics4D_1;
+  wire [7:0]  _bmuEven_0_io_brMetrics4D_2;
+  wire [7:0]  _bmuEven_0_io_brMetrics4D_3;
   wire [2:0]  _bmuEven_0_io_brSyms4D_0_0;
   wire [2:0]  _bmuEven_0_io_brSyms4D_0_1;
   wire [2:0]  _bmuEven_0_io_brSyms4D_0_2;
@@ -1350,14 +1349,14 @@ module LaPDFD(
   wire [2:0]  _bmuEven_0_io_brSyms4D_3_1;
   wire [2:0]  _bmuEven_0_io_brSyms4D_3_2;
   wire [2:0]  _bmuEven_0_io_brSyms4D_3_3;
-  wire [7:0]  _muxu_7_io_brMetricsA_0;
-  wire [7:0]  _muxu_7_io_brMetricsA_1;
-  wire [7:0]  _muxu_7_io_brMetricsA_2;
-  wire [7:0]  _muxu_7_io_brMetricsA_3;
-  wire [7:0]  _muxu_7_io_brMetricsB_0;
-  wire [7:0]  _muxu_7_io_brMetricsB_1;
-  wire [7:0]  _muxu_7_io_brMetricsB_2;
-  wire [7:0]  _muxu_7_io_brMetricsB_3;
+  wire [5:0]  _muxu_7_io_brMetricsA_0;
+  wire [5:0]  _muxu_7_io_brMetricsA_1;
+  wire [5:0]  _muxu_7_io_brMetricsA_2;
+  wire [5:0]  _muxu_7_io_brMetricsA_3;
+  wire [5:0]  _muxu_7_io_brMetricsB_0;
+  wire [5:0]  _muxu_7_io_brMetricsB_1;
+  wire [5:0]  _muxu_7_io_brMetricsB_2;
+  wire [5:0]  _muxu_7_io_brMetricsB_3;
   wire [2:0]  _muxu_7_io_brSymsA_0;
   wire [2:0]  _muxu_7_io_brSymsA_1;
   wire [2:0]  _muxu_7_io_brSymsA_2;
@@ -1366,14 +1365,14 @@ module LaPDFD(
   wire [2:0]  _muxu_7_io_brSymsB_1;
   wire [2:0]  _muxu_7_io_brSymsB_2;
   wire [2:0]  _muxu_7_io_brSymsB_3;
-  wire [7:0]  _muxu_6_io_brMetricsA_0;
-  wire [7:0]  _muxu_6_io_brMetricsA_1;
-  wire [7:0]  _muxu_6_io_brMetricsA_2;
-  wire [7:0]  _muxu_6_io_brMetricsA_3;
-  wire [7:0]  _muxu_6_io_brMetricsB_0;
-  wire [7:0]  _muxu_6_io_brMetricsB_1;
-  wire [7:0]  _muxu_6_io_brMetricsB_2;
-  wire [7:0]  _muxu_6_io_brMetricsB_3;
+  wire [5:0]  _muxu_6_io_brMetricsA_0;
+  wire [5:0]  _muxu_6_io_brMetricsA_1;
+  wire [5:0]  _muxu_6_io_brMetricsA_2;
+  wire [5:0]  _muxu_6_io_brMetricsA_3;
+  wire [5:0]  _muxu_6_io_brMetricsB_0;
+  wire [5:0]  _muxu_6_io_brMetricsB_1;
+  wire [5:0]  _muxu_6_io_brMetricsB_2;
+  wire [5:0]  _muxu_6_io_brMetricsB_3;
   wire [2:0]  _muxu_6_io_brSymsA_0;
   wire [2:0]  _muxu_6_io_brSymsA_1;
   wire [2:0]  _muxu_6_io_brSymsA_2;
@@ -1382,14 +1381,14 @@ module LaPDFD(
   wire [2:0]  _muxu_6_io_brSymsB_1;
   wire [2:0]  _muxu_6_io_brSymsB_2;
   wire [2:0]  _muxu_6_io_brSymsB_3;
-  wire [7:0]  _muxu_5_io_brMetricsA_0;
-  wire [7:0]  _muxu_5_io_brMetricsA_1;
-  wire [7:0]  _muxu_5_io_brMetricsA_2;
-  wire [7:0]  _muxu_5_io_brMetricsA_3;
-  wire [7:0]  _muxu_5_io_brMetricsB_0;
-  wire [7:0]  _muxu_5_io_brMetricsB_1;
-  wire [7:0]  _muxu_5_io_brMetricsB_2;
-  wire [7:0]  _muxu_5_io_brMetricsB_3;
+  wire [5:0]  _muxu_5_io_brMetricsA_0;
+  wire [5:0]  _muxu_5_io_brMetricsA_1;
+  wire [5:0]  _muxu_5_io_brMetricsA_2;
+  wire [5:0]  _muxu_5_io_brMetricsA_3;
+  wire [5:0]  _muxu_5_io_brMetricsB_0;
+  wire [5:0]  _muxu_5_io_brMetricsB_1;
+  wire [5:0]  _muxu_5_io_brMetricsB_2;
+  wire [5:0]  _muxu_5_io_brMetricsB_3;
   wire [2:0]  _muxu_5_io_brSymsA_0;
   wire [2:0]  _muxu_5_io_brSymsA_1;
   wire [2:0]  _muxu_5_io_brSymsA_2;
@@ -1398,14 +1397,14 @@ module LaPDFD(
   wire [2:0]  _muxu_5_io_brSymsB_1;
   wire [2:0]  _muxu_5_io_brSymsB_2;
   wire [2:0]  _muxu_5_io_brSymsB_3;
-  wire [7:0]  _muxu_4_io_brMetricsA_0;
-  wire [7:0]  _muxu_4_io_brMetricsA_1;
-  wire [7:0]  _muxu_4_io_brMetricsA_2;
-  wire [7:0]  _muxu_4_io_brMetricsA_3;
-  wire [7:0]  _muxu_4_io_brMetricsB_0;
-  wire [7:0]  _muxu_4_io_brMetricsB_1;
-  wire [7:0]  _muxu_4_io_brMetricsB_2;
-  wire [7:0]  _muxu_4_io_brMetricsB_3;
+  wire [5:0]  _muxu_4_io_brMetricsA_0;
+  wire [5:0]  _muxu_4_io_brMetricsA_1;
+  wire [5:0]  _muxu_4_io_brMetricsA_2;
+  wire [5:0]  _muxu_4_io_brMetricsA_3;
+  wire [5:0]  _muxu_4_io_brMetricsB_0;
+  wire [5:0]  _muxu_4_io_brMetricsB_1;
+  wire [5:0]  _muxu_4_io_brMetricsB_2;
+  wire [5:0]  _muxu_4_io_brMetricsB_3;
   wire [2:0]  _muxu_4_io_brSymsA_0;
   wire [2:0]  _muxu_4_io_brSymsA_1;
   wire [2:0]  _muxu_4_io_brSymsA_2;
@@ -1414,14 +1413,14 @@ module LaPDFD(
   wire [2:0]  _muxu_4_io_brSymsB_1;
   wire [2:0]  _muxu_4_io_brSymsB_2;
   wire [2:0]  _muxu_4_io_brSymsB_3;
-  wire [7:0]  _muxu_3_io_brMetricsA_0;
-  wire [7:0]  _muxu_3_io_brMetricsA_1;
-  wire [7:0]  _muxu_3_io_brMetricsA_2;
-  wire [7:0]  _muxu_3_io_brMetricsA_3;
-  wire [7:0]  _muxu_3_io_brMetricsB_0;
-  wire [7:0]  _muxu_3_io_brMetricsB_1;
-  wire [7:0]  _muxu_3_io_brMetricsB_2;
-  wire [7:0]  _muxu_3_io_brMetricsB_3;
+  wire [5:0]  _muxu_3_io_brMetricsA_0;
+  wire [5:0]  _muxu_3_io_brMetricsA_1;
+  wire [5:0]  _muxu_3_io_brMetricsA_2;
+  wire [5:0]  _muxu_3_io_brMetricsA_3;
+  wire [5:0]  _muxu_3_io_brMetricsB_0;
+  wire [5:0]  _muxu_3_io_brMetricsB_1;
+  wire [5:0]  _muxu_3_io_brMetricsB_2;
+  wire [5:0]  _muxu_3_io_brMetricsB_3;
   wire [2:0]  _muxu_3_io_brSymsA_0;
   wire [2:0]  _muxu_3_io_brSymsA_1;
   wire [2:0]  _muxu_3_io_brSymsA_2;
@@ -1430,14 +1429,14 @@ module LaPDFD(
   wire [2:0]  _muxu_3_io_brSymsB_1;
   wire [2:0]  _muxu_3_io_brSymsB_2;
   wire [2:0]  _muxu_3_io_brSymsB_3;
-  wire [7:0]  _muxu_2_io_brMetricsA_0;
-  wire [7:0]  _muxu_2_io_brMetricsA_1;
-  wire [7:0]  _muxu_2_io_brMetricsA_2;
-  wire [7:0]  _muxu_2_io_brMetricsA_3;
-  wire [7:0]  _muxu_2_io_brMetricsB_0;
-  wire [7:0]  _muxu_2_io_brMetricsB_1;
-  wire [7:0]  _muxu_2_io_brMetricsB_2;
-  wire [7:0]  _muxu_2_io_brMetricsB_3;
+  wire [5:0]  _muxu_2_io_brMetricsA_0;
+  wire [5:0]  _muxu_2_io_brMetricsA_1;
+  wire [5:0]  _muxu_2_io_brMetricsA_2;
+  wire [5:0]  _muxu_2_io_brMetricsA_3;
+  wire [5:0]  _muxu_2_io_brMetricsB_0;
+  wire [5:0]  _muxu_2_io_brMetricsB_1;
+  wire [5:0]  _muxu_2_io_brMetricsB_2;
+  wire [5:0]  _muxu_2_io_brMetricsB_3;
   wire [2:0]  _muxu_2_io_brSymsA_0;
   wire [2:0]  _muxu_2_io_brSymsA_1;
   wire [2:0]  _muxu_2_io_brSymsA_2;
@@ -1446,14 +1445,14 @@ module LaPDFD(
   wire [2:0]  _muxu_2_io_brSymsB_1;
   wire [2:0]  _muxu_2_io_brSymsB_2;
   wire [2:0]  _muxu_2_io_brSymsB_3;
-  wire [7:0]  _muxu_1_io_brMetricsA_0;
-  wire [7:0]  _muxu_1_io_brMetricsA_1;
-  wire [7:0]  _muxu_1_io_brMetricsA_2;
-  wire [7:0]  _muxu_1_io_brMetricsA_3;
-  wire [7:0]  _muxu_1_io_brMetricsB_0;
-  wire [7:0]  _muxu_1_io_brMetricsB_1;
-  wire [7:0]  _muxu_1_io_brMetricsB_2;
-  wire [7:0]  _muxu_1_io_brMetricsB_3;
+  wire [5:0]  _muxu_1_io_brMetricsA_0;
+  wire [5:0]  _muxu_1_io_brMetricsA_1;
+  wire [5:0]  _muxu_1_io_brMetricsA_2;
+  wire [5:0]  _muxu_1_io_brMetricsA_3;
+  wire [5:0]  _muxu_1_io_brMetricsB_0;
+  wire [5:0]  _muxu_1_io_brMetricsB_1;
+  wire [5:0]  _muxu_1_io_brMetricsB_2;
+  wire [5:0]  _muxu_1_io_brMetricsB_3;
   wire [2:0]  _muxu_1_io_brSymsA_0;
   wire [2:0]  _muxu_1_io_brSymsA_1;
   wire [2:0]  _muxu_1_io_brSymsA_2;
@@ -1462,14 +1461,14 @@ module LaPDFD(
   wire [2:0]  _muxu_1_io_brSymsB_1;
   wire [2:0]  _muxu_1_io_brSymsB_2;
   wire [2:0]  _muxu_1_io_brSymsB_3;
-  wire [7:0]  _muxu_0_io_brMetricsA_0;
-  wire [7:0]  _muxu_0_io_brMetricsA_1;
-  wire [7:0]  _muxu_0_io_brMetricsA_2;
-  wire [7:0]  _muxu_0_io_brMetricsA_3;
-  wire [7:0]  _muxu_0_io_brMetricsB_0;
-  wire [7:0]  _muxu_0_io_brMetricsB_1;
-  wire [7:0]  _muxu_0_io_brMetricsB_2;
-  wire [7:0]  _muxu_0_io_brMetricsB_3;
+  wire [5:0]  _muxu_0_io_brMetricsA_0;
+  wire [5:0]  _muxu_0_io_brMetricsA_1;
+  wire [5:0]  _muxu_0_io_brMetricsA_2;
+  wire [5:0]  _muxu_0_io_brMetricsA_3;
+  wire [5:0]  _muxu_0_io_brMetricsB_0;
+  wire [5:0]  _muxu_0_io_brMetricsB_1;
+  wire [5:0]  _muxu_0_io_brMetricsB_2;
+  wire [5:0]  _muxu_0_io_brMetricsB_3;
   wire [2:0]  _muxu_0_io_brSymsA_0;
   wire [2:0]  _muxu_0_io_brSymsA_1;
   wire [2:0]  _muxu_0_io_brSymsA_2;
@@ -1478,16 +1477,16 @@ module LaPDFD(
   wire [2:0]  _muxu_0_io_brSymsB_1;
   wire [2:0]  _muxu_0_io_brSymsB_2;
   wire [2:0]  _muxu_0_io_brSymsB_3;
-  wire [7:0]  _laBmu_3_io_symMetricsA_0;
-  wire [7:0]  _laBmu_3_io_symMetricsA_1;
-  wire [7:0]  _laBmu_3_io_symMetricsA_2;
-  wire [7:0]  _laBmu_3_io_symMetricsA_3;
-  wire [7:0]  _laBmu_3_io_symMetricsA_4;
-  wire [7:0]  _laBmu_3_io_symMetricsB_0;
-  wire [7:0]  _laBmu_3_io_symMetricsB_1;
-  wire [7:0]  _laBmu_3_io_symMetricsB_2;
-  wire [7:0]  _laBmu_3_io_symMetricsB_3;
-  wire [7:0]  _laBmu_3_io_symMetricsB_4;
+  wire [5:0]  _laBmu_3_io_symMetricsA_0;
+  wire [5:0]  _laBmu_3_io_symMetricsA_1;
+  wire [5:0]  _laBmu_3_io_symMetricsA_2;
+  wire [5:0]  _laBmu_3_io_symMetricsA_3;
+  wire [5:0]  _laBmu_3_io_symMetricsA_4;
+  wire [5:0]  _laBmu_3_io_symMetricsB_0;
+  wire [5:0]  _laBmu_3_io_symMetricsB_1;
+  wire [5:0]  _laBmu_3_io_symMetricsB_2;
+  wire [5:0]  _laBmu_3_io_symMetricsB_3;
+  wire [5:0]  _laBmu_3_io_symMetricsB_4;
   wire [2:0]  _laBmu_3_io_symsA_0;
   wire [2:0]  _laBmu_3_io_symsA_1;
   wire [2:0]  _laBmu_3_io_symsA_2;
@@ -1498,16 +1497,16 @@ module LaPDFD(
   wire [2:0]  _laBmu_3_io_symsB_2;
   wire [2:0]  _laBmu_3_io_symsB_3;
   wire [2:0]  _laBmu_3_io_symsB_4;
-  wire [7:0]  _laBmu_2_io_symMetricsA_0;
-  wire [7:0]  _laBmu_2_io_symMetricsA_1;
-  wire [7:0]  _laBmu_2_io_symMetricsA_2;
-  wire [7:0]  _laBmu_2_io_symMetricsA_3;
-  wire [7:0]  _laBmu_2_io_symMetricsA_4;
-  wire [7:0]  _laBmu_2_io_symMetricsB_0;
-  wire [7:0]  _laBmu_2_io_symMetricsB_1;
-  wire [7:0]  _laBmu_2_io_symMetricsB_2;
-  wire [7:0]  _laBmu_2_io_symMetricsB_3;
-  wire [7:0]  _laBmu_2_io_symMetricsB_4;
+  wire [5:0]  _laBmu_2_io_symMetricsA_0;
+  wire [5:0]  _laBmu_2_io_symMetricsA_1;
+  wire [5:0]  _laBmu_2_io_symMetricsA_2;
+  wire [5:0]  _laBmu_2_io_symMetricsA_3;
+  wire [5:0]  _laBmu_2_io_symMetricsA_4;
+  wire [5:0]  _laBmu_2_io_symMetricsB_0;
+  wire [5:0]  _laBmu_2_io_symMetricsB_1;
+  wire [5:0]  _laBmu_2_io_symMetricsB_2;
+  wire [5:0]  _laBmu_2_io_symMetricsB_3;
+  wire [5:0]  _laBmu_2_io_symMetricsB_4;
   wire [2:0]  _laBmu_2_io_symsA_0;
   wire [2:0]  _laBmu_2_io_symsA_1;
   wire [2:0]  _laBmu_2_io_symsA_2;
@@ -1518,16 +1517,16 @@ module LaPDFD(
   wire [2:0]  _laBmu_2_io_symsB_2;
   wire [2:0]  _laBmu_2_io_symsB_3;
   wire [2:0]  _laBmu_2_io_symsB_4;
-  wire [7:0]  _laBmu_1_io_symMetricsA_0;
-  wire [7:0]  _laBmu_1_io_symMetricsA_1;
-  wire [7:0]  _laBmu_1_io_symMetricsA_2;
-  wire [7:0]  _laBmu_1_io_symMetricsA_3;
-  wire [7:0]  _laBmu_1_io_symMetricsA_4;
-  wire [7:0]  _laBmu_1_io_symMetricsB_0;
-  wire [7:0]  _laBmu_1_io_symMetricsB_1;
-  wire [7:0]  _laBmu_1_io_symMetricsB_2;
-  wire [7:0]  _laBmu_1_io_symMetricsB_3;
-  wire [7:0]  _laBmu_1_io_symMetricsB_4;
+  wire [5:0]  _laBmu_1_io_symMetricsA_0;
+  wire [5:0]  _laBmu_1_io_symMetricsA_1;
+  wire [5:0]  _laBmu_1_io_symMetricsA_2;
+  wire [5:0]  _laBmu_1_io_symMetricsA_3;
+  wire [5:0]  _laBmu_1_io_symMetricsA_4;
+  wire [5:0]  _laBmu_1_io_symMetricsB_0;
+  wire [5:0]  _laBmu_1_io_symMetricsB_1;
+  wire [5:0]  _laBmu_1_io_symMetricsB_2;
+  wire [5:0]  _laBmu_1_io_symMetricsB_3;
+  wire [5:0]  _laBmu_1_io_symMetricsB_4;
   wire [2:0]  _laBmu_1_io_symsA_0;
   wire [2:0]  _laBmu_1_io_symsA_1;
   wire [2:0]  _laBmu_1_io_symsA_2;
@@ -1538,16 +1537,16 @@ module LaPDFD(
   wire [2:0]  _laBmu_1_io_symsB_2;
   wire [2:0]  _laBmu_1_io_symsB_3;
   wire [2:0]  _laBmu_1_io_symsB_4;
-  wire [7:0]  _laBmu_0_io_symMetricsA_0;
-  wire [7:0]  _laBmu_0_io_symMetricsA_1;
-  wire [7:0]  _laBmu_0_io_symMetricsA_2;
-  wire [7:0]  _laBmu_0_io_symMetricsA_3;
-  wire [7:0]  _laBmu_0_io_symMetricsA_4;
-  wire [7:0]  _laBmu_0_io_symMetricsB_0;
-  wire [7:0]  _laBmu_0_io_symMetricsB_1;
-  wire [7:0]  _laBmu_0_io_symMetricsB_2;
-  wire [7:0]  _laBmu_0_io_symMetricsB_3;
-  wire [7:0]  _laBmu_0_io_symMetricsB_4;
+  wire [5:0]  _laBmu_0_io_symMetricsA_0;
+  wire [5:0]  _laBmu_0_io_symMetricsA_1;
+  wire [5:0]  _laBmu_0_io_symMetricsA_2;
+  wire [5:0]  _laBmu_0_io_symMetricsA_3;
+  wire [5:0]  _laBmu_0_io_symMetricsA_4;
+  wire [5:0]  _laBmu_0_io_symMetricsB_0;
+  wire [5:0]  _laBmu_0_io_symMetricsB_1;
+  wire [5:0]  _laBmu_0_io_symMetricsB_2;
+  wire [5:0]  _laBmu_0_io_symMetricsB_3;
+  wire [5:0]  _laBmu_0_io_symMetricsB_4;
   wire [2:0]  _laBmu_0_io_symsA_0;
   wire [2:0]  _laBmu_0_io_symsA_1;
   wire [2:0]  _laBmu_0_io_symsA_2;
@@ -1572,16 +1571,16 @@ module LaPDFD(
   reg  [2:0]  REG_1_2;
   reg  [2:0]  REG_1_3;
   reg  [2:0]  REG_1_4;
-  reg  [7:0]  REG_2_0;
-  reg  [7:0]  REG_2_1;
-  reg  [7:0]  REG_2_2;
-  reg  [7:0]  REG_2_3;
-  reg  [7:0]  REG_2_4;
-  reg  [7:0]  REG_3_0;
-  reg  [7:0]  REG_3_1;
-  reg  [7:0]  REG_3_2;
-  reg  [7:0]  REG_3_3;
-  reg  [7:0]  REG_3_4;
+  reg  [5:0]  REG_2_0;
+  reg  [5:0]  REG_2_1;
+  reg  [5:0]  REG_2_2;
+  reg  [5:0]  REG_2_3;
+  reg  [5:0]  REG_2_4;
+  reg  [5:0]  REG_3_0;
+  reg  [5:0]  REG_3_1;
+  reg  [5:0]  REG_3_2;
+  reg  [5:0]  REG_3_3;
+  reg  [5:0]  REG_3_4;
   reg  [2:0]  REG_4_0;
   reg  [2:0]  REG_4_1;
   reg  [2:0]  REG_4_2;
@@ -1592,16 +1591,16 @@ module LaPDFD(
   reg  [2:0]  REG_5_2;
   reg  [2:0]  REG_5_3;
   reg  [2:0]  REG_5_4;
-  reg  [7:0]  REG_6_0;
-  reg  [7:0]  REG_6_1;
-  reg  [7:0]  REG_6_2;
-  reg  [7:0]  REG_6_3;
-  reg  [7:0]  REG_6_4;
-  reg  [7:0]  REG_7_0;
-  reg  [7:0]  REG_7_1;
-  reg  [7:0]  REG_7_2;
-  reg  [7:0]  REG_7_3;
-  reg  [7:0]  REG_7_4;
+  reg  [5:0]  REG_6_0;
+  reg  [5:0]  REG_6_1;
+  reg  [5:0]  REG_6_2;
+  reg  [5:0]  REG_6_3;
+  reg  [5:0]  REG_6_4;
+  reg  [5:0]  REG_7_0;
+  reg  [5:0]  REG_7_1;
+  reg  [5:0]  REG_7_2;
+  reg  [5:0]  REG_7_3;
+  reg  [5:0]  REG_7_4;
   reg  [2:0]  REG_8_0;
   reg  [2:0]  REG_8_1;
   reg  [2:0]  REG_8_2;
@@ -1612,16 +1611,16 @@ module LaPDFD(
   reg  [2:0]  REG_9_2;
   reg  [2:0]  REG_9_3;
   reg  [2:0]  REG_9_4;
-  reg  [7:0]  REG_10_0;
-  reg  [7:0]  REG_10_1;
-  reg  [7:0]  REG_10_2;
-  reg  [7:0]  REG_10_3;
-  reg  [7:0]  REG_10_4;
-  reg  [7:0]  REG_11_0;
-  reg  [7:0]  REG_11_1;
-  reg  [7:0]  REG_11_2;
-  reg  [7:0]  REG_11_3;
-  reg  [7:0]  REG_11_4;
+  reg  [5:0]  REG_10_0;
+  reg  [5:0]  REG_10_1;
+  reg  [5:0]  REG_10_2;
+  reg  [5:0]  REG_10_3;
+  reg  [5:0]  REG_10_4;
+  reg  [5:0]  REG_11_0;
+  reg  [5:0]  REG_11_1;
+  reg  [5:0]  REG_11_2;
+  reg  [5:0]  REG_11_3;
+  reg  [5:0]  REG_11_4;
   reg  [2:0]  REG_12_0;
   reg  [2:0]  REG_12_1;
   reg  [2:0]  REG_12_2;
@@ -1632,16 +1631,16 @@ module LaPDFD(
   reg  [2:0]  REG_13_2;
   reg  [2:0]  REG_13_3;
   reg  [2:0]  REG_13_4;
-  reg  [7:0]  REG_14_0;
-  reg  [7:0]  REG_14_1;
-  reg  [7:0]  REG_14_2;
-  reg  [7:0]  REG_14_3;
-  reg  [7:0]  REG_14_4;
-  reg  [7:0]  REG_15_0;
-  reg  [7:0]  REG_15_1;
-  reg  [7:0]  REG_15_2;
-  reg  [7:0]  REG_15_3;
-  reg  [7:0]  REG_15_4;
+  reg  [5:0]  REG_14_0;
+  reg  [5:0]  REG_14_1;
+  reg  [5:0]  REG_14_2;
+  reg  [5:0]  REG_14_3;
+  reg  [5:0]  REG_14_4;
+  reg  [5:0]  REG_15_0;
+  reg  [5:0]  REG_15_1;
+  reg  [5:0]  REG_15_2;
+  reg  [5:0]  REG_15_3;
+  reg  [5:0]  REG_15_4;
   reg  [2:0]  REG_16_0;
   reg  [2:0]  REG_16_1;
   reg  [2:0]  REG_16_2;
@@ -1652,16 +1651,16 @@ module LaPDFD(
   reg  [2:0]  REG_17_2;
   reg  [2:0]  REG_17_3;
   reg  [2:0]  REG_17_4;
-  reg  [7:0]  REG_18_0;
-  reg  [7:0]  REG_18_1;
-  reg  [7:0]  REG_18_2;
-  reg  [7:0]  REG_18_3;
-  reg  [7:0]  REG_18_4;
-  reg  [7:0]  REG_19_0;
-  reg  [7:0]  REG_19_1;
-  reg  [7:0]  REG_19_2;
-  reg  [7:0]  REG_19_3;
-  reg  [7:0]  REG_19_4;
+  reg  [5:0]  REG_18_0;
+  reg  [5:0]  REG_18_1;
+  reg  [5:0]  REG_18_2;
+  reg  [5:0]  REG_18_3;
+  reg  [5:0]  REG_18_4;
+  reg  [5:0]  REG_19_0;
+  reg  [5:0]  REG_19_1;
+  reg  [5:0]  REG_19_2;
+  reg  [5:0]  REG_19_3;
+  reg  [5:0]  REG_19_4;
   reg  [2:0]  REG_20_0;
   reg  [2:0]  REG_20_1;
   reg  [2:0]  REG_20_2;
@@ -1672,16 +1671,16 @@ module LaPDFD(
   reg  [2:0]  REG_21_2;
   reg  [2:0]  REG_21_3;
   reg  [2:0]  REG_21_4;
-  reg  [7:0]  REG_22_0;
-  reg  [7:0]  REG_22_1;
-  reg  [7:0]  REG_22_2;
-  reg  [7:0]  REG_22_3;
-  reg  [7:0]  REG_22_4;
-  reg  [7:0]  REG_23_0;
-  reg  [7:0]  REG_23_1;
-  reg  [7:0]  REG_23_2;
-  reg  [7:0]  REG_23_3;
-  reg  [7:0]  REG_23_4;
+  reg  [5:0]  REG_22_0;
+  reg  [5:0]  REG_22_1;
+  reg  [5:0]  REG_22_2;
+  reg  [5:0]  REG_22_3;
+  reg  [5:0]  REG_22_4;
+  reg  [5:0]  REG_23_0;
+  reg  [5:0]  REG_23_1;
+  reg  [5:0]  REG_23_2;
+  reg  [5:0]  REG_23_3;
+  reg  [5:0]  REG_23_4;
   reg  [2:0]  REG_24_0;
   reg  [2:0]  REG_24_1;
   reg  [2:0]  REG_24_2;
@@ -1692,16 +1691,16 @@ module LaPDFD(
   reg  [2:0]  REG_25_2;
   reg  [2:0]  REG_25_3;
   reg  [2:0]  REG_25_4;
-  reg  [7:0]  REG_26_0;
-  reg  [7:0]  REG_26_1;
-  reg  [7:0]  REG_26_2;
-  reg  [7:0]  REG_26_3;
-  reg  [7:0]  REG_26_4;
-  reg  [7:0]  REG_27_0;
-  reg  [7:0]  REG_27_1;
-  reg  [7:0]  REG_27_2;
-  reg  [7:0]  REG_27_3;
-  reg  [7:0]  REG_27_4;
+  reg  [5:0]  REG_26_0;
+  reg  [5:0]  REG_26_1;
+  reg  [5:0]  REG_26_2;
+  reg  [5:0]  REG_26_3;
+  reg  [5:0]  REG_26_4;
+  reg  [5:0]  REG_27_0;
+  reg  [5:0]  REG_27_1;
+  reg  [5:0]  REG_27_2;
+  reg  [5:0]  REG_27_3;
+  reg  [5:0]  REG_27_4;
   reg  [2:0]  REG_28_0;
   reg  [2:0]  REG_28_1;
   reg  [2:0]  REG_28_2;
@@ -1712,16 +1711,16 @@ module LaPDFD(
   reg  [2:0]  REG_29_2;
   reg  [2:0]  REG_29_3;
   reg  [2:0]  REG_29_4;
-  reg  [7:0]  REG_30_0;
-  reg  [7:0]  REG_30_1;
-  reg  [7:0]  REG_30_2;
-  reg  [7:0]  REG_30_3;
-  reg  [7:0]  REG_30_4;
-  reg  [7:0]  REG_31_0;
-  reg  [7:0]  REG_31_1;
-  reg  [7:0]  REG_31_2;
-  reg  [7:0]  REG_31_3;
-  reg  [7:0]  REG_31_4;
+  reg  [5:0]  REG_30_0;
+  reg  [5:0]  REG_30_1;
+  reg  [5:0]  REG_30_2;
+  reg  [5:0]  REG_30_3;
+  reg  [5:0]  REG_30_4;
+  reg  [5:0]  REG_31_0;
+  reg  [5:0]  REG_31_1;
+  reg  [5:0]  REG_31_2;
+  reg  [5:0]  REG_31_3;
+  reg  [5:0]  REG_31_4;
   reg  [2:0]  REG_32_0;
   reg  [2:0]  REG_32_1;
   reg  [2:0]  REG_32_2;
@@ -1732,16 +1731,16 @@ module LaPDFD(
   reg  [2:0]  REG_33_2;
   reg  [2:0]  REG_33_3;
   reg  [2:0]  REG_33_4;
-  reg  [7:0]  REG_34_0;
-  reg  [7:0]  REG_34_1;
-  reg  [7:0]  REG_34_2;
-  reg  [7:0]  REG_34_3;
-  reg  [7:0]  REG_34_4;
-  reg  [7:0]  REG_35_0;
-  reg  [7:0]  REG_35_1;
-  reg  [7:0]  REG_35_2;
-  reg  [7:0]  REG_35_3;
-  reg  [7:0]  REG_35_4;
+  reg  [5:0]  REG_34_0;
+  reg  [5:0]  REG_34_1;
+  reg  [5:0]  REG_34_2;
+  reg  [5:0]  REG_34_3;
+  reg  [5:0]  REG_34_4;
+  reg  [5:0]  REG_35_0;
+  reg  [5:0]  REG_35_1;
+  reg  [5:0]  REG_35_2;
+  reg  [5:0]  REG_35_3;
+  reg  [5:0]  REG_35_4;
   reg  [2:0]  REG_36_0;
   reg  [2:0]  REG_36_1;
   reg  [2:0]  REG_36_2;
@@ -1752,16 +1751,16 @@ module LaPDFD(
   reg  [2:0]  REG_37_2;
   reg  [2:0]  REG_37_3;
   reg  [2:0]  REG_37_4;
-  reg  [7:0]  REG_38_0;
-  reg  [7:0]  REG_38_1;
-  reg  [7:0]  REG_38_2;
-  reg  [7:0]  REG_38_3;
-  reg  [7:0]  REG_38_4;
-  reg  [7:0]  REG_39_0;
-  reg  [7:0]  REG_39_1;
-  reg  [7:0]  REG_39_2;
-  reg  [7:0]  REG_39_3;
-  reg  [7:0]  REG_39_4;
+  reg  [5:0]  REG_38_0;
+  reg  [5:0]  REG_38_1;
+  reg  [5:0]  REG_38_2;
+  reg  [5:0]  REG_38_3;
+  reg  [5:0]  REG_38_4;
+  reg  [5:0]  REG_39_0;
+  reg  [5:0]  REG_39_1;
+  reg  [5:0]  REG_39_2;
+  reg  [5:0]  REG_39_3;
+  reg  [5:0]  REG_39_4;
   reg  [2:0]  REG_40_0;
   reg  [2:0]  REG_40_1;
   reg  [2:0]  REG_40_2;
@@ -1772,16 +1771,16 @@ module LaPDFD(
   reg  [2:0]  REG_41_2;
   reg  [2:0]  REG_41_3;
   reg  [2:0]  REG_41_4;
-  reg  [7:0]  REG_42_0;
-  reg  [7:0]  REG_42_1;
-  reg  [7:0]  REG_42_2;
-  reg  [7:0]  REG_42_3;
-  reg  [7:0]  REG_42_4;
-  reg  [7:0]  REG_43_0;
-  reg  [7:0]  REG_43_1;
-  reg  [7:0]  REG_43_2;
-  reg  [7:0]  REG_43_3;
-  reg  [7:0]  REG_43_4;
+  reg  [5:0]  REG_42_0;
+  reg  [5:0]  REG_42_1;
+  reg  [5:0]  REG_42_2;
+  reg  [5:0]  REG_42_3;
+  reg  [5:0]  REG_42_4;
+  reg  [5:0]  REG_43_0;
+  reg  [5:0]  REG_43_1;
+  reg  [5:0]  REG_43_2;
+  reg  [5:0]  REG_43_3;
+  reg  [5:0]  REG_43_4;
   reg  [2:0]  REG_44_0;
   reg  [2:0]  REG_44_1;
   reg  [2:0]  REG_44_2;
@@ -1792,16 +1791,16 @@ module LaPDFD(
   reg  [2:0]  REG_45_2;
   reg  [2:0]  REG_45_3;
   reg  [2:0]  REG_45_4;
-  reg  [7:0]  REG_46_0;
-  reg  [7:0]  REG_46_1;
-  reg  [7:0]  REG_46_2;
-  reg  [7:0]  REG_46_3;
-  reg  [7:0]  REG_46_4;
-  reg  [7:0]  REG_47_0;
-  reg  [7:0]  REG_47_1;
-  reg  [7:0]  REG_47_2;
-  reg  [7:0]  REG_47_3;
-  reg  [7:0]  REG_47_4;
+  reg  [5:0]  REG_46_0;
+  reg  [5:0]  REG_46_1;
+  reg  [5:0]  REG_46_2;
+  reg  [5:0]  REG_46_3;
+  reg  [5:0]  REG_46_4;
+  reg  [5:0]  REG_47_0;
+  reg  [5:0]  REG_47_1;
+  reg  [5:0]  REG_47_2;
+  reg  [5:0]  REG_47_3;
+  reg  [5:0]  REG_47_4;
   reg  [2:0]  REG_48_0;
   reg  [2:0]  REG_48_1;
   reg  [2:0]  REG_48_2;
@@ -1812,16 +1811,16 @@ module LaPDFD(
   reg  [2:0]  REG_49_2;
   reg  [2:0]  REG_49_3;
   reg  [2:0]  REG_49_4;
-  reg  [7:0]  REG_50_0;
-  reg  [7:0]  REG_50_1;
-  reg  [7:0]  REG_50_2;
-  reg  [7:0]  REG_50_3;
-  reg  [7:0]  REG_50_4;
-  reg  [7:0]  REG_51_0;
-  reg  [7:0]  REG_51_1;
-  reg  [7:0]  REG_51_2;
-  reg  [7:0]  REG_51_3;
-  reg  [7:0]  REG_51_4;
+  reg  [5:0]  REG_50_0;
+  reg  [5:0]  REG_50_1;
+  reg  [5:0]  REG_50_2;
+  reg  [5:0]  REG_50_3;
+  reg  [5:0]  REG_50_4;
+  reg  [5:0]  REG_51_0;
+  reg  [5:0]  REG_51_1;
+  reg  [5:0]  REG_51_2;
+  reg  [5:0]  REG_51_3;
+  reg  [5:0]  REG_51_4;
   reg  [2:0]  REG_52_0;
   reg  [2:0]  REG_52_1;
   reg  [2:0]  REG_52_2;
@@ -1832,16 +1831,16 @@ module LaPDFD(
   reg  [2:0]  REG_53_2;
   reg  [2:0]  REG_53_3;
   reg  [2:0]  REG_53_4;
-  reg  [7:0]  REG_54_0;
-  reg  [7:0]  REG_54_1;
-  reg  [7:0]  REG_54_2;
-  reg  [7:0]  REG_54_3;
-  reg  [7:0]  REG_54_4;
-  reg  [7:0]  REG_55_0;
-  reg  [7:0]  REG_55_1;
-  reg  [7:0]  REG_55_2;
-  reg  [7:0]  REG_55_3;
-  reg  [7:0]  REG_55_4;
+  reg  [5:0]  REG_54_0;
+  reg  [5:0]  REG_54_1;
+  reg  [5:0]  REG_54_2;
+  reg  [5:0]  REG_54_3;
+  reg  [5:0]  REG_54_4;
+  reg  [5:0]  REG_55_0;
+  reg  [5:0]  REG_55_1;
+  reg  [5:0]  REG_55_2;
+  reg  [5:0]  REG_55_3;
+  reg  [5:0]  REG_55_4;
   reg  [2:0]  REG_56_0;
   reg  [2:0]  REG_56_1;
   reg  [2:0]  REG_56_2;
@@ -1852,16 +1851,16 @@ module LaPDFD(
   reg  [2:0]  REG_57_2;
   reg  [2:0]  REG_57_3;
   reg  [2:0]  REG_57_4;
-  reg  [7:0]  REG_58_0;
-  reg  [7:0]  REG_58_1;
-  reg  [7:0]  REG_58_2;
-  reg  [7:0]  REG_58_3;
-  reg  [7:0]  REG_58_4;
-  reg  [7:0]  REG_59_0;
-  reg  [7:0]  REG_59_1;
-  reg  [7:0]  REG_59_2;
-  reg  [7:0]  REG_59_3;
-  reg  [7:0]  REG_59_4;
+  reg  [5:0]  REG_58_0;
+  reg  [5:0]  REG_58_1;
+  reg  [5:0]  REG_58_2;
+  reg  [5:0]  REG_58_3;
+  reg  [5:0]  REG_58_4;
+  reg  [5:0]  REG_59_0;
+  reg  [5:0]  REG_59_1;
+  reg  [5:0]  REG_59_2;
+  reg  [5:0]  REG_59_3;
+  reg  [5:0]  REG_59_4;
   reg  [2:0]  REG_60_0;
   reg  [2:0]  REG_60_1;
   reg  [2:0]  REG_60_2;
@@ -1872,16 +1871,16 @@ module LaPDFD(
   reg  [2:0]  REG_61_2;
   reg  [2:0]  REG_61_3;
   reg  [2:0]  REG_61_4;
-  reg  [7:0]  REG_62_0;
-  reg  [7:0]  REG_62_1;
-  reg  [7:0]  REG_62_2;
-  reg  [7:0]  REG_62_3;
-  reg  [7:0]  REG_62_4;
-  reg  [7:0]  REG_63_0;
-  reg  [7:0]  REG_63_1;
-  reg  [7:0]  REG_63_2;
-  reg  [7:0]  REG_63_3;
-  reg  [7:0]  REG_63_4;
+  reg  [5:0]  REG_62_0;
+  reg  [5:0]  REG_62_1;
+  reg  [5:0]  REG_62_2;
+  reg  [5:0]  REG_62_3;
+  reg  [5:0]  REG_62_4;
+  reg  [5:0]  REG_63_0;
+  reg  [5:0]  REG_63_1;
+  reg  [5:0]  REG_63_2;
+  reg  [5:0]  REG_63_3;
+  reg  [5:0]  REG_63_4;
   reg  [2:0]  REG_64_0;
   reg  [2:0]  REG_64_1;
   reg  [2:0]  REG_64_2;
@@ -1892,16 +1891,16 @@ module LaPDFD(
   reg  [2:0]  REG_65_2;
   reg  [2:0]  REG_65_3;
   reg  [2:0]  REG_65_4;
-  reg  [7:0]  REG_66_0;
-  reg  [7:0]  REG_66_1;
-  reg  [7:0]  REG_66_2;
-  reg  [7:0]  REG_66_3;
-  reg  [7:0]  REG_66_4;
-  reg  [7:0]  REG_67_0;
-  reg  [7:0]  REG_67_1;
-  reg  [7:0]  REG_67_2;
-  reg  [7:0]  REG_67_3;
-  reg  [7:0]  REG_67_4;
+  reg  [5:0]  REG_66_0;
+  reg  [5:0]  REG_66_1;
+  reg  [5:0]  REG_66_2;
+  reg  [5:0]  REG_66_3;
+  reg  [5:0]  REG_66_4;
+  reg  [5:0]  REG_67_0;
+  reg  [5:0]  REG_67_1;
+  reg  [5:0]  REG_67_2;
+  reg  [5:0]  REG_67_3;
+  reg  [5:0]  REG_67_4;
   reg  [2:0]  REG_68_0;
   reg  [2:0]  REG_68_1;
   reg  [2:0]  REG_68_2;
@@ -1912,16 +1911,16 @@ module LaPDFD(
   reg  [2:0]  REG_69_2;
   reg  [2:0]  REG_69_3;
   reg  [2:0]  REG_69_4;
-  reg  [7:0]  REG_70_0;
-  reg  [7:0]  REG_70_1;
-  reg  [7:0]  REG_70_2;
-  reg  [7:0]  REG_70_3;
-  reg  [7:0]  REG_70_4;
-  reg  [7:0]  REG_71_0;
-  reg  [7:0]  REG_71_1;
-  reg  [7:0]  REG_71_2;
-  reg  [7:0]  REG_71_3;
-  reg  [7:0]  REG_71_4;
+  reg  [5:0]  REG_70_0;
+  reg  [5:0]  REG_70_1;
+  reg  [5:0]  REG_70_2;
+  reg  [5:0]  REG_70_3;
+  reg  [5:0]  REG_70_4;
+  reg  [5:0]  REG_71_0;
+  reg  [5:0]  REG_71_1;
+  reg  [5:0]  REG_71_2;
+  reg  [5:0]  REG_71_3;
+  reg  [5:0]  REG_71_4;
   reg  [2:0]  REG_72_0;
   reg  [2:0]  REG_72_1;
   reg  [2:0]  REG_72_2;
@@ -1932,16 +1931,16 @@ module LaPDFD(
   reg  [2:0]  REG_73_2;
   reg  [2:0]  REG_73_3;
   reg  [2:0]  REG_73_4;
-  reg  [7:0]  REG_74_0;
-  reg  [7:0]  REG_74_1;
-  reg  [7:0]  REG_74_2;
-  reg  [7:0]  REG_74_3;
-  reg  [7:0]  REG_74_4;
-  reg  [7:0]  REG_75_0;
-  reg  [7:0]  REG_75_1;
-  reg  [7:0]  REG_75_2;
-  reg  [7:0]  REG_75_3;
-  reg  [7:0]  REG_75_4;
+  reg  [5:0]  REG_74_0;
+  reg  [5:0]  REG_74_1;
+  reg  [5:0]  REG_74_2;
+  reg  [5:0]  REG_74_3;
+  reg  [5:0]  REG_74_4;
+  reg  [5:0]  REG_75_0;
+  reg  [5:0]  REG_75_1;
+  reg  [5:0]  REG_75_2;
+  reg  [5:0]  REG_75_3;
+  reg  [5:0]  REG_75_4;
   reg  [2:0]  REG_76_0;
   reg  [2:0]  REG_76_1;
   reg  [2:0]  REG_76_2;
@@ -1952,16 +1951,16 @@ module LaPDFD(
   reg  [2:0]  REG_77_2;
   reg  [2:0]  REG_77_3;
   reg  [2:0]  REG_77_4;
-  reg  [7:0]  REG_78_0;
-  reg  [7:0]  REG_78_1;
-  reg  [7:0]  REG_78_2;
-  reg  [7:0]  REG_78_3;
-  reg  [7:0]  REG_78_4;
-  reg  [7:0]  REG_79_0;
-  reg  [7:0]  REG_79_1;
-  reg  [7:0]  REG_79_2;
-  reg  [7:0]  REG_79_3;
-  reg  [7:0]  REG_79_4;
+  reg  [5:0]  REG_78_0;
+  reg  [5:0]  REG_78_1;
+  reg  [5:0]  REG_78_2;
+  reg  [5:0]  REG_78_3;
+  reg  [5:0]  REG_78_4;
+  reg  [5:0]  REG_79_0;
+  reg  [5:0]  REG_79_1;
+  reg  [5:0]  REG_79_2;
+  reg  [5:0]  REG_79_3;
+  reg  [5:0]  REG_79_4;
   reg  [2:0]  REG_80_0;
   reg  [2:0]  REG_80_1;
   reg  [2:0]  REG_80_2;
@@ -1972,16 +1971,16 @@ module LaPDFD(
   reg  [2:0]  REG_81_2;
   reg  [2:0]  REG_81_3;
   reg  [2:0]  REG_81_4;
-  reg  [7:0]  REG_82_0;
-  reg  [7:0]  REG_82_1;
-  reg  [7:0]  REG_82_2;
-  reg  [7:0]  REG_82_3;
-  reg  [7:0]  REG_82_4;
-  reg  [7:0]  REG_83_0;
-  reg  [7:0]  REG_83_1;
-  reg  [7:0]  REG_83_2;
-  reg  [7:0]  REG_83_3;
-  reg  [7:0]  REG_83_4;
+  reg  [5:0]  REG_82_0;
+  reg  [5:0]  REG_82_1;
+  reg  [5:0]  REG_82_2;
+  reg  [5:0]  REG_82_3;
+  reg  [5:0]  REG_82_4;
+  reg  [5:0]  REG_83_0;
+  reg  [5:0]  REG_83_1;
+  reg  [5:0]  REG_83_2;
+  reg  [5:0]  REG_83_3;
+  reg  [5:0]  REG_83_4;
   reg  [2:0]  REG_84_0;
   reg  [2:0]  REG_84_1;
   reg  [2:0]  REG_84_2;
@@ -1992,16 +1991,16 @@ module LaPDFD(
   reg  [2:0]  REG_85_2;
   reg  [2:0]  REG_85_3;
   reg  [2:0]  REG_85_4;
-  reg  [7:0]  REG_86_0;
-  reg  [7:0]  REG_86_1;
-  reg  [7:0]  REG_86_2;
-  reg  [7:0]  REG_86_3;
-  reg  [7:0]  REG_86_4;
-  reg  [7:0]  REG_87_0;
-  reg  [7:0]  REG_87_1;
-  reg  [7:0]  REG_87_2;
-  reg  [7:0]  REG_87_3;
-  reg  [7:0]  REG_87_4;
+  reg  [5:0]  REG_86_0;
+  reg  [5:0]  REG_86_1;
+  reg  [5:0]  REG_86_2;
+  reg  [5:0]  REG_86_3;
+  reg  [5:0]  REG_86_4;
+  reg  [5:0]  REG_87_0;
+  reg  [5:0]  REG_87_1;
+  reg  [5:0]  REG_87_2;
+  reg  [5:0]  REG_87_3;
+  reg  [5:0]  REG_87_4;
   reg  [2:0]  REG_88_0;
   reg  [2:0]  REG_88_1;
   reg  [2:0]  REG_88_2;
@@ -2012,16 +2011,16 @@ module LaPDFD(
   reg  [2:0]  REG_89_2;
   reg  [2:0]  REG_89_3;
   reg  [2:0]  REG_89_4;
-  reg  [7:0]  REG_90_0;
-  reg  [7:0]  REG_90_1;
-  reg  [7:0]  REG_90_2;
-  reg  [7:0]  REG_90_3;
-  reg  [7:0]  REG_90_4;
-  reg  [7:0]  REG_91_0;
-  reg  [7:0]  REG_91_1;
-  reg  [7:0]  REG_91_2;
-  reg  [7:0]  REG_91_3;
-  reg  [7:0]  REG_91_4;
+  reg  [5:0]  REG_90_0;
+  reg  [5:0]  REG_90_1;
+  reg  [5:0]  REG_90_2;
+  reg  [5:0]  REG_90_3;
+  reg  [5:0]  REG_90_4;
+  reg  [5:0]  REG_91_0;
+  reg  [5:0]  REG_91_1;
+  reg  [5:0]  REG_91_2;
+  reg  [5:0]  REG_91_3;
+  reg  [5:0]  REG_91_4;
   reg  [2:0]  REG_92_0;
   reg  [2:0]  REG_92_1;
   reg  [2:0]  REG_92_2;
@@ -2032,16 +2031,16 @@ module LaPDFD(
   reg  [2:0]  REG_93_2;
   reg  [2:0]  REG_93_3;
   reg  [2:0]  REG_93_4;
-  reg  [7:0]  REG_94_0;
-  reg  [7:0]  REG_94_1;
-  reg  [7:0]  REG_94_2;
-  reg  [7:0]  REG_94_3;
-  reg  [7:0]  REG_94_4;
-  reg  [7:0]  REG_95_0;
-  reg  [7:0]  REG_95_1;
-  reg  [7:0]  REG_95_2;
-  reg  [7:0]  REG_95_3;
-  reg  [7:0]  REG_95_4;
+  reg  [5:0]  REG_94_0;
+  reg  [5:0]  REG_94_1;
+  reg  [5:0]  REG_94_2;
+  reg  [5:0]  REG_94_3;
+  reg  [5:0]  REG_94_4;
+  reg  [5:0]  REG_95_0;
+  reg  [5:0]  REG_95_1;
+  reg  [5:0]  REG_95_2;
+  reg  [5:0]  REG_95_3;
+  reg  [5:0]  REG_95_4;
   reg  [2:0]  REG_96_0;
   reg  [2:0]  REG_96_1;
   reg  [2:0]  REG_96_2;
@@ -2052,16 +2051,16 @@ module LaPDFD(
   reg  [2:0]  REG_97_2;
   reg  [2:0]  REG_97_3;
   reg  [2:0]  REG_97_4;
-  reg  [7:0]  REG_98_0;
-  reg  [7:0]  REG_98_1;
-  reg  [7:0]  REG_98_2;
-  reg  [7:0]  REG_98_3;
-  reg  [7:0]  REG_98_4;
-  reg  [7:0]  REG_99_0;
-  reg  [7:0]  REG_99_1;
-  reg  [7:0]  REG_99_2;
-  reg  [7:0]  REG_99_3;
-  reg  [7:0]  REG_99_4;
+  reg  [5:0]  REG_98_0;
+  reg  [5:0]  REG_98_1;
+  reg  [5:0]  REG_98_2;
+  reg  [5:0]  REG_98_3;
+  reg  [5:0]  REG_98_4;
+  reg  [5:0]  REG_99_0;
+  reg  [5:0]  REG_99_1;
+  reg  [5:0]  REG_99_2;
+  reg  [5:0]  REG_99_3;
+  reg  [5:0]  REG_99_4;
   reg  [2:0]  REG_100_0;
   reg  [2:0]  REG_100_1;
   reg  [2:0]  REG_100_2;
@@ -2072,16 +2071,16 @@ module LaPDFD(
   reg  [2:0]  REG_101_2;
   reg  [2:0]  REG_101_3;
   reg  [2:0]  REG_101_4;
-  reg  [7:0]  REG_102_0;
-  reg  [7:0]  REG_102_1;
-  reg  [7:0]  REG_102_2;
-  reg  [7:0]  REG_102_3;
-  reg  [7:0]  REG_102_4;
-  reg  [7:0]  REG_103_0;
-  reg  [7:0]  REG_103_1;
-  reg  [7:0]  REG_103_2;
-  reg  [7:0]  REG_103_3;
-  reg  [7:0]  REG_103_4;
+  reg  [5:0]  REG_102_0;
+  reg  [5:0]  REG_102_1;
+  reg  [5:0]  REG_102_2;
+  reg  [5:0]  REG_102_3;
+  reg  [5:0]  REG_102_4;
+  reg  [5:0]  REG_103_0;
+  reg  [5:0]  REG_103_1;
+  reg  [5:0]  REG_103_2;
+  reg  [5:0]  REG_103_3;
+  reg  [5:0]  REG_103_4;
   reg  [2:0]  REG_104_0;
   reg  [2:0]  REG_104_1;
   reg  [2:0]  REG_104_2;
@@ -2092,16 +2091,16 @@ module LaPDFD(
   reg  [2:0]  REG_105_2;
   reg  [2:0]  REG_105_3;
   reg  [2:0]  REG_105_4;
-  reg  [7:0]  REG_106_0;
-  reg  [7:0]  REG_106_1;
-  reg  [7:0]  REG_106_2;
-  reg  [7:0]  REG_106_3;
-  reg  [7:0]  REG_106_4;
-  reg  [7:0]  REG_107_0;
-  reg  [7:0]  REG_107_1;
-  reg  [7:0]  REG_107_2;
-  reg  [7:0]  REG_107_3;
-  reg  [7:0]  REG_107_4;
+  reg  [5:0]  REG_106_0;
+  reg  [5:0]  REG_106_1;
+  reg  [5:0]  REG_106_2;
+  reg  [5:0]  REG_106_3;
+  reg  [5:0]  REG_106_4;
+  reg  [5:0]  REG_107_0;
+  reg  [5:0]  REG_107_1;
+  reg  [5:0]  REG_107_2;
+  reg  [5:0]  REG_107_3;
+  reg  [5:0]  REG_107_4;
   reg  [2:0]  REG_108_0;
   reg  [2:0]  REG_108_1;
   reg  [2:0]  REG_108_2;
@@ -2112,16 +2111,16 @@ module LaPDFD(
   reg  [2:0]  REG_109_2;
   reg  [2:0]  REG_109_3;
   reg  [2:0]  REG_109_4;
-  reg  [7:0]  REG_110_0;
-  reg  [7:0]  REG_110_1;
-  reg  [7:0]  REG_110_2;
-  reg  [7:0]  REG_110_3;
-  reg  [7:0]  REG_110_4;
-  reg  [7:0]  REG_111_0;
-  reg  [7:0]  REG_111_1;
-  reg  [7:0]  REG_111_2;
-  reg  [7:0]  REG_111_3;
-  reg  [7:0]  REG_111_4;
+  reg  [5:0]  REG_110_0;
+  reg  [5:0]  REG_110_1;
+  reg  [5:0]  REG_110_2;
+  reg  [5:0]  REG_110_3;
+  reg  [5:0]  REG_110_4;
+  reg  [5:0]  REG_111_0;
+  reg  [5:0]  REG_111_1;
+  reg  [5:0]  REG_111_2;
+  reg  [5:0]  REG_111_3;
+  reg  [5:0]  REG_111_4;
   reg  [2:0]  REG_112_0;
   reg  [2:0]  REG_112_1;
   reg  [2:0]  REG_112_2;
@@ -2132,16 +2131,16 @@ module LaPDFD(
   reg  [2:0]  REG_113_2;
   reg  [2:0]  REG_113_3;
   reg  [2:0]  REG_113_4;
-  reg  [7:0]  REG_114_0;
-  reg  [7:0]  REG_114_1;
-  reg  [7:0]  REG_114_2;
-  reg  [7:0]  REG_114_3;
-  reg  [7:0]  REG_114_4;
-  reg  [7:0]  REG_115_0;
-  reg  [7:0]  REG_115_1;
-  reg  [7:0]  REG_115_2;
-  reg  [7:0]  REG_115_3;
-  reg  [7:0]  REG_115_4;
+  reg  [5:0]  REG_114_0;
+  reg  [5:0]  REG_114_1;
+  reg  [5:0]  REG_114_2;
+  reg  [5:0]  REG_114_3;
+  reg  [5:0]  REG_114_4;
+  reg  [5:0]  REG_115_0;
+  reg  [5:0]  REG_115_1;
+  reg  [5:0]  REG_115_2;
+  reg  [5:0]  REG_115_3;
+  reg  [5:0]  REG_115_4;
   reg  [2:0]  REG_116_0;
   reg  [2:0]  REG_116_1;
   reg  [2:0]  REG_116_2;
@@ -2152,16 +2151,16 @@ module LaPDFD(
   reg  [2:0]  REG_117_2;
   reg  [2:0]  REG_117_3;
   reg  [2:0]  REG_117_4;
-  reg  [7:0]  REG_118_0;
-  reg  [7:0]  REG_118_1;
-  reg  [7:0]  REG_118_2;
-  reg  [7:0]  REG_118_3;
-  reg  [7:0]  REG_118_4;
-  reg  [7:0]  REG_119_0;
-  reg  [7:0]  REG_119_1;
-  reg  [7:0]  REG_119_2;
-  reg  [7:0]  REG_119_3;
-  reg  [7:0]  REG_119_4;
+  reg  [5:0]  REG_118_0;
+  reg  [5:0]  REG_118_1;
+  reg  [5:0]  REG_118_2;
+  reg  [5:0]  REG_118_3;
+  reg  [5:0]  REG_118_4;
+  reg  [5:0]  REG_119_0;
+  reg  [5:0]  REG_119_1;
+  reg  [5:0]  REG_119_2;
+  reg  [5:0]  REG_119_3;
+  reg  [5:0]  REG_119_4;
   reg  [2:0]  REG_120_0;
   reg  [2:0]  REG_120_1;
   reg  [2:0]  REG_120_2;
@@ -2172,16 +2171,16 @@ module LaPDFD(
   reg  [2:0]  REG_121_2;
   reg  [2:0]  REG_121_3;
   reg  [2:0]  REG_121_4;
-  reg  [7:0]  REG_122_0;
-  reg  [7:0]  REG_122_1;
-  reg  [7:0]  REG_122_2;
-  reg  [7:0]  REG_122_3;
-  reg  [7:0]  REG_122_4;
-  reg  [7:0]  REG_123_0;
-  reg  [7:0]  REG_123_1;
-  reg  [7:0]  REG_123_2;
-  reg  [7:0]  REG_123_3;
-  reg  [7:0]  REG_123_4;
+  reg  [5:0]  REG_122_0;
+  reg  [5:0]  REG_122_1;
+  reg  [5:0]  REG_122_2;
+  reg  [5:0]  REG_122_3;
+  reg  [5:0]  REG_122_4;
+  reg  [5:0]  REG_123_0;
+  reg  [5:0]  REG_123_1;
+  reg  [5:0]  REG_123_2;
+  reg  [5:0]  REG_123_3;
+  reg  [5:0]  REG_123_4;
   reg  [2:0]  REG_124_0;
   reg  [2:0]  REG_124_1;
   reg  [2:0]  REG_124_2;
@@ -2192,16 +2191,16 @@ module LaPDFD(
   reg  [2:0]  REG_125_2;
   reg  [2:0]  REG_125_3;
   reg  [2:0]  REG_125_4;
-  reg  [7:0]  REG_126_0;
-  reg  [7:0]  REG_126_1;
-  reg  [7:0]  REG_126_2;
-  reg  [7:0]  REG_126_3;
-  reg  [7:0]  REG_126_4;
-  reg  [7:0]  REG_127_0;
-  reg  [7:0]  REG_127_1;
-  reg  [7:0]  REG_127_2;
-  reg  [7:0]  REG_127_3;
-  reg  [7:0]  REG_127_4;
+  reg  [5:0]  REG_126_0;
+  reg  [5:0]  REG_126_1;
+  reg  [5:0]  REG_126_2;
+  reg  [5:0]  REG_126_3;
+  reg  [5:0]  REG_126_4;
+  reg  [5:0]  REG_127_0;
+  reg  [5:0]  REG_127_1;
+  reg  [5:0]  REG_127_2;
+  reg  [5:0]  REG_127_3;
+  reg  [5:0]  REG_127_4;
   always @(posedge clock) begin
     if (reset) begin
       REG_0 <= 3'h0;
@@ -2214,16 +2213,16 @@ module LaPDFD(
       REG_1_2 <= 3'h0;
       REG_1_3 <= 3'h0;
       REG_1_4 <= 3'h0;
-      REG_2_0 <= 8'h0;
-      REG_2_1 <= 8'h0;
-      REG_2_2 <= 8'h0;
-      REG_2_3 <= 8'h0;
-      REG_2_4 <= 8'h0;
-      REG_3_0 <= 8'h0;
-      REG_3_1 <= 8'h0;
-      REG_3_2 <= 8'h0;
-      REG_3_3 <= 8'h0;
-      REG_3_4 <= 8'h0;
+      REG_2_0 <= 6'h0;
+      REG_2_1 <= 6'h0;
+      REG_2_2 <= 6'h0;
+      REG_2_3 <= 6'h0;
+      REG_2_4 <= 6'h0;
+      REG_3_0 <= 6'h0;
+      REG_3_1 <= 6'h0;
+      REG_3_2 <= 6'h0;
+      REG_3_3 <= 6'h0;
+      REG_3_4 <= 6'h0;
       REG_4_0 <= 3'h0;
       REG_4_1 <= 3'h0;
       REG_4_2 <= 3'h0;
@@ -2234,16 +2233,16 @@ module LaPDFD(
       REG_5_2 <= 3'h0;
       REG_5_3 <= 3'h0;
       REG_5_4 <= 3'h0;
-      REG_6_0 <= 8'h0;
-      REG_6_1 <= 8'h0;
-      REG_6_2 <= 8'h0;
-      REG_6_3 <= 8'h0;
-      REG_6_4 <= 8'h0;
-      REG_7_0 <= 8'h0;
-      REG_7_1 <= 8'h0;
-      REG_7_2 <= 8'h0;
-      REG_7_3 <= 8'h0;
-      REG_7_4 <= 8'h0;
+      REG_6_0 <= 6'h0;
+      REG_6_1 <= 6'h0;
+      REG_6_2 <= 6'h0;
+      REG_6_3 <= 6'h0;
+      REG_6_4 <= 6'h0;
+      REG_7_0 <= 6'h0;
+      REG_7_1 <= 6'h0;
+      REG_7_2 <= 6'h0;
+      REG_7_3 <= 6'h0;
+      REG_7_4 <= 6'h0;
       REG_8_0 <= 3'h0;
       REG_8_1 <= 3'h0;
       REG_8_2 <= 3'h0;
@@ -2254,16 +2253,16 @@ module LaPDFD(
       REG_9_2 <= 3'h0;
       REG_9_3 <= 3'h0;
       REG_9_4 <= 3'h0;
-      REG_10_0 <= 8'h0;
-      REG_10_1 <= 8'h0;
-      REG_10_2 <= 8'h0;
-      REG_10_3 <= 8'h0;
-      REG_10_4 <= 8'h0;
-      REG_11_0 <= 8'h0;
-      REG_11_1 <= 8'h0;
-      REG_11_2 <= 8'h0;
-      REG_11_3 <= 8'h0;
-      REG_11_4 <= 8'h0;
+      REG_10_0 <= 6'h0;
+      REG_10_1 <= 6'h0;
+      REG_10_2 <= 6'h0;
+      REG_10_3 <= 6'h0;
+      REG_10_4 <= 6'h0;
+      REG_11_0 <= 6'h0;
+      REG_11_1 <= 6'h0;
+      REG_11_2 <= 6'h0;
+      REG_11_3 <= 6'h0;
+      REG_11_4 <= 6'h0;
       REG_12_0 <= 3'h0;
       REG_12_1 <= 3'h0;
       REG_12_2 <= 3'h0;
@@ -2274,16 +2273,16 @@ module LaPDFD(
       REG_13_2 <= 3'h0;
       REG_13_3 <= 3'h0;
       REG_13_4 <= 3'h0;
-      REG_14_0 <= 8'h0;
-      REG_14_1 <= 8'h0;
-      REG_14_2 <= 8'h0;
-      REG_14_3 <= 8'h0;
-      REG_14_4 <= 8'h0;
-      REG_15_0 <= 8'h0;
-      REG_15_1 <= 8'h0;
-      REG_15_2 <= 8'h0;
-      REG_15_3 <= 8'h0;
-      REG_15_4 <= 8'h0;
+      REG_14_0 <= 6'h0;
+      REG_14_1 <= 6'h0;
+      REG_14_2 <= 6'h0;
+      REG_14_3 <= 6'h0;
+      REG_14_4 <= 6'h0;
+      REG_15_0 <= 6'h0;
+      REG_15_1 <= 6'h0;
+      REG_15_2 <= 6'h0;
+      REG_15_3 <= 6'h0;
+      REG_15_4 <= 6'h0;
       REG_16_0 <= 3'h0;
       REG_16_1 <= 3'h0;
       REG_16_2 <= 3'h0;
@@ -2294,16 +2293,16 @@ module LaPDFD(
       REG_17_2 <= 3'h0;
       REG_17_3 <= 3'h0;
       REG_17_4 <= 3'h0;
-      REG_18_0 <= 8'h0;
-      REG_18_1 <= 8'h0;
-      REG_18_2 <= 8'h0;
-      REG_18_3 <= 8'h0;
-      REG_18_4 <= 8'h0;
-      REG_19_0 <= 8'h0;
-      REG_19_1 <= 8'h0;
-      REG_19_2 <= 8'h0;
-      REG_19_3 <= 8'h0;
-      REG_19_4 <= 8'h0;
+      REG_18_0 <= 6'h0;
+      REG_18_1 <= 6'h0;
+      REG_18_2 <= 6'h0;
+      REG_18_3 <= 6'h0;
+      REG_18_4 <= 6'h0;
+      REG_19_0 <= 6'h0;
+      REG_19_1 <= 6'h0;
+      REG_19_2 <= 6'h0;
+      REG_19_3 <= 6'h0;
+      REG_19_4 <= 6'h0;
       REG_20_0 <= 3'h0;
       REG_20_1 <= 3'h0;
       REG_20_2 <= 3'h0;
@@ -2314,16 +2313,16 @@ module LaPDFD(
       REG_21_2 <= 3'h0;
       REG_21_3 <= 3'h0;
       REG_21_4 <= 3'h0;
-      REG_22_0 <= 8'h0;
-      REG_22_1 <= 8'h0;
-      REG_22_2 <= 8'h0;
-      REG_22_3 <= 8'h0;
-      REG_22_4 <= 8'h0;
-      REG_23_0 <= 8'h0;
-      REG_23_1 <= 8'h0;
-      REG_23_2 <= 8'h0;
-      REG_23_3 <= 8'h0;
-      REG_23_4 <= 8'h0;
+      REG_22_0 <= 6'h0;
+      REG_22_1 <= 6'h0;
+      REG_22_2 <= 6'h0;
+      REG_22_3 <= 6'h0;
+      REG_22_4 <= 6'h0;
+      REG_23_0 <= 6'h0;
+      REG_23_1 <= 6'h0;
+      REG_23_2 <= 6'h0;
+      REG_23_3 <= 6'h0;
+      REG_23_4 <= 6'h0;
       REG_24_0 <= 3'h0;
       REG_24_1 <= 3'h0;
       REG_24_2 <= 3'h0;
@@ -2334,16 +2333,16 @@ module LaPDFD(
       REG_25_2 <= 3'h0;
       REG_25_3 <= 3'h0;
       REG_25_4 <= 3'h0;
-      REG_26_0 <= 8'h0;
-      REG_26_1 <= 8'h0;
-      REG_26_2 <= 8'h0;
-      REG_26_3 <= 8'h0;
-      REG_26_4 <= 8'h0;
-      REG_27_0 <= 8'h0;
-      REG_27_1 <= 8'h0;
-      REG_27_2 <= 8'h0;
-      REG_27_3 <= 8'h0;
-      REG_27_4 <= 8'h0;
+      REG_26_0 <= 6'h0;
+      REG_26_1 <= 6'h0;
+      REG_26_2 <= 6'h0;
+      REG_26_3 <= 6'h0;
+      REG_26_4 <= 6'h0;
+      REG_27_0 <= 6'h0;
+      REG_27_1 <= 6'h0;
+      REG_27_2 <= 6'h0;
+      REG_27_3 <= 6'h0;
+      REG_27_4 <= 6'h0;
       REG_28_0 <= 3'h0;
       REG_28_1 <= 3'h0;
       REG_28_2 <= 3'h0;
@@ -2354,16 +2353,16 @@ module LaPDFD(
       REG_29_2 <= 3'h0;
       REG_29_3 <= 3'h0;
       REG_29_4 <= 3'h0;
-      REG_30_0 <= 8'h0;
-      REG_30_1 <= 8'h0;
-      REG_30_2 <= 8'h0;
-      REG_30_3 <= 8'h0;
-      REG_30_4 <= 8'h0;
-      REG_31_0 <= 8'h0;
-      REG_31_1 <= 8'h0;
-      REG_31_2 <= 8'h0;
-      REG_31_3 <= 8'h0;
-      REG_31_4 <= 8'h0;
+      REG_30_0 <= 6'h0;
+      REG_30_1 <= 6'h0;
+      REG_30_2 <= 6'h0;
+      REG_30_3 <= 6'h0;
+      REG_30_4 <= 6'h0;
+      REG_31_0 <= 6'h0;
+      REG_31_1 <= 6'h0;
+      REG_31_2 <= 6'h0;
+      REG_31_3 <= 6'h0;
+      REG_31_4 <= 6'h0;
       REG_32_0 <= 3'h0;
       REG_32_1 <= 3'h0;
       REG_32_2 <= 3'h0;
@@ -2374,16 +2373,16 @@ module LaPDFD(
       REG_33_2 <= 3'h0;
       REG_33_3 <= 3'h0;
       REG_33_4 <= 3'h0;
-      REG_34_0 <= 8'h0;
-      REG_34_1 <= 8'h0;
-      REG_34_2 <= 8'h0;
-      REG_34_3 <= 8'h0;
-      REG_34_4 <= 8'h0;
-      REG_35_0 <= 8'h0;
-      REG_35_1 <= 8'h0;
-      REG_35_2 <= 8'h0;
-      REG_35_3 <= 8'h0;
-      REG_35_4 <= 8'h0;
+      REG_34_0 <= 6'h0;
+      REG_34_1 <= 6'h0;
+      REG_34_2 <= 6'h0;
+      REG_34_3 <= 6'h0;
+      REG_34_4 <= 6'h0;
+      REG_35_0 <= 6'h0;
+      REG_35_1 <= 6'h0;
+      REG_35_2 <= 6'h0;
+      REG_35_3 <= 6'h0;
+      REG_35_4 <= 6'h0;
       REG_36_0 <= 3'h0;
       REG_36_1 <= 3'h0;
       REG_36_2 <= 3'h0;
@@ -2394,16 +2393,16 @@ module LaPDFD(
       REG_37_2 <= 3'h0;
       REG_37_3 <= 3'h0;
       REG_37_4 <= 3'h0;
-      REG_38_0 <= 8'h0;
-      REG_38_1 <= 8'h0;
-      REG_38_2 <= 8'h0;
-      REG_38_3 <= 8'h0;
-      REG_38_4 <= 8'h0;
-      REG_39_0 <= 8'h0;
-      REG_39_1 <= 8'h0;
-      REG_39_2 <= 8'h0;
-      REG_39_3 <= 8'h0;
-      REG_39_4 <= 8'h0;
+      REG_38_0 <= 6'h0;
+      REG_38_1 <= 6'h0;
+      REG_38_2 <= 6'h0;
+      REG_38_3 <= 6'h0;
+      REG_38_4 <= 6'h0;
+      REG_39_0 <= 6'h0;
+      REG_39_1 <= 6'h0;
+      REG_39_2 <= 6'h0;
+      REG_39_3 <= 6'h0;
+      REG_39_4 <= 6'h0;
       REG_40_0 <= 3'h0;
       REG_40_1 <= 3'h0;
       REG_40_2 <= 3'h0;
@@ -2414,16 +2413,16 @@ module LaPDFD(
       REG_41_2 <= 3'h0;
       REG_41_3 <= 3'h0;
       REG_41_4 <= 3'h0;
-      REG_42_0 <= 8'h0;
-      REG_42_1 <= 8'h0;
-      REG_42_2 <= 8'h0;
-      REG_42_3 <= 8'h0;
-      REG_42_4 <= 8'h0;
-      REG_43_0 <= 8'h0;
-      REG_43_1 <= 8'h0;
-      REG_43_2 <= 8'h0;
-      REG_43_3 <= 8'h0;
-      REG_43_4 <= 8'h0;
+      REG_42_0 <= 6'h0;
+      REG_42_1 <= 6'h0;
+      REG_42_2 <= 6'h0;
+      REG_42_3 <= 6'h0;
+      REG_42_4 <= 6'h0;
+      REG_43_0 <= 6'h0;
+      REG_43_1 <= 6'h0;
+      REG_43_2 <= 6'h0;
+      REG_43_3 <= 6'h0;
+      REG_43_4 <= 6'h0;
       REG_44_0 <= 3'h0;
       REG_44_1 <= 3'h0;
       REG_44_2 <= 3'h0;
@@ -2434,16 +2433,16 @@ module LaPDFD(
       REG_45_2 <= 3'h0;
       REG_45_3 <= 3'h0;
       REG_45_4 <= 3'h0;
-      REG_46_0 <= 8'h0;
-      REG_46_1 <= 8'h0;
-      REG_46_2 <= 8'h0;
-      REG_46_3 <= 8'h0;
-      REG_46_4 <= 8'h0;
-      REG_47_0 <= 8'h0;
-      REG_47_1 <= 8'h0;
-      REG_47_2 <= 8'h0;
-      REG_47_3 <= 8'h0;
-      REG_47_4 <= 8'h0;
+      REG_46_0 <= 6'h0;
+      REG_46_1 <= 6'h0;
+      REG_46_2 <= 6'h0;
+      REG_46_3 <= 6'h0;
+      REG_46_4 <= 6'h0;
+      REG_47_0 <= 6'h0;
+      REG_47_1 <= 6'h0;
+      REG_47_2 <= 6'h0;
+      REG_47_3 <= 6'h0;
+      REG_47_4 <= 6'h0;
       REG_48_0 <= 3'h0;
       REG_48_1 <= 3'h0;
       REG_48_2 <= 3'h0;
@@ -2454,16 +2453,16 @@ module LaPDFD(
       REG_49_2 <= 3'h0;
       REG_49_3 <= 3'h0;
       REG_49_4 <= 3'h0;
-      REG_50_0 <= 8'h0;
-      REG_50_1 <= 8'h0;
-      REG_50_2 <= 8'h0;
-      REG_50_3 <= 8'h0;
-      REG_50_4 <= 8'h0;
-      REG_51_0 <= 8'h0;
-      REG_51_1 <= 8'h0;
-      REG_51_2 <= 8'h0;
-      REG_51_3 <= 8'h0;
-      REG_51_4 <= 8'h0;
+      REG_50_0 <= 6'h0;
+      REG_50_1 <= 6'h0;
+      REG_50_2 <= 6'h0;
+      REG_50_3 <= 6'h0;
+      REG_50_4 <= 6'h0;
+      REG_51_0 <= 6'h0;
+      REG_51_1 <= 6'h0;
+      REG_51_2 <= 6'h0;
+      REG_51_3 <= 6'h0;
+      REG_51_4 <= 6'h0;
       REG_52_0 <= 3'h0;
       REG_52_1 <= 3'h0;
       REG_52_2 <= 3'h0;
@@ -2474,16 +2473,16 @@ module LaPDFD(
       REG_53_2 <= 3'h0;
       REG_53_3 <= 3'h0;
       REG_53_4 <= 3'h0;
-      REG_54_0 <= 8'h0;
-      REG_54_1 <= 8'h0;
-      REG_54_2 <= 8'h0;
-      REG_54_3 <= 8'h0;
-      REG_54_4 <= 8'h0;
-      REG_55_0 <= 8'h0;
-      REG_55_1 <= 8'h0;
-      REG_55_2 <= 8'h0;
-      REG_55_3 <= 8'h0;
-      REG_55_4 <= 8'h0;
+      REG_54_0 <= 6'h0;
+      REG_54_1 <= 6'h0;
+      REG_54_2 <= 6'h0;
+      REG_54_3 <= 6'h0;
+      REG_54_4 <= 6'h0;
+      REG_55_0 <= 6'h0;
+      REG_55_1 <= 6'h0;
+      REG_55_2 <= 6'h0;
+      REG_55_3 <= 6'h0;
+      REG_55_4 <= 6'h0;
       REG_56_0 <= 3'h0;
       REG_56_1 <= 3'h0;
       REG_56_2 <= 3'h0;
@@ -2494,16 +2493,16 @@ module LaPDFD(
       REG_57_2 <= 3'h0;
       REG_57_3 <= 3'h0;
       REG_57_4 <= 3'h0;
-      REG_58_0 <= 8'h0;
-      REG_58_1 <= 8'h0;
-      REG_58_2 <= 8'h0;
-      REG_58_3 <= 8'h0;
-      REG_58_4 <= 8'h0;
-      REG_59_0 <= 8'h0;
-      REG_59_1 <= 8'h0;
-      REG_59_2 <= 8'h0;
-      REG_59_3 <= 8'h0;
-      REG_59_4 <= 8'h0;
+      REG_58_0 <= 6'h0;
+      REG_58_1 <= 6'h0;
+      REG_58_2 <= 6'h0;
+      REG_58_3 <= 6'h0;
+      REG_58_4 <= 6'h0;
+      REG_59_0 <= 6'h0;
+      REG_59_1 <= 6'h0;
+      REG_59_2 <= 6'h0;
+      REG_59_3 <= 6'h0;
+      REG_59_4 <= 6'h0;
       REG_60_0 <= 3'h0;
       REG_60_1 <= 3'h0;
       REG_60_2 <= 3'h0;
@@ -2514,16 +2513,16 @@ module LaPDFD(
       REG_61_2 <= 3'h0;
       REG_61_3 <= 3'h0;
       REG_61_4 <= 3'h0;
-      REG_62_0 <= 8'h0;
-      REG_62_1 <= 8'h0;
-      REG_62_2 <= 8'h0;
-      REG_62_3 <= 8'h0;
-      REG_62_4 <= 8'h0;
-      REG_63_0 <= 8'h0;
-      REG_63_1 <= 8'h0;
-      REG_63_2 <= 8'h0;
-      REG_63_3 <= 8'h0;
-      REG_63_4 <= 8'h0;
+      REG_62_0 <= 6'h0;
+      REG_62_1 <= 6'h0;
+      REG_62_2 <= 6'h0;
+      REG_62_3 <= 6'h0;
+      REG_62_4 <= 6'h0;
+      REG_63_0 <= 6'h0;
+      REG_63_1 <= 6'h0;
+      REG_63_2 <= 6'h0;
+      REG_63_3 <= 6'h0;
+      REG_63_4 <= 6'h0;
       REG_64_0 <= 3'h0;
       REG_64_1 <= 3'h0;
       REG_64_2 <= 3'h0;
@@ -2534,16 +2533,16 @@ module LaPDFD(
       REG_65_2 <= 3'h0;
       REG_65_3 <= 3'h0;
       REG_65_4 <= 3'h0;
-      REG_66_0 <= 8'h0;
-      REG_66_1 <= 8'h0;
-      REG_66_2 <= 8'h0;
-      REG_66_3 <= 8'h0;
-      REG_66_4 <= 8'h0;
-      REG_67_0 <= 8'h0;
-      REG_67_1 <= 8'h0;
-      REG_67_2 <= 8'h0;
-      REG_67_3 <= 8'h0;
-      REG_67_4 <= 8'h0;
+      REG_66_0 <= 6'h0;
+      REG_66_1 <= 6'h0;
+      REG_66_2 <= 6'h0;
+      REG_66_3 <= 6'h0;
+      REG_66_4 <= 6'h0;
+      REG_67_0 <= 6'h0;
+      REG_67_1 <= 6'h0;
+      REG_67_2 <= 6'h0;
+      REG_67_3 <= 6'h0;
+      REG_67_4 <= 6'h0;
       REG_68_0 <= 3'h0;
       REG_68_1 <= 3'h0;
       REG_68_2 <= 3'h0;
@@ -2554,16 +2553,16 @@ module LaPDFD(
       REG_69_2 <= 3'h0;
       REG_69_3 <= 3'h0;
       REG_69_4 <= 3'h0;
-      REG_70_0 <= 8'h0;
-      REG_70_1 <= 8'h0;
-      REG_70_2 <= 8'h0;
-      REG_70_3 <= 8'h0;
-      REG_70_4 <= 8'h0;
-      REG_71_0 <= 8'h0;
-      REG_71_1 <= 8'h0;
-      REG_71_2 <= 8'h0;
-      REG_71_3 <= 8'h0;
-      REG_71_4 <= 8'h0;
+      REG_70_0 <= 6'h0;
+      REG_70_1 <= 6'h0;
+      REG_70_2 <= 6'h0;
+      REG_70_3 <= 6'h0;
+      REG_70_4 <= 6'h0;
+      REG_71_0 <= 6'h0;
+      REG_71_1 <= 6'h0;
+      REG_71_2 <= 6'h0;
+      REG_71_3 <= 6'h0;
+      REG_71_4 <= 6'h0;
       REG_72_0 <= 3'h0;
       REG_72_1 <= 3'h0;
       REG_72_2 <= 3'h0;
@@ -2574,16 +2573,16 @@ module LaPDFD(
       REG_73_2 <= 3'h0;
       REG_73_3 <= 3'h0;
       REG_73_4 <= 3'h0;
-      REG_74_0 <= 8'h0;
-      REG_74_1 <= 8'h0;
-      REG_74_2 <= 8'h0;
-      REG_74_3 <= 8'h0;
-      REG_74_4 <= 8'h0;
-      REG_75_0 <= 8'h0;
-      REG_75_1 <= 8'h0;
-      REG_75_2 <= 8'h0;
-      REG_75_3 <= 8'h0;
-      REG_75_4 <= 8'h0;
+      REG_74_0 <= 6'h0;
+      REG_74_1 <= 6'h0;
+      REG_74_2 <= 6'h0;
+      REG_74_3 <= 6'h0;
+      REG_74_4 <= 6'h0;
+      REG_75_0 <= 6'h0;
+      REG_75_1 <= 6'h0;
+      REG_75_2 <= 6'h0;
+      REG_75_3 <= 6'h0;
+      REG_75_4 <= 6'h0;
       REG_76_0 <= 3'h0;
       REG_76_1 <= 3'h0;
       REG_76_2 <= 3'h0;
@@ -2594,16 +2593,16 @@ module LaPDFD(
       REG_77_2 <= 3'h0;
       REG_77_3 <= 3'h0;
       REG_77_4 <= 3'h0;
-      REG_78_0 <= 8'h0;
-      REG_78_1 <= 8'h0;
-      REG_78_2 <= 8'h0;
-      REG_78_3 <= 8'h0;
-      REG_78_4 <= 8'h0;
-      REG_79_0 <= 8'h0;
-      REG_79_1 <= 8'h0;
-      REG_79_2 <= 8'h0;
-      REG_79_3 <= 8'h0;
-      REG_79_4 <= 8'h0;
+      REG_78_0 <= 6'h0;
+      REG_78_1 <= 6'h0;
+      REG_78_2 <= 6'h0;
+      REG_78_3 <= 6'h0;
+      REG_78_4 <= 6'h0;
+      REG_79_0 <= 6'h0;
+      REG_79_1 <= 6'h0;
+      REG_79_2 <= 6'h0;
+      REG_79_3 <= 6'h0;
+      REG_79_4 <= 6'h0;
       REG_80_0 <= 3'h0;
       REG_80_1 <= 3'h0;
       REG_80_2 <= 3'h0;
@@ -2614,16 +2613,16 @@ module LaPDFD(
       REG_81_2 <= 3'h0;
       REG_81_3 <= 3'h0;
       REG_81_4 <= 3'h0;
-      REG_82_0 <= 8'h0;
-      REG_82_1 <= 8'h0;
-      REG_82_2 <= 8'h0;
-      REG_82_3 <= 8'h0;
-      REG_82_4 <= 8'h0;
-      REG_83_0 <= 8'h0;
-      REG_83_1 <= 8'h0;
-      REG_83_2 <= 8'h0;
-      REG_83_3 <= 8'h0;
-      REG_83_4 <= 8'h0;
+      REG_82_0 <= 6'h0;
+      REG_82_1 <= 6'h0;
+      REG_82_2 <= 6'h0;
+      REG_82_3 <= 6'h0;
+      REG_82_4 <= 6'h0;
+      REG_83_0 <= 6'h0;
+      REG_83_1 <= 6'h0;
+      REG_83_2 <= 6'h0;
+      REG_83_3 <= 6'h0;
+      REG_83_4 <= 6'h0;
       REG_84_0 <= 3'h0;
       REG_84_1 <= 3'h0;
       REG_84_2 <= 3'h0;
@@ -2634,16 +2633,16 @@ module LaPDFD(
       REG_85_2 <= 3'h0;
       REG_85_3 <= 3'h0;
       REG_85_4 <= 3'h0;
-      REG_86_0 <= 8'h0;
-      REG_86_1 <= 8'h0;
-      REG_86_2 <= 8'h0;
-      REG_86_3 <= 8'h0;
-      REG_86_4 <= 8'h0;
-      REG_87_0 <= 8'h0;
-      REG_87_1 <= 8'h0;
-      REG_87_2 <= 8'h0;
-      REG_87_3 <= 8'h0;
-      REG_87_4 <= 8'h0;
+      REG_86_0 <= 6'h0;
+      REG_86_1 <= 6'h0;
+      REG_86_2 <= 6'h0;
+      REG_86_3 <= 6'h0;
+      REG_86_4 <= 6'h0;
+      REG_87_0 <= 6'h0;
+      REG_87_1 <= 6'h0;
+      REG_87_2 <= 6'h0;
+      REG_87_3 <= 6'h0;
+      REG_87_4 <= 6'h0;
       REG_88_0 <= 3'h0;
       REG_88_1 <= 3'h0;
       REG_88_2 <= 3'h0;
@@ -2654,16 +2653,16 @@ module LaPDFD(
       REG_89_2 <= 3'h0;
       REG_89_3 <= 3'h0;
       REG_89_4 <= 3'h0;
-      REG_90_0 <= 8'h0;
-      REG_90_1 <= 8'h0;
-      REG_90_2 <= 8'h0;
-      REG_90_3 <= 8'h0;
-      REG_90_4 <= 8'h0;
-      REG_91_0 <= 8'h0;
-      REG_91_1 <= 8'h0;
-      REG_91_2 <= 8'h0;
-      REG_91_3 <= 8'h0;
-      REG_91_4 <= 8'h0;
+      REG_90_0 <= 6'h0;
+      REG_90_1 <= 6'h0;
+      REG_90_2 <= 6'h0;
+      REG_90_3 <= 6'h0;
+      REG_90_4 <= 6'h0;
+      REG_91_0 <= 6'h0;
+      REG_91_1 <= 6'h0;
+      REG_91_2 <= 6'h0;
+      REG_91_3 <= 6'h0;
+      REG_91_4 <= 6'h0;
       REG_92_0 <= 3'h0;
       REG_92_1 <= 3'h0;
       REG_92_2 <= 3'h0;
@@ -2674,16 +2673,16 @@ module LaPDFD(
       REG_93_2 <= 3'h0;
       REG_93_3 <= 3'h0;
       REG_93_4 <= 3'h0;
-      REG_94_0 <= 8'h0;
-      REG_94_1 <= 8'h0;
-      REG_94_2 <= 8'h0;
-      REG_94_3 <= 8'h0;
-      REG_94_4 <= 8'h0;
-      REG_95_0 <= 8'h0;
-      REG_95_1 <= 8'h0;
-      REG_95_2 <= 8'h0;
-      REG_95_3 <= 8'h0;
-      REG_95_4 <= 8'h0;
+      REG_94_0 <= 6'h0;
+      REG_94_1 <= 6'h0;
+      REG_94_2 <= 6'h0;
+      REG_94_3 <= 6'h0;
+      REG_94_4 <= 6'h0;
+      REG_95_0 <= 6'h0;
+      REG_95_1 <= 6'h0;
+      REG_95_2 <= 6'h0;
+      REG_95_3 <= 6'h0;
+      REG_95_4 <= 6'h0;
       REG_96_0 <= 3'h0;
       REG_96_1 <= 3'h0;
       REG_96_2 <= 3'h0;
@@ -2694,16 +2693,16 @@ module LaPDFD(
       REG_97_2 <= 3'h0;
       REG_97_3 <= 3'h0;
       REG_97_4 <= 3'h0;
-      REG_98_0 <= 8'h0;
-      REG_98_1 <= 8'h0;
-      REG_98_2 <= 8'h0;
-      REG_98_3 <= 8'h0;
-      REG_98_4 <= 8'h0;
-      REG_99_0 <= 8'h0;
-      REG_99_1 <= 8'h0;
-      REG_99_2 <= 8'h0;
-      REG_99_3 <= 8'h0;
-      REG_99_4 <= 8'h0;
+      REG_98_0 <= 6'h0;
+      REG_98_1 <= 6'h0;
+      REG_98_2 <= 6'h0;
+      REG_98_3 <= 6'h0;
+      REG_98_4 <= 6'h0;
+      REG_99_0 <= 6'h0;
+      REG_99_1 <= 6'h0;
+      REG_99_2 <= 6'h0;
+      REG_99_3 <= 6'h0;
+      REG_99_4 <= 6'h0;
       REG_100_0 <= 3'h0;
       REG_100_1 <= 3'h0;
       REG_100_2 <= 3'h0;
@@ -2714,16 +2713,16 @@ module LaPDFD(
       REG_101_2 <= 3'h0;
       REG_101_3 <= 3'h0;
       REG_101_4 <= 3'h0;
-      REG_102_0 <= 8'h0;
-      REG_102_1 <= 8'h0;
-      REG_102_2 <= 8'h0;
-      REG_102_3 <= 8'h0;
-      REG_102_4 <= 8'h0;
-      REG_103_0 <= 8'h0;
-      REG_103_1 <= 8'h0;
-      REG_103_2 <= 8'h0;
-      REG_103_3 <= 8'h0;
-      REG_103_4 <= 8'h0;
+      REG_102_0 <= 6'h0;
+      REG_102_1 <= 6'h0;
+      REG_102_2 <= 6'h0;
+      REG_102_3 <= 6'h0;
+      REG_102_4 <= 6'h0;
+      REG_103_0 <= 6'h0;
+      REG_103_1 <= 6'h0;
+      REG_103_2 <= 6'h0;
+      REG_103_3 <= 6'h0;
+      REG_103_4 <= 6'h0;
       REG_104_0 <= 3'h0;
       REG_104_1 <= 3'h0;
       REG_104_2 <= 3'h0;
@@ -2734,16 +2733,16 @@ module LaPDFD(
       REG_105_2 <= 3'h0;
       REG_105_3 <= 3'h0;
       REG_105_4 <= 3'h0;
-      REG_106_0 <= 8'h0;
-      REG_106_1 <= 8'h0;
-      REG_106_2 <= 8'h0;
-      REG_106_3 <= 8'h0;
-      REG_106_4 <= 8'h0;
-      REG_107_0 <= 8'h0;
-      REG_107_1 <= 8'h0;
-      REG_107_2 <= 8'h0;
-      REG_107_3 <= 8'h0;
-      REG_107_4 <= 8'h0;
+      REG_106_0 <= 6'h0;
+      REG_106_1 <= 6'h0;
+      REG_106_2 <= 6'h0;
+      REG_106_3 <= 6'h0;
+      REG_106_4 <= 6'h0;
+      REG_107_0 <= 6'h0;
+      REG_107_1 <= 6'h0;
+      REG_107_2 <= 6'h0;
+      REG_107_3 <= 6'h0;
+      REG_107_4 <= 6'h0;
       REG_108_0 <= 3'h0;
       REG_108_1 <= 3'h0;
       REG_108_2 <= 3'h0;
@@ -2754,16 +2753,16 @@ module LaPDFD(
       REG_109_2 <= 3'h0;
       REG_109_3 <= 3'h0;
       REG_109_4 <= 3'h0;
-      REG_110_0 <= 8'h0;
-      REG_110_1 <= 8'h0;
-      REG_110_2 <= 8'h0;
-      REG_110_3 <= 8'h0;
-      REG_110_4 <= 8'h0;
-      REG_111_0 <= 8'h0;
-      REG_111_1 <= 8'h0;
-      REG_111_2 <= 8'h0;
-      REG_111_3 <= 8'h0;
-      REG_111_4 <= 8'h0;
+      REG_110_0 <= 6'h0;
+      REG_110_1 <= 6'h0;
+      REG_110_2 <= 6'h0;
+      REG_110_3 <= 6'h0;
+      REG_110_4 <= 6'h0;
+      REG_111_0 <= 6'h0;
+      REG_111_1 <= 6'h0;
+      REG_111_2 <= 6'h0;
+      REG_111_3 <= 6'h0;
+      REG_111_4 <= 6'h0;
       REG_112_0 <= 3'h0;
       REG_112_1 <= 3'h0;
       REG_112_2 <= 3'h0;
@@ -2774,16 +2773,16 @@ module LaPDFD(
       REG_113_2 <= 3'h0;
       REG_113_3 <= 3'h0;
       REG_113_4 <= 3'h0;
-      REG_114_0 <= 8'h0;
-      REG_114_1 <= 8'h0;
-      REG_114_2 <= 8'h0;
-      REG_114_3 <= 8'h0;
-      REG_114_4 <= 8'h0;
-      REG_115_0 <= 8'h0;
-      REG_115_1 <= 8'h0;
-      REG_115_2 <= 8'h0;
-      REG_115_3 <= 8'h0;
-      REG_115_4 <= 8'h0;
+      REG_114_0 <= 6'h0;
+      REG_114_1 <= 6'h0;
+      REG_114_2 <= 6'h0;
+      REG_114_3 <= 6'h0;
+      REG_114_4 <= 6'h0;
+      REG_115_0 <= 6'h0;
+      REG_115_1 <= 6'h0;
+      REG_115_2 <= 6'h0;
+      REG_115_3 <= 6'h0;
+      REG_115_4 <= 6'h0;
       REG_116_0 <= 3'h0;
       REG_116_1 <= 3'h0;
       REG_116_2 <= 3'h0;
@@ -2794,16 +2793,16 @@ module LaPDFD(
       REG_117_2 <= 3'h0;
       REG_117_3 <= 3'h0;
       REG_117_4 <= 3'h0;
-      REG_118_0 <= 8'h0;
-      REG_118_1 <= 8'h0;
-      REG_118_2 <= 8'h0;
-      REG_118_3 <= 8'h0;
-      REG_118_4 <= 8'h0;
-      REG_119_0 <= 8'h0;
-      REG_119_1 <= 8'h0;
-      REG_119_2 <= 8'h0;
-      REG_119_3 <= 8'h0;
-      REG_119_4 <= 8'h0;
+      REG_118_0 <= 6'h0;
+      REG_118_1 <= 6'h0;
+      REG_118_2 <= 6'h0;
+      REG_118_3 <= 6'h0;
+      REG_118_4 <= 6'h0;
+      REG_119_0 <= 6'h0;
+      REG_119_1 <= 6'h0;
+      REG_119_2 <= 6'h0;
+      REG_119_3 <= 6'h0;
+      REG_119_4 <= 6'h0;
       REG_120_0 <= 3'h0;
       REG_120_1 <= 3'h0;
       REG_120_2 <= 3'h0;
@@ -2814,16 +2813,16 @@ module LaPDFD(
       REG_121_2 <= 3'h0;
       REG_121_3 <= 3'h0;
       REG_121_4 <= 3'h0;
-      REG_122_0 <= 8'h0;
-      REG_122_1 <= 8'h0;
-      REG_122_2 <= 8'h0;
-      REG_122_3 <= 8'h0;
-      REG_122_4 <= 8'h0;
-      REG_123_0 <= 8'h0;
-      REG_123_1 <= 8'h0;
-      REG_123_2 <= 8'h0;
-      REG_123_3 <= 8'h0;
-      REG_123_4 <= 8'h0;
+      REG_122_0 <= 6'h0;
+      REG_122_1 <= 6'h0;
+      REG_122_2 <= 6'h0;
+      REG_122_3 <= 6'h0;
+      REG_122_4 <= 6'h0;
+      REG_123_0 <= 6'h0;
+      REG_123_1 <= 6'h0;
+      REG_123_2 <= 6'h0;
+      REG_123_3 <= 6'h0;
+      REG_123_4 <= 6'h0;
       REG_124_0 <= 3'h0;
       REG_124_1 <= 3'h0;
       REG_124_2 <= 3'h0;
@@ -2834,16 +2833,16 @@ module LaPDFD(
       REG_125_2 <= 3'h0;
       REG_125_3 <= 3'h0;
       REG_125_4 <= 3'h0;
-      REG_126_0 <= 8'h0;
-      REG_126_1 <= 8'h0;
-      REG_126_2 <= 8'h0;
-      REG_126_3 <= 8'h0;
-      REG_126_4 <= 8'h0;
-      REG_127_0 <= 8'h0;
-      REG_127_1 <= 8'h0;
-      REG_127_2 <= 8'h0;
-      REG_127_3 <= 8'h0;
-      REG_127_4 <= 8'h0;
+      REG_126_0 <= 6'h0;
+      REG_126_1 <= 6'h0;
+      REG_126_2 <= 6'h0;
+      REG_126_3 <= 6'h0;
+      REG_126_4 <= 6'h0;
+      REG_127_0 <= 6'h0;
+      REG_127_1 <= 6'h0;
+      REG_127_2 <= 6'h0;
+      REG_127_3 <= 6'h0;
+      REG_127_4 <= 6'h0;
     end
     else begin
       REG_0 <= _laBmu_0_io_symsA_0;
