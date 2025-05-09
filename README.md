@@ -6,7 +6,7 @@ This project implements a Decision Feedback Equalizer (DFE) and trellis decoder 
 # Implementation Details
 Our design consists of several smaller functional blocks, as shown in the block diagram below (connections shown for state 0).
 
-![alt text](/figures/full_diagram.png "Block diagram showing small blocks labeled DFP, 1D-LaBMU, MUXU, 4D-BMU, ACSU, and SMU connected with arrows and flip-flops.")
+![alt text](/figures/full_diagram.jpg "Block diagram showing small blocks labeled DFP, 1D-LaBMU, MUXU, 4D-BMU, ACSU, and SMU connected with arrows and flip-flops.")
 
 - **DFP**: The primary function of the decision-feedback prefilter (DFP) is to cancel most of the post-cursor ISI, reducing the residual ISI to a single tap for processing in subsequent blocks. 
 - **1D-LaBMU**: The primary function of the 1D lookahead branch metric unit (1D-LaBMU) is to cancel the remaining post-cursor ISI and compute the distance to the closest A or B symbol set in a lookahead fashion. This results in five type-A symMetrics and five type-B symMetrics.
