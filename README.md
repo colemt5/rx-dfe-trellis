@@ -4,7 +4,7 @@ This project implements a Decision Feedback Equalizer (DFE) and trellis decoder 
 ![alt text](/figures/integration.png "Block diagram showing the combination DFE/trellis decoder block between the FFE and PCS blocks. The DFE/trellis decoder takes in inputs from the FFE and NEXT/Echo blocks and outputs decoded symbols to the PCS.")
 
 # Implementation Details
-Our design consists of several smaller functional blocks, as shown in the block diagram below.
+Our design consists of several smaller functional blocks, as shown in the block diagram below (connections shown for state 0).
 
 ![alt text](/figures/full_diagram.png "Block diagram showing small blocks labeled DFP, 1D-LaBMU, MUXU, 4D-BMU, ACSU, and SMU connected with arrows and flip-flops.")
 
