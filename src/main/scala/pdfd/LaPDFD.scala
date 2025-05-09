@@ -16,7 +16,7 @@ import pdfd.Utils._
   *  - 1 rx valid signal
   */
 
-class LaPDFD(level: Int = 52, tapScale: Int = 128, tapWidth: Int = 8, sampleWidth: Int = 8)
+class LaPDFD(level: Int = 33, tapScale: Int = 128, tapWidth: Int = 8, sampleWidth: Int = 8)
     extends Module {
   
   // require that tapWidth is large enough to hold scaled tap values

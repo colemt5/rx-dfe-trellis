@@ -99,14 +99,16 @@ module DFP(
       filtSample <=
         {{3{io_rxSample[7]}}, io_rxSample, 7'h0} + feedbackPath_11
         + {{2{_filtSample_T_3[15]}}, _filtSample_T_3};
-      if ($signed(_decSample_T_4[17:7]) > 11'sh30)
-        softSym <= 8'h40;
+      if ($signed(_decSample_T_4[17:7]) > 11'sh31)
+        softSym <= 8'h42;
       else if ($signed(_decSample_T_4[17:7]) > 11'sh10)
-        softSym <= 8'h20;
+        softSym <= 8'h21;
       else if ($signed(_decSample_T_4[17:7]) > -11'sh10)
         softSym <= 8'h0;
+      else if ($signed(_decSample_T_4[17:7]) > -11'sh31)
+        softSym <= 8'hDF;
       else
-        softSym <= {2'h3, $signed(_decSample_T_4[17:7]) > -11'sh30, 5'h0};
+        softSym <= 8'hBE;
       feedbackPath_0 <= {{2{_feedbackPath_0_T_3[15]}}, _feedbackPath_0_T_3};
       feedbackPath_1 <=
         feedbackPath_0 + {{2{_feedbackPath_1_T_3[15]}}, _feedbackPath_1_T_3};
@@ -161,59 +163,59 @@ module OneDimLaBMU(
 );
 
   wire [14:0] _GEN = {{7{io_tapOne[7]}}, io_tapOne};
-  wire [14:0] _estSym_0_T_1 = io_rxFilter - _GEN * 15'h7FC0;
-  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
+  wire [14:0] _estSym_0_T_1 = io_rxFilter - _GEN * 15'h7FBE;
+  wire [7:0]  closeA_0_result = $signed(_estSym_0_T_1[14:7]) > 8'sh0 ? 8'h21 : 8'hDF;
   wire [7:0]  closeB_0_result =
-    $signed(_estSym_0_T_1[14:7]) > 8'sh20
-      ? 8'h40
-      : $signed(_estSym_0_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
+    $signed(_estSym_0_T_1[14:7]) > 8'sh21
+      ? 8'h42
+      : $signed(_estSym_0_T_1[14:7]) > -8'sh21 ? 8'h0 : 8'hBE;
   wire [7:0]  _diffA_0_T = _estSym_0_T_1[14:7] - closeA_0_result;
   wire [7:0]  _diffB_0_T = _estSym_0_T_1[14:7] - closeB_0_result;
   wire [15:0] _GEN_0 = {{8{_diffA_0_T[7]}}, _diffA_0_T};
   wire [15:0] io_symMetricsA_0_fullSquare = _GEN_0 * _GEN_0;
   wire [15:0] _GEN_1 = {{8{_diffB_0_T[7]}}, _diffB_0_T};
   wire [15:0] io_symMetricsB_0_fullSquare = _GEN_1 * _GEN_1;
-  wire [14:0] _estSym_1_T_1 = io_rxFilter - _GEN * 15'h7FE0;
-  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
+  wire [14:0] _estSym_1_T_1 = io_rxFilter - _GEN * 15'h7FDF;
+  wire [7:0]  closeA_1_result = $signed(_estSym_1_T_1[14:7]) > 8'sh0 ? 8'h21 : 8'hDF;
   wire [7:0]  closeB_1_result =
-    $signed(_estSym_1_T_1[14:7]) > 8'sh20
-      ? 8'h40
-      : $signed(_estSym_1_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
+    $signed(_estSym_1_T_1[14:7]) > 8'sh21
+      ? 8'h42
+      : $signed(_estSym_1_T_1[14:7]) > -8'sh21 ? 8'h0 : 8'hBE;
   wire [7:0]  _diffA_1_T = _estSym_1_T_1[14:7] - closeA_1_result;
   wire [7:0]  _diffB_1_T = _estSym_1_T_1[14:7] - closeB_1_result;
   wire [15:0] _GEN_2 = {{8{_diffA_1_T[7]}}, _diffA_1_T};
   wire [15:0] io_symMetricsA_1_fullSquare = _GEN_2 * _GEN_2;
   wire [15:0] _GEN_3 = {{8{_diffB_1_T[7]}}, _diffB_1_T};
   wire [15:0] io_symMetricsB_1_fullSquare = _GEN_3 * _GEN_3;
-  wire [7:0]  closeA_2_result = $signed(io_rxFilter[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
+  wire [7:0]  closeA_2_result = $signed(io_rxFilter[14:7]) > 8'sh0 ? 8'h21 : 8'hDF;
   wire [7:0]  closeB_2_result =
-    $signed(io_rxFilter[14:7]) > 8'sh20
-      ? 8'h40
-      : $signed(io_rxFilter[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
+    $signed(io_rxFilter[14:7]) > 8'sh21
+      ? 8'h42
+      : $signed(io_rxFilter[14:7]) > -8'sh21 ? 8'h0 : 8'hBE;
   wire [7:0]  _diffA_2_T = io_rxFilter[14:7] - closeA_2_result;
   wire [7:0]  _diffB_2_T = io_rxFilter[14:7] - closeB_2_result;
   wire [15:0] _GEN_4 = {{8{_diffA_2_T[7]}}, _diffA_2_T};
   wire [15:0] io_symMetricsA_2_fullSquare = _GEN_4 * _GEN_4;
   wire [15:0] _GEN_5 = {{8{_diffB_2_T[7]}}, _diffB_2_T};
   wire [15:0] io_symMetricsB_2_fullSquare = _GEN_5 * _GEN_5;
-  wire [14:0] _estSym_3_T_1 = io_rxFilter - {{2{io_tapOne[7]}}, io_tapOne, 5'h0};
-  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
+  wire [14:0] _estSym_3_T_1 = io_rxFilter - _GEN * 15'h21;
+  wire [7:0]  closeA_3_result = $signed(_estSym_3_T_1[14:7]) > 8'sh0 ? 8'h21 : 8'hDF;
   wire [7:0]  closeB_3_result =
-    $signed(_estSym_3_T_1[14:7]) > 8'sh20
-      ? 8'h40
-      : $signed(_estSym_3_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
+    $signed(_estSym_3_T_1[14:7]) > 8'sh21
+      ? 8'h42
+      : $signed(_estSym_3_T_1[14:7]) > -8'sh21 ? 8'h0 : 8'hBE;
   wire [7:0]  _diffA_3_T = _estSym_3_T_1[14:7] - closeA_3_result;
   wire [7:0]  _diffB_3_T = _estSym_3_T_1[14:7] - closeB_3_result;
   wire [15:0] _GEN_6 = {{8{_diffA_3_T[7]}}, _diffA_3_T};
   wire [15:0] io_symMetricsA_3_fullSquare = _GEN_6 * _GEN_6;
   wire [15:0] _GEN_7 = {{8{_diffB_3_T[7]}}, _diffB_3_T};
   wire [15:0] io_symMetricsB_3_fullSquare = _GEN_7 * _GEN_7;
-  wire [14:0] _estSym_4_T_1 = io_rxFilter - {io_tapOne[7], io_tapOne, 6'h0};
-  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_1[14:7]) > 8'sh0 ? 8'h20 : 8'hE0;
+  wire [14:0] _estSym_4_T_1 = io_rxFilter - _GEN * 15'h42;
+  wire [7:0]  closeA_4_result = $signed(_estSym_4_T_1[14:7]) > 8'sh0 ? 8'h21 : 8'hDF;
   wire [7:0]  closeB_4_result =
-    $signed(_estSym_4_T_1[14:7]) > 8'sh20
-      ? 8'h40
-      : $signed(_estSym_4_T_1[14:7]) > -8'sh20 ? 8'h0 : 8'hC0;
+    $signed(_estSym_4_T_1[14:7]) > 8'sh21
+      ? 8'h42
+      : $signed(_estSym_4_T_1[14:7]) > -8'sh21 ? 8'h0 : 8'hBE;
   wire [7:0]  _diffA_4_T = _estSym_4_T_1[14:7] - closeA_4_result;
   wire [7:0]  _diffB_4_T = _estSym_4_T_1[14:7] - closeB_4_result;
   wire [15:0] _GEN_8 = {{8{_diffA_4_T[7]}}, _diffA_4_T};
@@ -240,21 +242,21 @@ module OneDimLaBMU(
     (|(io_symMetricsB_3_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_3_fullSquare[5:0];
   assign io_symMetricsB_4 =
     (|(io_symMetricsB_4_fullSquare[15:6])) ? 6'h3F : io_symMetricsB_4_fullSquare[5:0];
-  assign io_symsA_0 = {{2{&(closeA_0_result[7:6])}}, 1'h1};
-  assign io_symsA_1 = {{2{&(closeA_1_result[7:6])}}, 1'h1};
-  assign io_symsA_2 = {{2{&(closeA_2_result[7:6])}}, 1'h1};
-  assign io_symsA_3 = {{2{&(closeA_3_result[7:6])}}, 1'h1};
-  assign io_symsA_4 = {{2{&(closeA_4_result[7:6])}}, 1'h1};
+  assign io_symsA_0 = {{2{closeA_0_result[7:1] == 7'h6F}}, 1'h1};
+  assign io_symsA_1 = {{2{closeA_1_result[7:1] == 7'h6F}}, 1'h1};
+  assign io_symsA_2 = {{2{closeA_2_result[7:1] == 7'h6F}}, 1'h1};
+  assign io_symsA_3 = {{2{closeA_3_result[7:1] == 7'h6F}}, 1'h1};
+  assign io_symsA_4 = {{2{closeA_4_result[7:1] == 7'h6F}}, 1'h1};
   assign io_symsB_0 =
-    (&(closeB_0_result[7:6])) ? 3'h6 : {1'h0, closeB_0_result[7:6] == 2'h1, 1'h0};
+    closeB_0_result[7:1] == 7'h5F ? 3'h6 : {1'h0, closeB_0_result[7:1] == 7'h21, 1'h0};
   assign io_symsB_1 =
-    (&(closeB_1_result[7:6])) ? 3'h6 : {1'h0, closeB_1_result[7:6] == 2'h1, 1'h0};
+    closeB_1_result[7:1] == 7'h5F ? 3'h6 : {1'h0, closeB_1_result[7:1] == 7'h21, 1'h0};
   assign io_symsB_2 =
-    (&(closeB_2_result[7:6])) ? 3'h6 : {1'h0, closeB_2_result[7:6] == 2'h1, 1'h0};
+    closeB_2_result[7:1] == 7'h5F ? 3'h6 : {1'h0, closeB_2_result[7:1] == 7'h21, 1'h0};
   assign io_symsB_3 =
-    (&(closeB_3_result[7:6])) ? 3'h6 : {1'h0, closeB_3_result[7:6] == 2'h1, 1'h0};
+    closeB_3_result[7:1] == 7'h5F ? 3'h6 : {1'h0, closeB_3_result[7:1] == 7'h21, 1'h0};
   assign io_symsB_4 =
-    (&(closeB_4_result[7:6])) ? 3'h6 : {1'h0, closeB_4_result[7:6] == 2'h1, 1'h0};
+    closeB_4_result[7:1] == 7'h5F ? 3'h6 : {1'h0, closeB_4_result[7:1] == 7'h21, 1'h0};
 endmodule
 
 module SymMux(
